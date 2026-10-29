@@ -439,3 +439,8 @@ La base de Vite es `/hotline-curico/`. El workflow publica `dist` desde `main` d
 En GitHub, seleccionar **Settings → Pages → Build and deployment → Source → GitHub Actions**.
 El progreso local de localhost no se transfiere automáticamente al dominio de Pages.
 
+
+## Descripción original del repositorio
+
+# hotline-curico
+Hotline Curicó — Top-down pixel art roguelite shooter by Project507.
