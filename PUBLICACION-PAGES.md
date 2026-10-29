@@ -25,7 +25,7 @@ Se añadió `package-lock.json`, conservando las versiones principales instalada
 
 ## Antes del primer push
 
-El inventario local `PUBLICACION-ARCHIVOS.txt` enumera las rutas exactas preparadas para subir; ese inventario no se publica. El usuario debe autorizar el primer push después de revisarlo. No se ha subido ningún archivo durante la preparación y no se ha ejecutado el workflow remoto.
+El inventario local `PUBLICACION-ARCHIVOS.txt` enumera las rutas exactas preparadas para subir; ese inventario no se publica. El usuario autorizó el primer push. Se subieron los archivos y se conservó el commit inicial remoto mediante una integración sin forzar el historial.
 
 Si Git pide autenticación, usar el inicio de sesión del navegador de Git Credential Manager, GitHub CLI o un método seguro equivalente. No copiar contraseñas ni tokens en los archivos del proyecto. No usar `push --force`.
 
@@ -38,7 +38,7 @@ Después del push autorizado:
 3. En **Actions → Publish Hotline Curicó to Pages**, comprobar la ejecución asociada al commit. Si es necesario, pulsar **Run workflow** y elegir `main`.
 4. Confirmar que los trabajos `build` y `deploy` finalizan correctamente y comprobar la URL publicada, sus recursos y la entrada al juego antes de declarar terminado el despliegue.
 
-Dirección esperada, todavía no confirmada como publicación de esta versión: https://jordante507.github.io/hotline-curico/
+Dirección publicada y comprobada (HTTP 200): https://jordante507.github.io/hotline-curico/
 
 ## Android y guardado
 
@@ -47,3 +47,13 @@ Una vez confirmado el despliegue, abrir el enlace HTTPS en Chrome de Android, ac
 Los controles táctiles, sticks, botones, menús y HUD adaptables forman parte del paquete. La comodidad, el rendimiento sostenido, el teclado virtual, las áreas seguras, el audio y los permisos deben probarse en un teléfono real.
 
 Monedas, mejoras y logros siguen usando el almacenamiento local existente. **El progreso de localhost no se transfiere automáticamente a GitHub Pages**: cada origen y navegador conserva sus propios datos. No se borró el progreso existente ni se añadió sincronización.
+
+## Publicación confirmada — 29 de octubre de 2026
+
+- Commit del juego: f39a979; integración del README e historial remoto: 2d02f24.
+- Push a origin/main completado y rama sincronizada.
+- GitHub Pages activado con build_type workflow.
+- Ejecución https://github.com/JorDanTe507/hotline-curico/actions/runs/40823932089: success, intento 2. El primer despliegue falló porque Pages no estaba habilitado; después de activarlo se reejecutó correctamente.
+- npm ci, npm test y npm run build aprobados en el runner de GitHub.
+- URL pública HTTP 200. check-mobile151-production.cjs aprobado contra el dominio publicado: selección oficial, introducción, ruleta, controles, HUD y pausa sin errores HTTP o JavaScript.
+- No se ha probado en un teléfono físico. No se modificaron mecánicas ni se borró almacenamiento local.
