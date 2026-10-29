@@ -1,0 +1,23 @@
+{
+  "cervela": {
+    "officialSource": "D:/Descargas/Imagen de ChatGPT 27 oct 2026, 05_40_37 a.m.png",
+    "sourceSha256": "4a43ca5b08578d5eff8c015ca26166e03b7d98159f72df68c0140e092aabdf98",
+    "copiedSha256": "4a43ca5b08578d5eff8c015ca26166e03b7d98159f72df68c0140e092aabdf98",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaMask": null
+  },
+  "nicolas": {
+    "officialSource": "D:/Descargas/Joven de neón con pistola.png",
+    "sourceSha256": "0af7760c07eda4ce55fcd2d51a9342dd188718613b2840dee83c7d4718bdaf24",
+    "copiedSha256": "0af7760c07eda4ce55fcd2d51a9342dd188718613b2840dee83c7d4718bdaf24",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaMask": "nicolas-alpha.png"
+  },
+  "composition": "Official source RGB retained. Nicolas uses imagegen-prepared alpha only; Cervela retains original RGBA."
+}

@@ -1,0 +1,1 @@
+Original procedurally synthesized sound effects created for Hotline Curico. CC0 1.0 Universal: free to use, modify and distribute, including commercially. No third-party recordings. Source: tools/generate_audio.py.

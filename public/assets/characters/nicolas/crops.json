@@ -1,0 +1,612 @@
+{
+  "sources": {
+    "clean": [
+      1312,
+      1199
+    ],
+    "normal": [
+      1536,
+      1024
+    ],
+    "wounded": [
+      1536,
+      1024
+    ]
+  },
+  "sprites": {
+    "normal-idle-0": {
+      "source": "clean",
+      "box": [
+        337,
+        53,
+        405,
+        181
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-back-0": {
+      "source": "clean",
+      "box": [
+        421,
+        53,
+        491,
+        181
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-walk-0": {
+      "source": "clean",
+      "box": [
+        781,
+        53,
+        855,
+        184
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-walk-1": {
+      "source": "clean",
+      "box": [
+        863,
+        53,
+        937,
+        184
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-run-0": {
+      "source": "normal",
+      "box": [
+        1020,
+        68,
+        1080,
+        165
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-run-1": {
+      "source": "normal",
+      "box": [
+        1082,
+        68,
+        1142,
+        165
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-pistol-0": {
+      "source": "clean",
+      "box": [
+        399,
+        231,
+        471,
+        347
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-pistol-1": {
+      "source": "clean",
+      "box": [
+        519,
+        231,
+        591,
+        347
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-heavy-0": {
+      "source": "clean",
+      "box": [
+        394,
+        395,
+        477,
+        517
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-heavy-1": {
+      "source": "clean",
+      "box": [
+        488,
+        395,
+        574,
+        517
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-melee-0": {
+      "source": "clean",
+      "box": [
+        399,
+        553,
+        474,
+        686
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-melee-1": {
+      "source": "clean",
+      "box": [
+        741,
+        553,
+        846,
+        686
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-reload-0": {
+      "source": "clean",
+      "box": [
+        337,
+        53,
+        405,
+        181
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-hurt-0": {
+      "source": "clean",
+      "box": [
+        405,
+        730,
+        474,
+        833
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-hurt-1": {
+      "source": "clean",
+      "box": [
+        529,
+        730,
+        605,
+        833
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-hurt-2": {
+      "source": "clean",
+      "box": [
+        651,
+        730,
+        731,
+        833
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-dead-0": {
+      "source": "clean",
+      "box": [
+        535,
+        865,
+        659,
+        957
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-dead-1": {
+      "source": "clean",
+      "box": [
+        669,
+        865,
+        824,
+        957
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-dead-2": {
+      "source": "clean",
+      "box": [
+        839,
+        865,
+        1027,
+        957
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "normal-dead-3": {
+      "source": "clean",
+      "box": [
+        1043,
+        865,
+        1277,
+        957
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-idle-0": {
+      "source": "wounded",
+      "box": [
+        260,
+        76,
+        312,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-back-0": {
+      "source": "wounded",
+      "box": [
+        1320,
+        76,
+        1376,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-walk-0": {
+      "source": "wounded",
+      "box": [
+        576,
+        76,
+        629,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-walk-1": {
+      "source": "wounded",
+      "box": [
+        632,
+        76,
+        686,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-run-0": {
+      "source": "wounded",
+      "box": [
+        1007,
+        76,
+        1071,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-run-1": {
+      "source": "wounded",
+      "box": [
+        1074,
+        76,
+        1137,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-pistol-0": {
+      "source": "wounded",
+      "box": [
+        267,
+        222,
+        313,
+        305
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-pistol-1": {
+      "source": "wounded",
+      "box": [
+        329,
+        222,
+        382,
+        305
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-heavy-0": {
+      "source": "wounded",
+      "box": [
+        266,
+        358,
+        319,
+        450
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-heavy-1": {
+      "source": "wounded",
+      "box": [
+        329,
+        358,
+        383,
+        450
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-melee-0": {
+      "source": "wounded",
+      "box": [
+        947,
+        230,
+        1002,
+        306
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-melee-1": {
+      "source": "wounded",
+      "box": [
+        1010,
+        230,
+        1068,
+        306
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-reload-0": {
+      "source": "wounded",
+      "box": [
+        260,
+        76,
+        312,
+        166
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-hurt-0": {
+      "source": "wounded",
+      "box": [
+        943,
+        362,
+        996,
+        449
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-hurt-1": {
+      "source": "wounded",
+      "box": [
+        1008,
+        362,
+        1064,
+        449
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-hurt-2": {
+      "source": "wounded",
+      "box": [
+        1070,
+        362,
+        1126,
+        449
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-dead-0": {
+      "source": "wounded",
+      "box": [
+        945,
+        498,
+        1025,
+        560
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-dead-1": {
+      "source": "wounded",
+      "box": [
+        1034,
+        498,
+        1117,
+        560
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-dead-2": {
+      "source": "wounded",
+      "box": [
+        1127,
+        498,
+        1223,
+        560
+      ],
+      "size": [
+        68,
+        128
+      ]
+    },
+    "wounded-dead-3": {
+      "source": "wounded",
+      "box": [
+        1235,
+        498,
+        1378,
+        560
+      ],
+      "size": [
+        68,
+        128
+      ]
+    }
+  },
+  "portraits": {
+    "normal": {
+      "source": "clean",
+      "box": [
+        398,
+        1000,
+        578,
+        1189
+      ]
+    },
+    "wounded-0": {
+      "source": "wounded",
+      "box": [
+        247,
+        605,
+        397,
+        758
+      ]
+    },
+    "wounded-1": {
+      "source": "wounded",
+      "box": [
+        406,
+        605,
+        554,
+        758
+      ]
+    },
+    "wounded-2": {
+      "source": "wounded",
+      "box": [
+        570,
+        605,
+        718,
+        758
+      ]
+    },
+    "wounded-3": {
+      "source": "wounded",
+      "box": [
+        727,
+        605,
+        874,
+        758
+      ]
+    },
+    "wounded-4": {
+      "source": "wounded",
+      "box": [
+        886,
+        605,
+        1033,
+        758
+      ]
+    },
+    "wounded-5": {
+      "source": "wounded",
+      "box": [
+        1041,
+        605,
+        1182,
+        758
+      ]
+    },
+    "special": {
+      "source": "normal",
+      "box": [
+        1086,
+        527,
+        1270,
+        652
+      ]
+    }
+  }
+}

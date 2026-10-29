@@ -1,0 +1,4 @@
+import Phaser from 'phaser';
+export const TORTURADO_FRAMES={idle:1,back:1,walk:1,shoot:2,reload:1,dash:1,hurt:1,angry:2,dead:4};
+export function loadTorturado(scene:Phaser.Scene){for(const [state,count] of Object.entries(TORTURADO_FRAMES))for(let i=0;i<count;i++)scene.load.image(`torturado-${state}-${i}`,`assets/bosses/torturado/${state}-${i}.png`);for(const key of ['ultimate-special','torturado-portrait'])scene.load.image(key,`assets/portraits/${key}.png`)}
+export function animateTorturado(scene:Phaser.Scene){for(const [state,count] of Object.entries(TORTURADO_FRAMES))if(!scene.anims.exists(`torturado-${state}`))scene.anims.create({key:`torturado-${state}`,frames:Array.from({length:count},(_,i)=>({key:`torturado-${state}-${i}`})),frameRate:8,repeat:['dead','hurt','shoot'].includes(state)?0:-1})}

@@ -1,0 +1,16 @@
+[
+  {
+    "file": "achievements.png",
+    "original": "D:\\Descargas\\Atlas de sprites de logros neon.png",
+    "sha256": "bb473a17abcb048c81b72543b7b3ce4f3001c6542c284c7d20f1f5d888c53065",
+    "matchesOriginal": true,
+    "preparation": "Individual 64px icons/props and 128px facade textures cropped at boot by src/maps/urbanAssets.ts; never render complete sheets"
+  },
+  {
+    "file": "city.png",
+    "original": "D:\\Descargas\\Guía pixel art neon de Curicó.png",
+    "sha256": "e7b3314c8750008fd94ddd2e98634eff5643c24338b9df9b00e77e9bd4952538",
+    "matchesOriginal": true,
+    "preparation": "Individual 64px icons/props and 128px facade textures cropped at boot by src/maps/urbanAssets.ts; never render complete sheets"
+  }
+]

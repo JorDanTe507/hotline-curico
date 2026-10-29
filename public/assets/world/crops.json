@@ -1,0 +1,183 @@
+{
+  "source": "Mapa Ne\u00f3n de Calles e Industria.png",
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "tiles": [
+    {
+      "name": "asphalt",
+      "crop": [
+        12,
+        798,
+        36,
+        822
+      ]
+    },
+    {
+      "name": "sidewalk",
+      "crop": [
+        12,
+        838,
+        36,
+        862
+      ]
+    },
+    {
+      "name": "cracks",
+      "crop": [
+        12,
+        835,
+        43,
+        866
+      ]
+    },
+    {
+      "name": "industrial",
+      "crop": [
+        785,
+        796,
+        816,
+        827
+      ]
+    },
+    {
+      "name": "hazard",
+      "crop": [
+        828,
+        835,
+        858,
+        865
+      ]
+    },
+    {
+      "name": "wet",
+      "crop": [
+        173,
+        939,
+        205,
+        971
+      ]
+    }
+  ],
+  "rectangles": {
+    "container": {
+      "crop": [
+        983,
+        834,
+        1055,
+        881
+      ],
+      "size": [
+        64,
+        128
+      ],
+      "rotate90": true
+    },
+    "container-blue": {
+      "crop": [
+        983,
+        796,
+        1055,
+        831
+      ],
+      "size": [
+        64,
+        128
+      ],
+      "rotate90": true
+    },
+    "forklift": {
+      "crop": [
+        1180,
+        797,
+        1215,
+        862
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "rotate90": false
+    },
+    "barrel": {
+      "crop": [
+        1242,
+        800,
+        1274,
+        834
+      ],
+      "size": [
+        32,
+        32
+      ],
+      "rotate90": false
+    },
+    "tank": {
+      "crop": [
+        1235,
+        864,
+        1276,
+        923
+      ],
+      "size": [
+        64,
+        96
+      ],
+      "rotate90": false
+    },
+    "bench": {
+      "crop": [
+        1238,
+        972,
+        1280,
+        996
+      ],
+      "size": [
+        64,
+        32
+      ],
+      "rotate90": false
+    },
+    "tree": {
+      "crop": [
+        460,
+        553,
+        506,
+        627
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "rotate90": false
+    },
+    "fountain": {
+      "crop": [
+        552,
+        646,
+        589,
+        686
+      ],
+      "size": [
+        64,
+        64
+      ],
+      "rotate90": false
+    },
+    "truck": {
+      "crop": [
+        1390,
+        797,
+        1524,
+        861
+      ],
+      "size": [
+        64,
+        128
+      ],
+      "rotate90": true
+    }
+  },
+  "sha256": "a5a0cdc99b4887aa2eedcd20a730b7d62c9519ed4f800d38c860e65556be3579"
+}

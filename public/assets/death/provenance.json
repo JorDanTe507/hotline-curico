@@ -1,0 +1,22 @@
+{
+  "cervela": {
+    "reference": "Último Cigarrito de Cervela.png",
+    "file": "cervela.png",
+    "size": [
+      1122,
+      1402
+    ],
+    "sha256": "e50007f57bd0356e07b0ac1d01c3d7aee91605d1a6bfb6afd162ea20f360eab7",
+    "preparation": "Individual portrait composition prepared with imagegen, all original UI/text removed, full pose retained. Rendered alongside native Phaser UI."
+  },
+  "nicolas": {
+    "reference": "Pantalla de game over cyberpunk lluviosa.png",
+    "file": "nicolas.png",
+    "size": [
+      1122,
+      1402
+    ],
+    "sha256": "890b48c16b7c31c0fa219b121c462beb87fd1c834d1989bf4f764830e0fcaa39",
+    "preparation": "Individual portrait composition prepared with imagegen, all original UI/text removed, full pose retained. Rendered alongside native Phaser UI."
+  }
+}

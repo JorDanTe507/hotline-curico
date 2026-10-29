@@ -1,0 +1,18 @@
+{
+  "source": "HUD cyberpunk en pixel art.png",
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "crop": [
+    106,
+    390,
+    184,
+    475
+  ],
+  "outputSize": [
+    32,
+    32
+  ],
+  "method": "Edge-connected dark background removal, proportional nearest-neighbor resize and transparent padding. Source captions are reference, not game parameters."
+}

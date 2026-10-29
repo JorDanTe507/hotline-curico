@@ -1,0 +1,46 @@
+{
+  "name": "hotline-curico",
+  "version": "1.5.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "test": "tsx --test tests/*.test.ts",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:browser": "node check.cjs",
+    "test:browser:arsenal": "node check-arsenal.cjs",
+    "test:browser:characters": "node check-characters.cjs",
+    "test:browser:selection": "node check-selection-portraits.cjs",
+    "test:browser:v14": "node check-v14.cjs",
+    "test:browser:v14:menus": "node check-v14-menus.cjs",
+    "test:browser:v13": "node check-v13.cjs",
+    "test:browser:v12": "node check-v12.cjs",
+    "test:browser:v11": "node check-v11.cjs",
+    "test:browser:v03": "node check-v03.cjs",
+    "test:browser:v04": "node check-v04.cjs",
+    "test:browser:v05": "node check-v05.cjs",
+    "test:browser:v06": "node check-v06.cjs",
+    "test:browser:v061": "node check-v061.cjs",
+    "test:browser:world": "node check-world.cjs",
+    "test:browser:v09": "node check-v09.cjs",
+    "test:browser:v08": "node check-v08.cjs",
+    "test:browser:v07": "node check-v07.cjs",
+    "test:browser:v062": "node check-v062.cjs",
+    "test:browser:v15": "node check-v15.cjs",
+    "test:browser:v15:world": "node check-v15-world.cjs",
+    "dev:mobile": "vite --host 0.0.0.0 --port 5176",
+    "test:browser:mobile": "node check-mobile151.cjs",
+    "test:browser:mobile:menus": "node check-mobile151-menus.cjs",
+    "test:browser:mobile:platform": "node check-mobile151-platform.cjs"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1",
+    "tsx": "^4.20.6",
+    "@types/node": "^24.0.0"
+  }
+}

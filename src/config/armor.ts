@@ -1,0 +1,3 @@
+export const ARMOR_CAPACITY=50;
+export const NORMAL_ARMOR_DROP_CHANCE=.05;
+export const BOSS_ARMOR_DROP_CHANCE=.25;

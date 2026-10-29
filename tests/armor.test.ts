@@ -1,0 +1,12 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {newRun,heal} from '../src/systems/run';
+import {receiveDamage,takeArmor,armorDrop} from '../src/systems/Armor';
+import {Ultimate} from '../src/systems/Ultimate';
+import {ULTIMATE_DURATION,ULTIMATE_HEAL_PER_SECOND,ULTIMATE_DAMAGE_REDUCTION} from '../src/config/instinct';
+import {readFileSync} from 'node:fs';
+test('chaleco 50, sin acumulación y reposición de uno parcialmente dañado',()=>{const r=newRun();assert.equal(r.armor,0);assert.ok(takeArmor(r));assert.equal(r.armor,50);assert.equal(takeArmor(r),false);r.armor=25;assert.ok(takeArmor(r));assert.equal(r.armor,50);assert.equal(r.health,100);assert.equal(newRun().armor,0)});
+test('absorción primero y sobrante a la salud',()=>{const r=newRun();takeArmor(r);assert.deepEqual(receiveDamage(r,25,false),{amount:25,absorbed:25,healthDamage:0});assert.equal(r.armor,25);assert.equal(r.health,100);receiveDamage(r,40,false);assert.equal(r.armor,0);assert.equal(r.health,85);receiveDamage(r,10,false);assert.equal(r.health,75)});
+test('reducción 40% antes del chaleco; daño suficiente sigue siendo letal',()=>{const r=newRun();takeArmor(r);receiveDamage(r,50,true);assert.equal(r.armor,20);assert.equal(r.health,100);receiveDamage(r,50,true);assert.equal(r.armor,0);assert.equal(r.health,90);receiveDamage(r,1000,true);assert.equal(r.health,0);assert.equal(ULTIMATE_DAMAGE_REDUCTION,.4)});
+test('botiquín y ulti no reparan la protección; regen de 20 HP/s durante 12s',()=>{const r=newRun();r.health=10;r.armor=25;heal(r);assert.equal(r.health,50);assert.equal(r.armor,25);const u=new Ultimate();u.charge=40;u.activate(0);r.health=u.tick(1000,r.health);assert.equal(r.health,70);assert.equal(r.armor,25);r.health=u.tick(12000,r.health);assert.equal(r.health,100);assert.equal(r.armor,25);assert.equal(u.active(12000),false);assert.equal(ULTIMATE_DURATION,12000);assert.equal(ULTIMATE_HEAL_PER_SECOND,20)});
+test('probabilidades 5% y 25%, con una única tirada por llamada',()=>{for(const [boss,edge] of [[false,.05],[true,.25]] as const){let calls=0;assert.ok(armorDrop(boss,()=>{calls++;return edge-.000001}));assert.equal(calls,1);assert.equal(armorDrop(boss,()=>edge),false)}});
+test('la reducción se aplica a daño recibido y el icono es 32×32',()=>{const r=newRun();receiveDamage(r,20,true);assert.equal(r.health,88);const png=readFileSync('public/assets/items/armor.png');assert.equal(png.readUInt32BE(16),32);assert.equal(png.readUInt32BE(20),32)});

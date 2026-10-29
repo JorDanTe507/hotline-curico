@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {WEAPONS,gun,reload} from '../src/weapons/arsenal';
+import {createMap,pathStep} from '../src/maps/apartments';
+import {bossIndex} from '../src/bosses/config';
+import {newRun,heal} from '../src/systems/run';
+import {waveCount} from '../src/enemies/config';
+test('arsenal y recarga conservan munición',()=>{assert.equal(WEAPONS.length,16);const g=gun(0);g.ammo=2;g.reserve=3;assert.equal(reload(g),3);assert.equal(g.ammo,5);assert.equal(g.reserve,0);assert.equal(gun(6).reserve,0)});
+test('todos los espacios transitables están conectados',()=>{const map=createMap();for(let y=1;y<27;y++)for(let x=1;x<39;x++)if(!map[y][x])assert.ok(pathStep(map,5,6,x,y),`${x},${y}`)});
+test('jefes cada cinco rondas y ciclo infinito',()=>{assert.equal(bossIndex(4),-1);assert.equal(bossIndex(5),0);assert.equal(bossIndex(25),4);assert.equal(bossIndex(30),0);assert.ok(waveCount(100)>waveCount(50))});
+test('botiquín, límite y estado nuevo',()=>{const r=newRun();r.health=75;assert.ok(heal(r));assert.equal(r.health,100);assert.equal(r.medkits,0);assert.equal(heal(r),false);r.round=9;assert.equal(newRun().round,0)});

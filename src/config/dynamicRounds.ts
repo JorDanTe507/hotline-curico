@@ -1,0 +1,10 @@
+export const REST_DURATION=10000;
+export const MAX_ALIVE_ENEMIES=24;
+export const SURVIVAL_SPAWN_INTERVAL=1700;
+export const ROUND_SPAWN_DISTANCE=470;
+export const ULTIMATE_PRESENTATION_DURATION=2250;
+export const ULTIMATE_SLOW_MOTION=.35;
+export const NORMAL_RPG_CHANCE=.01;
+export const BOSS_RPG_CHANCE=.10;
+export const BOSS_MEDKIT_CHANCE=.45;
+export const TORTURADO={health:450,speed:126*1.15,damage:20,meleeDamage:28,meleeRange:65,meleeCooldown:1000,range:650,distance:240,magazine:4,reload:1800,cadence:1100,pellets:5,spread:.24,specialPellets:8,specialSpread:.5,specialCooldown:6500,prepare:350,specialPrepare:700,chargeCooldown:6000,chargeDuration:350,chargeMultiplier:2.3,healthScaling:.25,damageScaling:.12,speedScaling:.04};

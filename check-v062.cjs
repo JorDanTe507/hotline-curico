@@ -1,0 +1,49 @@
+// Baseline regression fixture: XP choices are tested independently in check-v09.cjs.
+const assert=require('node:assert/strict');let pw;try{pw=require('playwright')}catch{pw=require('C:/Users/JorDanTe/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')}
+(async()=>{const browser=await pw.chromium.launch({headless:true,channel:'msedge'});try{
+const page=await browser.newPage({viewport:{width:1280,height:720}}),errors=[];page.on('pageerror',e=>{errors.push(e.message);console.error(e.message)});await page.goto(process.env.GAME_URL||'http://127.0.0.1:5176');await page.waitForFunction(()=>window.hotlineGame?.scene.isActive('Menu'));await page.waitForFunction(()=>window.hotlineGame.scene.getScene('Menu').backgroundVideo.video.video?.currentTime>.1);
+assert.ok(await page.evaluate(()=>{const v=window.hotlineGame.scene.getScene('Menu').backgroundVideo.video.video;window.video=v;return v.muted&&v.volume===0&&v.loop&&!v.paused&&v.src.endsWith('/assets/video/menu.mp4')}));
+await page.mouse.click(1200,610);await page.waitForFunction(()=>window.hotlineGame.sound.getAllPlaying().some(p=>p.key==='music-neon-noir'));assert.deepEqual(await page.evaluate(()=>window.hotlineGame.sound.getAllPlaying().filter(p=>p.key.startsWith('music-')).map(p=>p.key)),['music-neon-noir']);
+await page.mouse.click(930,480);await page.waitForFunction(()=>window.hotlineGame.scene.isActive('CharacterSelect'));await page.mouse.click(360,340);await page.waitForFunction(()=>window.hotlineGame.scene.isActive('Intro'));await page.keyboard.press('Enter');await page.waitForTimeout(65);await page.keyboard.press('Enter');await page.waitForFunction(()=>window.hotlineGame.scene.isActive('Game'));await page.evaluate(()=>{window.s=window.hotlineGame.scene.getScene('Game');s.progression.defeated=()=>0});assert.ok(await page.evaluate(()=>window.video.paused&&s.run.armor===0&&s.character.id==='cervela'));
+const tap=async(key)=>{await page.keyboard.down(key);await page.waitForTimeout(65);await page.keyboard.up(key);await page.waitForTimeout(35)};
+const reset=()=>page.evaluate(()=>{s.roulette.cancel();s.stopMinigun();s.guns=[{id:0,ammo:10,reserve:80}];s.active=0;s.rounds.stop();s.retireEnemies();s.survival.stop();s.presentation.cancel();s.ultimate.stop();for(const d of [...s.drops])s.removeDrop(d);s.player.body.reset(300,650);s.cameras.main.stopFollow().setScroll(0,0);s.run.health=100;s.run.armor=0;s.run.medkits=1;s.hurtAt=0;s.dash.until=0;s.dash.readyAt=0;s.reloadAt=0;s.nextFire=0;s.combatHud.update()});
+await reset();
+// No full-screen strip, no interactive decorations; compact fields do not overlap.
+assert.ok(await page.evaluate(()=>!s.children.list.some(o=>o.type==='Rectangle'&&o.scrollFactorX===0&&o.width>=1200&&o.height>=50&&o.height<=100&&o.fillAlpha>.8)));
+assert.ok(await page.evaluate(()=>{const h=s.combatHud;return h.armorBar.y>h.healthBar.y&&h.name.x<100&&h.weapon.x===640&&h.dash.x>=1000&&[h.name,h.weapon,h.round,h.dash,h.healthBar,h.armorBar].every(o=>!o.input)}));
+assert.ok(await page.evaluate(()=>{const h=s.combatHud,a=h.name.getBounds(),b=h.weapon.getBounds(),c=h.dash.getBounds();return a.right<b.left&&b.right<c.left}));
+// E pickup, no stacking/full replacement, real damage immediately changes blue bar.
+await page.evaluate(()=>s.addDrop(300,650,'armor',0));await tap('e');assert.ok(await page.evaluate(()=>s.run.armor===50&&s.combatHud.armorBar.width===180&&s.drops.length===0));
+await page.evaluate(()=>s.addDrop(300,650,'armor',0));await tap('e');assert.ok(await page.evaluate(()=>s.run.armor===50&&s.drops.some(d=>d.kind==='armor')));
+assert.deepEqual(await page.evaluate(()=>{s.hurtAt=0;s.damage(25);return {hp:s.run.health,armor:s.run.armor,width:s.combatHud.armorBar.width}}),{hp:100,armor:25,width:90});
+await tap('e');assert.equal(await page.evaluate(()=>s.run.armor),50);await page.screenshot({path:'hud-v062.png'});
+assert.deepEqual(await page.evaluate(()=>{s.hurtAt=0;s.damage(70);return {hp:s.run.health,armor:s.run.armor,width:s.combatHud.armorBar.width}}),{hp:80,armor:0,width:0});
+await page.evaluate(()=>{s.run.armor=25;s.run.health=20;s.run.medkits=1});await tap('f');assert.deepEqual(await page.evaluate(()=>({hp:s.run.health,armor:s.run.armor})),{hp:60,armor:25});
+// Exact 20 HP/s, no armor regeneration, mitigation before armor, and finite vulnerability.
+await page.evaluate(()=>{s.run.health=20;s.run.armor=25;s.ultimate.charge=40});await tap('x');assert.ok(await page.evaluate(()=>s.presentation.active&&s.ultimate.charge===0));await page.waitForTimeout(750);assert.ok(await page.evaluate(()=>s.ultimate.active(s.clock)&&s.ultimate.until-s.clock>11500));
+const hp=await page.evaluate(()=>s.run.health);await page.waitForTimeout(1020);assert.ok(await page.evaluate(h=>s.run.health>h+18&&s.run.health<h+23&&s.run.armor===25,hp));
+assert.deepEqual(await page.evaluate(()=>{s.run.health=100;s.run.armor=50;s.hurtAt=0;s.damage(50);return {hp:s.run.health,armor:s.run.armor}}),{hp:100,armor:20});
+assert.deepEqual(await page.evaluate(()=>{s.hurtAt=0;s.damage(50);return {hp:s.run.health,armor:s.run.armor}}),{hp:90,armor:0});
+await page.evaluate(()=>{s.run.health=10;s.run.armor=17;s.update(0,1000);window.regenProof={hp:s.run.health,armor:s.run.armor}});assert.ok(await page.evaluate(()=>Math.abs(window.regenProof.hp-30)<1e-8&&window.regenProof.armor===17));
+await page.evaluate(()=>{s.clock=s.ultimate.until-50});await page.waitForTimeout(130);assert.ok(await page.evaluate(()=>!s.ultimate.active(s.clock)&&s.run.armor===17));
+assert.deepEqual(await page.evaluate(()=>{s.run.health=100;s.run.armor=0;s.hurtAt=0;s.damage(20);return s.run.health}),80);
+// Each normal death gets one extra armor roll; retirement never drops one.
+await reset();assert.ok(await page.evaluate(()=>{const e=s.spawn(0,-1);e.sprite.body.reset(400,650);const r=s.rounds.random;s.rounds.random=()=>0;try{s.hit(e,100000);s.hit(e,100000);s.rounds.killed(e)}finally{s.rounds.random=r}const drops=s.drops.filter(d=>d.kind==='armor');return drops.length===1&&s.grid[Math.floor(drops[0].sprite.y/48)][Math.floor(drops[0].sprite.x/48)]===0&&drops[0].sprite.list.some(o=>o.texture?.key==='armor'&&o.displayWidth===32&&o.displayHeight===32)}));
+await reset();assert.ok(await page.evaluate(()=>{const e=s.spawn(0,-1);s.retireEnemies();return s.drops.length===0}));
+// Boss armor is additional; forced special roll still produces the RPG and normal rewards.
+await reset();assert.ok(await page.evaluate(()=>{const e=s.spawn(4,0);e.sprite.body.reset(400,650);const r=s.rounds.random;s.rounds.random=()=>0;try{s.hit(e,100000);s.hit(e,100000);s.rounds.killed(e)}finally{s.rounds.random=r}return s.drops.filter(d=>d.kind==='armor').length===1&&s.drops.some(d=>d.kind==='ammo')&&s.drops.some(d=>d.kind==='gun'&&d.id!==6)&&s.drops.filter(d=>d.kind==='gun'&&d.id===6).length===1}));
+// Dynamic rounds and boss intro remain functional with the compact HUD.
+await reset();await page.evaluate(()=>{s.run.round=0;s.startWave();s.roulette.update(4000);s.run.armor=25;for(const e of [...s.foes])s.hit(e,100000)});await page.waitForTimeout(80);assert.ok(await page.evaluate(()=>s.rounds.state.phase==='rest'&&s.run.armor===25));await page.evaluate(()=>s.clock=s.rounds.state.restUntil);await page.waitForTimeout(60);assert.ok(await page.evaluate(()=>s.run.round===2&&s.rounds.state.plan.type==='SUPERVIVENCIA'));
+await page.evaluate(()=>{s.roulette.update(4000);s.clock=s.rounds.state.endsAt;s.rounds.update();s.run.round=4;s.startWave();s.roulette.update(4000)});assert.ok(await page.evaluate(()=>s.foes.length===1&&s.bossDialogue.active));for(let i=0;i<6;i++){await page.keyboard.press('Enter');await page.waitForTimeout(60)}assert.ok(await page.evaluate(()=>!s.bossDialogue.active&&s.foes[0].hp===450));
+await page.evaluate(()=>{s.run.armor=50;s.run.health=25;s.combatHud.update();s.critical.update(25,s.clock,false)});await page.screenshot({path:'hud-boss-v062.png'});
+// Scaled viewport keeps all HUD groups within the visible game area.
+await page.setViewportSize({width:960,height:720});await page.waitForTimeout(120);assert.ok(await page.evaluate(()=>{const rect=document.querySelector('canvas').getBoundingClientRect();return rect.width<=960&&rect.height<=720&&Math.abs(rect.width/rect.height-1280/720)<.001}));await page.screenshot({path:'hud-small-v062.png'});await page.setViewportSize({width:1280,height:720});
+// Lethal incoming damage remains lethal despite ulti + full armor, then clean retries.
+for(let i=0;i<3;i++){await page.evaluate(()=>{s.roulette.update(4000);s.ultimate.stop();s.ultimate.charge=40;s.ultimate.activate(s.clock,s.guns);s.run.health=100;s.run.armor=50;s.hurtAt=0;s.dash.until=0;s.damage(10000)});await page.waitForTimeout(80);assert.ok(await page.evaluate(()=>s.ended));await page.waitForFunction(()=>s.deathSequence.phase==='screen');await page.mouse.click(977,510);await page.waitForTimeout(200);assert.ok(await page.evaluate(()=>s.run.health===100&&s.run.armor===0&&s.run.round===1&&s.ultimate.charge===0&&!s.ultimate.active(s.clock)))}
+await tap('Escape');await page.mouse.click(520,435);await page.waitForTimeout(70);await page.mouse.click(520,415);await page.waitForFunction(()=>window.hotlineGame.scene.isActive('Menu'));await page.waitForFunction(()=>window.hotlineGame.scene.getScene('Menu').backgroundVideo.video.video?.currentTime>.1);assert.ok(await page.evaluate(()=>{const v=window.hotlineGame.scene.getScene('Menu').backgroundVideo.video.video;return v.src.endsWith('/assets/video/menu.mp4')&&v.muted&&v.volume===0&&v.loop}));
+assert.deepEqual(errors,[]);console.log('PASS V0.6.2: ulti 20 HP/s/12s/40% sin inmortalidad, armadura 50/reposición/absorción/sobrante/sin regeneración, drops únicos normales y boss adicionales al RPG, HUD transparente y escalado, rondas/jefe, menú original y tres reintentos. Sin errores JavaScript.');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
+
+
+
+

@@ -1,0 +1,27 @@
+{
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "rectangles": [
+    [
+      16,
+      564,
+      169,
+      704
+    ],
+    [
+      190,
+      564,
+      352,
+      704
+    ],
+    [
+      373,
+      564,
+      533,
+      704
+    ]
+  ],
+  "note": "Nonuniform portrait crops; dark original background retained. Display using contain scale."
+}

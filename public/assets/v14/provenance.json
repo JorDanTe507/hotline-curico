@@ -1,0 +1,74 @@
+{
+  "version": "1.4",
+  "assets": [
+    {
+      "file": "enemies.png",
+      "reference": "Hoja de sprites de enemigos neón (1).png",
+      "size": [
+        1316,
+        1195
+      ],
+      "mode": "RGBA",
+      "sha256": "1a4dd2c85754215a68fe6be36929745bd708a6afbc58ad16433667093383a424",
+      "preparation": "ImageGen transparent isolated sprite atlas; runtime transparent-bound trimming and proportional normalization",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "cars.png",
+      "reference": "Hoja de sprites de autos pixelados.png",
+      "size": [
+        2172,
+        724
+      ],
+      "mode": "RGBA",
+      "sha256": "a36a60adc098f94147186ac9ff83fa5cdad08c0b9b2e3f0c77dd6fa9d627c779",
+      "preparation": "ImageGen transparent isolated sprite atlas; runtime transparent-bound trimming and proportional normalization",
+      "alphaRange": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "aceite.png",
+      "reference": "Hoja de sprites pixel art de Tío Aceite (1).png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "sha256": "36222c1477419e1d6e081711609d1b0cd7251bf43d38057d73a176f14767e91a",
+      "preparation": "ImageGen transparent isolated sprite atlas; runtime transparent-bound trimming and proportional normalization",
+      "alphaRange": [
+        0,
+        254
+      ]
+    },
+    {
+      "file": "cervela-banner.png",
+      "reference": "Hagamos esto una vez más (1).png",
+      "size": [
+        2048,
+        768
+      ],
+      "mode": "RGB",
+      "sha256": "d9e5e6bb3a2b5132436ac813ea27f386fc79863bf1b9d6190fff688b7ac933b1",
+      "preparation": "Exact original banner, proportional scaling in shared cinematic system",
+      "matchesOriginal": true
+    },
+    {
+      "file": "nicolas-banner.png",
+      "reference": "Gamer neón contra los jefes.png",
+      "size": [
+        2048,
+        768
+      ],
+      "mode": "RGB",
+      "sha256": "1db2b3aa8d2a6b38b2aaac2af7fb5d956dbdc5a5cd0bb504882af8a995e0f472",
+      "preparation": "Exact original banner, proportional scaling in shared cinematic system",
+      "matchesOriginal": true
+    }
+  ]
+}

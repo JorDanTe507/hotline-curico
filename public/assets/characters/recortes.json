@@ -1,0 +1,63 @@
+{
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "rectangles": {
+    "idle": [
+      333,
+      50,
+      401,
+      175
+    ],
+    "back": [
+      410,
+      50,
+      479,
+      175
+    ],
+    "side": [
+      494,
+      49,
+      561,
+      175
+    ],
+    "walk1": [
+      826,
+      49,
+      900,
+      177
+    ],
+    "walk2": [
+      911,
+      49,
+      985,
+      177
+    ],
+    "shoot": [
+      424,
+      234,
+      509,
+      354
+    ],
+    "reload": [
+      341,
+      408,
+      416,
+      540
+    ],
+    "hurt": [
+      342,
+      596,
+      418,
+      732
+    ],
+    "dead": [
+      1233,
+      625,
+      1368,
+      719
+    ]
+  },
+  "note": "Checkerboard removal may remove light shirt highlights; provisional extracted assets."
+}

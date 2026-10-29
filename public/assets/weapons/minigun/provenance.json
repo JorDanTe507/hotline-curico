@@ -1,0 +1,19 @@
+{
+  "reference": "Atlas neón de armas pixel art.png (user supplied)",
+  "method": "Built-in imagegen, single transparent minigun; normalized to 32x32 with Pillow nearest-neighbor. Barrel highlights are separate animation frames.",
+  "prompt": "Use case: stylized-concept. Asset type: single game weapon sprite for Hotline Curicó. Input image is STYLE REFERENCE ONLY. Create ONE isolated side-view six-barrel rotary MINIGUN pointing right, dark gunmetal with steel highlights, small cyan reflections and magenta rim pixels, rear grip and ammunition drum. Crisp authentic low-resolution pixel art, readable silhouette when reduced to 32x32, centered with generous transparent margin. Match the reference's weapon style but unmistakably a heavy multi-barrel minigun, not an Uzi. True transparent background. No text, no cards, no borders, no characters, no muzzle flash, no floor, no checkerboard. One weapon only.",
+  "sourceSize": [
+    1774,
+    887
+  ],
+  "frames": [
+    "pickup",
+    "hud",
+    "spin-0",
+    "spin-1",
+    "fire-0",
+    "fire-1",
+    "flash",
+    "casing"
+  ]
+}

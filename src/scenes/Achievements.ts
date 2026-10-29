@@ -1,0 +1,26 @@
+import Phaser from 'phaser';
+import {achievements,ACHIEVEMENTS,type AchievementDefinition} from '../systems/Achievements';
+import {developerSession} from '../systems/DeveloperSession';
+import {AudioSystem} from '../systems/AudioSystem';
+import {text} from './Menu';
+export const RARITY_COLORS={common:0xb9c4d0,uncommon:0x45ed85,rare:0x35baff,epic:0xd05bff,legendary:0xffce47};
+const names={common:'COMÚN',uncommon:'POCO COMÚN',rare:'RARO',epic:'ÉPICO',legendary:'LEGENDARIO'};
+export class Achievements extends Phaser.Scene {
+ private filter='TODOS';private page=0;private parts:Phaser.GameObjects.GameObject[]=[];
+ constructor(){super('Achievements')}
+ create(){this.filter='TODOS';this.page=0;this.parts=[];this.cameras.main.setBackgroundColor('#090711');this.draw();const wheel=(_p:unknown,_g:unknown,_dx:number,dy:number)=>{this.page+=dy>0?1:-1;this.draw()};this.input.on('wheel',wheel);this.events.once('shutdown',()=>this.input.off('wheel',wheel))}
+ private draw(){this.parts.forEach(p=>p.destroy());this.parts=[];const add=<T extends Phaser.GameObjects.GameObject>(p:T)=>{this.parts.push(p);return p},store=achievements(),available=store.available,obtained=store.obtained;add(text(this,55,30,'LOGROS',39,'#ff398b'));add(text(this,55,83,`${obtained}/${available.length} · ${Math.round(obtained/available.length*100)}% COMPLETADO`,20,'#bdeffa'));add(this.add.rectangle(1030,90,330,10,0x352037));add(this.add.rectangle(865+330*obtained/available.length/2,90,330*obtained/available.length,10,0xff398b));
+ const button=(x:number,y:number,label:string,fn:()=>void)=>add(text(this,x,y,label,20,'#93e9f4')).setInteractive({useHandCursor:true}).on('pointerdown',fn);
+ for(const [i,label] of ['TODOS','OBTENIDOS','PENDIENTES'].entries())button(55+i*260,125,`${label===this.filter?'▶ ':''}${label}`,()=>{this.filter=label;this.page=0;this.draw()});
+ const list=available.filter(a=>this.filter==='TODOS'||(this.filter==='OBTENIDOS'?!!store.data.unlocked[a.id]:!store.data.unlocked[a.id]));this.page=Phaser.Math.Clamp(this.page,0,Math.max(0,Math.ceil(list.length/6)-1));
+ list.slice(this.page*6,this.page*6+6).forEach((a,i)=>{const date=store.data.unlocked[a.id],hidden=a.secret&&!date,color=hidden?0xeb397b:RARITY_COLORS[a.rarity],y=180+i*69;add(this.add.rectangle(640,y+30,1170,62,0x15101f,.94).setStrokeStyle(1,color,.6));add(this.add.image(91,y+30,`rarity-${hidden?5:['common','uncommon','rare','epic','legendary'].indexOf(a.rarity)}`).setDisplaySize(53,53));add(this.add.image(91,y+30,`achievement-${hidden?11:a.icon}`).setDisplaySize(40,40).setTint(date?0xffffff:0x777780));add(text(this,135,y+5,hidden?'???':a.name,19,date?'#fff1f7':'#ad9fb5'));add(text(this,135,y+32,hidden?'Logro oculto.':a.description,15,'#b6adc5'));add(text(this,1020,y+4,hidden?'SECRETO':names[a.rarity],13,'#'+color.toString(16).padStart(6,'0')));const target=a.id==='all'?available.length-1:a.target,progress=store.data.progress[a.id]??0;add(text(this,1020,y+29,date?'✓ '+new Date(date).toLocaleDateString('es-CL'):hidden?'OCULTO':target>1?`${progress}/${target}`:'PENDIENTE',14,date?'#64ff9b':'#a89ab5'))});
+ if(!list.length)add(text(this,80,220,'Todavía no hay logros en este filtro.',22));button(55,625,'↑ ANTERIOR',()=>{this.page--;this.draw()});button(310,625,'↓ SIGUIENTE',()=>{this.page++;this.draw()});add(text(this,620,628,`PÁGINA ${this.page+1}/${Math.max(1,Math.ceil(list.length/6))}`,17));button(1000,625,'← VOLVER',()=>this.scene.start('Menu'));add(text(this,55,675,`${ACHIEVEMENTS.length-available.length} logros reservados para contenido futuro · no cuentan en el total activo.`,15,'#8c7a9b'));if(developerSession.active)add(text(this,790,40,'PRUEBAS: DESBLOQUEOS DESACTIVADOS',15,'#ffd06b'));if(!store.persisted)add(text(this,55,701,'Guardado local no disponible.',12,'#ffd06b'));
+ }
+}
+/** Independent overlay scene: banners keep their own clock even while gameplay tweens pause. */
+export class AchievementToast extends Phaser.Scene {
+ private banner?:Phaser.GameObjects.Container;private elapsed=0;private current?:AchievementDefinition;
+ get notification(){return this.banner?.active?this.current:undefined}get notificationAlpha(){return this.banner?.alpha??0}
+ constructor(){super('AchievementToast')}
+ update(_time:number,delta:number){this.scene.bringToTop();if(developerSession.active){achievements().notifications.length=0;this.banner?.destroy(true);this.banner=undefined;return}if(!this.banner){const a=achievements().notifications.shift();if(!a)return;this.current=a;this.elapsed=0;const bg=this.add.rectangle(0,0,360,90,0x100b1b,.97).setStrokeStyle(2,RARITY_COLORS[a.rarity]),icon=this.add.image(-142,0,`achievement-${a.icon}`).setDisplaySize(58,58),title=text(this,-100,-34,'LOGRO DESBLOQUEADO',13,'#ff51a2'),name=text(this,-100,-12,a.name,16).setWordWrapWidth(260),desc=text(this,-100,15,a.description,12,'#c0b4ce').setWordWrapWidth(260);this.banner=this.add.container(1090,645,[bg,icon,title,name,desc]).setScrollFactor(0);AudioSystem.play(this,'achievement',.65)}this.banner.setVisible(!this.registry.get('mobileUI'));this.elapsed+=Math.max(0,delta);const alpha=Math.min(1,this.elapsed/300,(4400-this.elapsed)/400);this.banner.setAlpha(Math.max(0,alpha)).setX(1090-80*(1-Math.min(1,this.elapsed/300)));if(this.elapsed>=4400){this.banner.destroy(true);this.banner=undefined;this.current=undefined}}
+}

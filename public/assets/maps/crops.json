@@ -1,0 +1,583 @@
+{
+  "source": "Atlas de texturas neón para Hotline Curicó (1).png",
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "sha256": "28b073a5de2785d709b97a54463dc0b966b3cbc2916864660bd1d8677f367949",
+  "baseSize": 32,
+  "tiles": [
+    {
+      "name": "slate",
+      "crop": [
+        12,
+        84,
+        58,
+        130
+      ],
+      "index": 0
+    },
+    {
+      "name": "lilac",
+      "crop": [
+        124,
+        83,
+        170,
+        130
+      ],
+      "index": 1
+    },
+    {
+      "name": "checker",
+      "crop": [
+        178,
+        82,
+        228,
+        132
+      ],
+      "index": 2
+    },
+    {
+      "name": "wood",
+      "crop": [
+        235,
+        83,
+        281,
+        130
+      ],
+      "index": 3
+    },
+    {
+      "name": "ceramic",
+      "crop": [
+        180,
+        143,
+        226,
+        190
+      ],
+      "index": 4
+    },
+    {
+      "name": "blue",
+      "crop": [
+        124,
+        203,
+        170,
+        250
+      ],
+      "index": 5
+    },
+    {
+      "name": "red",
+      "crop": [
+        236,
+        143,
+        282,
+        190
+      ],
+      "index": 6
+    },
+    {
+      "name": "asphalt",
+      "crop": [
+        446,
+        84,
+        498,
+        136
+      ],
+      "index": 7
+    },
+    {
+      "name": "concrete",
+      "crop": [
+        358,
+        200,
+        398,
+        248
+      ],
+      "index": 8
+    },
+    {
+      "name": "industrial",
+      "crop": [
+        455,
+        322,
+        499,
+        369
+      ],
+      "index": 9
+    },
+    {
+      "name": "brick",
+      "crop": [
+        1232,
+        91,
+        1308,
+        151
+      ],
+      "index": 10
+    },
+    {
+      "name": "wall",
+      "crop": [
+        806,
+        90,
+        838,
+        145
+      ],
+      "index": 11
+    },
+    {
+      "name": "steel",
+      "crop": [
+        1027,
+        90,
+        1066,
+        144
+      ],
+      "index": 12
+    },
+    {
+      "name": "grate",
+      "crop": [
+        1400,
+        90,
+        1430,
+        145
+      ],
+      "index": 13
+    },
+    {
+      "name": "worn",
+      "crop": [
+        1134,
+        182,
+        1167,
+        237
+      ],
+      "index": 14
+    }
+  ],
+  "objects": {
+    "sofa": {
+      "crop": [
+        305,
+        418,
+        414,
+        484
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "desk": {
+      "crop": [
+        386,
+        550,
+        482,
+        587
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "table": {
+      "crop": [
+        307,
+        488,
+        379,
+        543
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "vending": {
+      "crop": [
+        557,
+        419,
+        632,
+        480
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "bed": {
+      "crop": [
+        638,
+        420,
+        683,
+        511
+      ],
+      "outputSize": [
+        32,
+        64
+      ],
+      "cleanup": "edge"
+    },
+    "bed-blue": {
+      "crop": [
+        488,
+        519,
+        552,
+        590
+      ],
+      "outputSize": [
+        32,
+        64
+      ],
+      "cleanup": "edge"
+    },
+    "wardrobe": {
+      "crop": [
+        680,
+        510,
+        728,
+        586
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "nightstand": {
+      "crop": [
+        619,
+        585,
+        661,
+        641
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "washer": {
+      "crop": [
+        490,
+        465,
+        523,
+        518
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "dryer": {
+      "crop": [
+        526,
+        464,
+        555,
+        518
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "counter": {
+      "crop": [
+        423,
+        467,
+        486,
+        520
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "shelves": {
+      "crop": [
+        633,
+        588,
+        668,
+        641
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "crate": {
+      "crop": [
+        780,
+        420,
+        825,
+        464
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "barrel": {
+      "crop": [
+        786,
+        580,
+        821,
+        638
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "container": {
+      "crop": [
+        876,
+        422,
+        992,
+        496
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "machine": {
+      "crop": [
+        1146,
+        415,
+        1214,
+        484
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "pipes": {
+      "crop": [
+        904,
+        500,
+        949,
+        552
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "car": {
+      "crop": [
+        1371,
+        417,
+        1434,
+        518
+      ],
+      "outputSize": [
+        32,
+        64
+      ],
+      "cleanup": "edge"
+    },
+    "plant": {
+      "crop": [
+        18,
+        684,
+        61,
+        762
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "trash": {
+      "crop": [
+        258,
+        811,
+        288,
+        855
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "door": {
+      "crop": [
+        69,
+        419,
+        113,
+        485
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "exit": {
+      "crop": [
+        1241,
+        761,
+        1311,
+        801
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "hotel": {
+      "crop": [
+        1254,
+        691,
+        1366,
+        740
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "parking": {
+      "crop": [
+        1415,
+        765,
+        1451,
+        798
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "edge"
+    },
+    "graffiti": {
+      "crop": [
+        254,
+        754,
+        318,
+        803
+      ],
+      "outputSize": [
+        64,
+        32
+      ],
+      "cleanup": "color"
+    },
+    "blood-0": {
+      "crop": [
+        827,
+        840,
+        915,
+        898
+      ],
+      "outputSize": [
+        64,
+        64
+      ],
+      "cleanup": "red"
+    },
+    "blood-1": {
+      "crop": [
+        921,
+        845,
+        970,
+        899
+      ],
+      "outputSize": [
+        64,
+        64
+      ],
+      "cleanup": "red"
+    },
+    "blood-2": {
+      "crop": [
+        827,
+        903,
+        880,
+        956
+      ],
+      "outputSize": [
+        64,
+        64
+      ],
+      "cleanup": "red"
+    },
+    "impact": {
+      "crop": [
+        1068,
+        960,
+        1110,
+        1000
+      ],
+      "outputSize": [
+        32,
+        32
+      ],
+      "cleanup": "light"
+    },
+    "reflection": {
+      "crop": [
+        1291,
+        902,
+        1332,
+        950
+      ],
+      "outputSize": [
+        32,
+        64
+      ],
+      "cleanup": "color"
+    },
+    "lamp": {
+      "crop": [
+        852,
+        689,
+        875,
+        699
+      ],
+      "outputSize": [
+        32,
+        8
+      ],
+      "cleanup": "edge"
+    },
+    "rug": {
+      "crop": [
+        236,
+        320,
+        282,
+        373
+      ],
+      "outputSize": [
+        64,
+        64
+      ],
+      "cleanup": "opaque"
+    },
+    "light": {
+      "recreated": "Neutral radial lighting mask, tinted by Phaser; no replacement artwork."
+    }
+  },
+  "method": "Explicit rectangles inside category panels, no captions or magenta presentation borders. Seamless floors mirror 16px samples. Proportional nearest-neighbor objects with edge-connected dark-background removal; transparent padding. Normalized files are packed for rendering."
+}
