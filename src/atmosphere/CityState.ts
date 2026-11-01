@@ -23,5 +23,5 @@ export class EventDirector {
 export class EffectQuality {
  level=2;average=16.7;private elapsed=0;private samples=0;private total=0;private stable=0;
  update(ms:number){if(ms<=0||ms>250)return;this.elapsed+=ms;this.total+=ms;this.samples++;this.stable+=ms;if(this.elapsed<4000)return;this.average=this.total/this.samples;this.elapsed=this.total=this.samples=0;if(this.stable<12000)return;if(this.average>28&&this.level>0){this.level--;this.stable=0}else if(this.average<19&&this.level<2){this.level++;this.stable=0}}
- get budget(){return [{rain:24,fog:1,reflections:false},{rain:55,fog:1,reflections:true},{rain:100,fog:2,reflections:true}][this.level]}
+ get budget(){return [{rain:40,fog:1,reflections:false},{rain:90,fog:1,reflections:true},{rain:160,fog:2,reflections:true}][this.level]}
 }

@@ -18,3 +18,12 @@ export function commonEnemyFirearmDamage(base:number,weaponId:number,tier:number
  const common=isCommonEnemy(tier,boss);
  return base*(common&&weaponKind(weaponId)==='firearm'&&!WEAPONS[weaponId].explosive?COMMON_FIREARM_DAMAGE_MULTIPLIER:1);
 }
+
+export const NORMAL_WEAPON_DROP_CHANCE=.35;
+export const BASIC_WEAPON_PICKUP_CHANCE=.05;
+export function dropsEquippedWeapon(tier:number,boss:number,random:()=>number=Math.random){return !isCommonEnemy(tier,boss)||random()<NORMAL_WEAPON_DROP_CHANCE}
+/** One attempt per enemy/weapon, including a weapon unloaded and restored by streaming. */
+export class WeaponPickupOpportunities {
+ private attempted=new WeakSet<object>();private instanceIds=new Set<string>();
+ allow(tier:number,drop:object,random:()=>number=Math.random){if(tier!==0)return true;const id=(drop as {instanceId?:string}).instanceId;if(id?this.instanceIds.has(id):this.attempted.has(drop))return false;if(id)this.instanceIds.add(id);else this.attempted.add(drop);return random()<BASIC_WEAPON_PICKUP_CHANCE}
+}

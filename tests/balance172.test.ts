@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {dropsEquippedWeapon,WeaponPickupOpportunities,NORMAL_WEAPON_DROP_CHANCE,BASIC_WEAPON_PICKUP_CHANCE} from '../src/config/enemyBalance';
+function seeded(){let n=507;return ()=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return n/4294967296}}
+test('100000 independent normal armed deaths approach 35%; specials bypass the roll',()=>{const random=seeded();let count=0;for(let i=0;i<100000;i++)if(dropsEquippedWeapon(1,-1,random))count++;assert.ok(Math.abs(count/100000-.35)<.005);assert.equal(NORMAL_WEAPON_DROP_CHANCE,.35);for(const [tier,boss] of [[4,-1],[12,-1],[4,0],[4,4]])assert.ok(dropsEquippedWeapon(tier,boss,()=>{throw Error('special reward rolled')}));console.log('Weapon death frequency',count/100000)});
+test('100000 independent basic opportunities approach 5%; failed identity never retries',()=>{const random=seeded(),op=new WeaponPickupOpportunities();let count=0;for(let i=0;i<100000;i++)if(op.allow(0,{},random))count++;assert.ok(Math.abs(count/100000-.05)<.003);assert.equal(BASIC_WEAPON_PICKUP_CHANCE,.05);const drop={};let calls=0;assert.equal(op.allow(0,drop,()=>{calls++;return .9}),false);for(let i=0;i<1000;i++)assert.equal(op.allow(0,drop,()=>{calls++;return 0}),false);assert.equal(calls,1);assert.ok(op.allow(1,drop,()=>{throw Error('specialist rolled')}));console.log('Pickup frequency',count/100000)});
+
+test('streaming retains a rejected weapon identity',()=>{const op=new WeaponPickupOpportunities();assert.equal(op.allow(0,{instanceId:'gun-1'},()=>1),false);assert.equal(op.allow(0,{instanceId:'gun-1'},()=>{throw Error('repeated ID')}),false);assert.equal(op.allow(0,{instanceId:'gun-2'},()=>0),true)});

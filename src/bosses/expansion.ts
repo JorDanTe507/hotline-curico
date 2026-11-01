@@ -3,13 +3,13 @@ export const BOSS_DEFINITIONS=[
  {name:'EL TORTURADO',hp:450,speed:TORTURADO.speed,damage:20,weapon:3,weaponName:'Escopeta pesada',range:650,prepare:350,cooldown:1100,mag:4,
   lines:['Así que hasta aquí llegaste...','Ya que te gusta fumar... me fumaré un cigarro sobre tu cadáver.']},
  {name:'EL COMANDANTE',hp:650,speed:100,damage:12,weapon:7,weaponName:'LA TRITURADORA',range:760,prepare:700,cooldown:1800,mag:32,
-  lines:['En mi ciudad no existen los héroes.','Este no es un juego, mocoso.']},
+  lines:['En mi ciudad no existen los héroes.','Este no es un juego, mocoso.'],replies:['Perfecto. Porque yo tampoco vine a salvar a nadie.','Ya me di cuenta. Los gráficos después de todo son pixel art.']},
  {name:'EL DEMOLEDOR',hp:850,speed:82,damage:90,weapon:11,weaponName:'EL SEPULTURERO',range:650,prepare:900,cooldown:2300,mag:1,
-  lines:['¿Sabes qué es lo bonito de una explosión? Que no queda nadie para reclamar.','Ya puedes saltar, igual explota.']},
+  lines:['¿Sabes qué es lo bonito de una explosión? Que no queda nadie para reclamar.','Ya puedes saltar, igual explota.'],replies:['Entonces procura no estar demasiado cerca cuando explotes.','Ah, como Mr. Five de One Piece.']},
  {name:'EL VERDUGO',hp:1000,speed:105,damage:85,weapon:5,weaponName:'SENTENCIA',range:1400,prepare:1100,cooldown:1700,mag:5,
-  lines:['No necesito perseguirte. Solo necesito que te detengas.','Tan lejos y aun así vas a caer.']},
+  lines:['No necesito perseguirte. Solo necesito que te detengas.','Tan lejos y aun así vas a caer.'],replies:['Qué coincidencia. Yo también estaba esperando que dejaras de hablar.','Llevo veinte rondas escuchando amenazas. Ponte a la fila.']},
  {name:'EL CARNICERO',hp:1300,speed:70,damage:55,weapon:15,weaponName:'EL JUICIO',range:140,prepare:900,cooldown:1900,mag:0,
-  lines:['Aquí no enterramos a nadie. Los hacemos desaparecer.','Ni con respawn te salvas de esta.']}
+  lines:['Aquí no enterramos a nadie. Los hacemos desaparecer.','Ni con respawn te salvas de esta.'],replies:['Entonces nadie va a extrañarte cuando termine contigo.','Después de ti me voy a hacer Enies Lobby Hard.']}
 ] as const;
 export const BOSS_TUNING={burstShots:8,burstInterval:90,chargeDuration:1500,chargeMultiplier:4.5,carniceroEngage:550,spinDuration:1000,spinInterval:350,spinDamage:.65,slamRadius:110,spinRadius:140,contactDamage:28,contactCooldown:1100} as const;
 /** HP from the supplied sheet; missing movement/attack timings are provisional configuration. */

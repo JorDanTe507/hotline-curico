@@ -1,3 +1,4 @@
+import {bossSurfaceDistance} from '../bosses/BossGeometry';
 import {commonEnemyFirearmDamage} from '../config/enemyBalance';
 import {achievements} from '../systems/Achievements';
 import {enemyAnimation,ENEMIES} from '../enemies/config';
@@ -15,7 +16,7 @@ export class WeaponCombat {
   if(!enemy)s.rounds.requiem.offensive('melee',g.id);AudioSystem.play(s,SHOTS[g.id],enemy?.45:1);if(!enemy)achievements().event({type:'weapon',weapon:g.id});
   const arc=s.add.graphics().setDepth(16).lineStyle(3,g.id===15?0xff5680:0x8edcfa,.65);arc.beginPath().arc(x,y,w.range,angle-.8,angle+.8).strokePath();s.tweens.add({targets:arc,alpha:0,duration:160,onComplete:()=>arc.destroy()});
   if(enemy){enemy.sprite.play(enemyAnimation(enemy.tier,'attack'),true);if(Math.hypot(s.player.x-x,s.player.y-y)<=w.range&&s.lineClear(x,y,s.player.x,s.player.y))s.damage(enemyDamage);return}
-  s.appearance.hold('melee');const targets=s.foes.filter(e=>e.sprite.active&&e.hp>0&&Math.hypot(e.sprite.x-x,e.sprite.y-y)<=w.range&&Math.cos(Math.atan2(e.sprite.y-y,e.sprite.x-x)-angle)>.35&&s.lineClear(x,y,e.sprite.x,e.sprite.y)).sort((a,b)=>Math.hypot(a.sprite.x-x,a.sprite.y-y)-Math.hypot(b.sprite.x-x,b.sprite.y-y));
+  s.appearance.hold('melee');const targets=s.foes.filter(e=>e.sprite.active&&e.hp>0&&(e.boss>=0?bossSurfaceDistance(e.boss,e.sprite,x,y):Math.hypot(e.sprite.x-x,e.sprite.y-y))<=w.range&&Math.cos(Math.atan2(e.sprite.y-y,e.sprite.x-x)-angle)>.35&&s.lineClear(x,y,e.sprite.x,e.sprite.y)).sort((a,b)=>Math.hypot(a.sprite.x-x,a.sprite.y-y)-Math.hypot(b.sprite.x-x,b.sprite.y-y));
   if(!targets[0])s.fortune.melee(x,y,angle,w.range,playerDamage(w.damage,s.run.stats,40,true));
   if(targets[0]){const e=targets[0];s.hit(e,playerDamage(w.damage,s.run.stats,Math.hypot(e.sprite.x-x,e.sprite.y-y),true)*(s.ultimate.active(s.clock)?s.ultimate.weaponMultiplier:1),{...s.ultimate.shot(s.clock),weaponId:g.id,method:'melee'});if(e.hp>0&&this.random()<(w.stunChance??0))s.survival.stun(e)}
  }

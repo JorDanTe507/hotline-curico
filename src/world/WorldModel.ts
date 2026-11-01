@@ -1,6 +1,5 @@
 import {zoneChoice,type UrbanZone} from './UrbanZones';
 import {templateFor,type BuildingType} from './BuildingTemplates';
-import {ACEITE} from '../config/aceite';
 import {createMap,COLS,ROWS} from '../maps/apartments';
 export const CHUNK_TILES=32,WORLD_TILE=48,CHUNK_SIZE=CHUNK_TILES*WORLD_TILE;
 export type Biome='residential'|'commercial'|'plaza'|'industrial';
@@ -55,9 +54,7 @@ export class WorldModel {
     reserved.push({x,y,w:11,h:11});continue;
    }
    if(biome==='industrial'&&q===3&&n%2===0){prop(n%3?'container':'truck',x,y,2,4,'city');prop('container-blue',x+4,y,2,4,'city');prop('forklift',x+1,y+6,2,2,'city');prop('barrel',x+7,y+6);continue}
-   const wantsStall=['commercial','plaza'].includes(biome)&&cx%ACEITE.spacingChunks===0&&cy%ACEITE.spacingChunks===0&&hash(this.seed+47,cx,cy)/4294967296<ACEITE.spawnProbability;
-   if(biome==='plaza'||(biome==='commercial'&&q===3&&(n%3===0||wantsStall))){
-    const stallArea={x,y,w:5,h:5};if(q===3&&wantsStall&&free(stallArea)&&!buildings.some(b=>overlap(b,stallArea))&&prop('aceite-0',x+1,y,3,3,'expansion')){reserved.push(stallArea);continue}
+   if(biome==='plaza'||(biome==='commercial'&&q===3&&n%3===0)){
     if(n%2){prop('car',x+1,y+1,1,2);prop('car',x+5,y+1,1,2);prop('bin-yellow',x+7,y+6,1,1,'urban')}else{prop('tree',x,y,2,2,'city');prop('tree',x+6,y+6,2,2,'city');prop('bench-urban',x+4,y,2,1,'urban');prop('fountain',x+2,y+3,2,2,'city')}continue;
    }
    const w=t.id==='convenience'?7:9+n%2,h=9+Math.floor(n/2)%2;if(touchesApartment(x,y,w,h))continue;
@@ -73,11 +70,6 @@ export class WorldModel {
    modules.forEach((r,i)=>{const roomName=roomOrder[i],frame=furniture[roomName]??'nightstand';b.rooms!.push({...r,name:roomName});if(roomName==='Cerrada'){for(let j=r.y;j<r.y+r.h;j++)for(let k=r.x;k<r.x+r.w;k++)cells[j][k]=1;return}const px=n%2&&r.w>1?r.x+r.w-1:r.x,hp=roomName!=='Doble'&&(frame==='bed'||frame==='bed-blue'||frame==='car')&&r.h>1?2:1;prop(frame,px,r.y,1,hp,['fence-urban','vault-urban'].includes(frame)?'urban':'environment');if(roomName==='Doble'&&r.w>1)prop('bed',r.x===px?r.x+r.w-1:r.x,r.y,1,hp);if((roomName==='Mesas'||roomName==='Salón')&&r.w>1)prop('chair-urban',r.x===px?r.x+r.w-1:r.x,r.y,1,1,'urban')});
    b.rooms!.push({x:mid-1,y:y+1,w:2,h:h-2,name:'Pasillo'});
    if(t.id==='supermarket'){if(n%2)for(let j=y+2;j<y+h-2;j+=2)prop('shelves',x+w-2,j);else for(let i=x+1;i<x+w-1;i+=2)prop('shelves',i,y+h-2)}
-  }
-  // Full cart/awning plus side clearance and a two-tile interaction apron.
-  if(!props.some(p=>p.frame==='aceite-0')&&['commercial','plaza'].includes(biome)&&cx%ACEITE.spacingChunks===0&&cy%ACEITE.spacingChunks===0&&hash(this.seed+47,cx,cy)/4294967296<ACEITE.spawnProbability){
-   const candidates=[{x:9,y:9},{x:20,y:9},{x:9,y:20},{x:20,y:20},{x:4,y:9},{x:23,y:9},{x:4,y:20},{x:23,y:20}];
-   for(const r of candidates){const area={...r,w:5,h:5};if(!free(area)||buildings.some(b=>overlap(b,area)))continue;if(prop('aceite-0',r.x+1,r.y,3,3,'expansion')){reserved.push(area);break}}
   }
   const outdoor=['bin-green','bin-open','bin-blue','bin-yellow','bags','cardboard','pallet','urban-barrel','tires','rubble','planter','bench-urban','streetlamp','trafficlight','sign-road','hydrant','manhole-urban','drain-urban','pole-urban','fence-urban','barrier-urban','cone-urban','graffiti-urban','generator-urban','phone','guard-booth','public-toilet'];
   for(let k=0;k<9;k++){const n=hash(this.seed+301+k,cx,cy),x=1+n%30,y=1+Math.floor(n/31)%30,name=outdoor[n%outdoor.length],r={x,y,w:1,h:1};if((x>=13&&x<=18)||(y>=13&&y<=18)||buildings.some(b=>overlap(b,r)))continue;const large=['bin-green','bin-open','bin-blue','bench-urban','barrier-urban'].includes(name);prop(name,x,y,large?2:1,1,'urban',!['graffiti-urban','manhole-urban','drain-urban','rubble'].includes(name))}

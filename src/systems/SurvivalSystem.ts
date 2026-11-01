@@ -1,4 +1,5 @@
-import {enemyGroundWeaponAllowed} from '../config/enemyBalance';
+import {bossHitAt,bossSurfaceDistance} from '../bosses/BossGeometry';
+import {enemyGroundWeaponAllowed,dropsEquippedWeapon,WeaponPickupOpportunities} from '../config/enemyBalance';
 import {BOSS_DEFINITIONS} from '../bosses/expansion';
 import {achievements} from './Achievements';
 import {playerDamage} from './PlayerModifiers';
@@ -13,7 +14,7 @@ import {ENEMIES,enemyAnimation} from '../enemies/config';
 import {AudioSystem} from './AudioSystem';
 import * as C from '../config/survival';
 export type EnemyAction='esperar'|'perseguir'|'buscar arma'|'recoger arma'|'atacar'|'preparar ejecución'|'aturdido'|'muerto';
-interface Mind {owner:string;spinAt?:number;state:EnemyAction;stunUntil:number;nextSearch:number;weapon?:Gun;reloadAt:number;target?:Drop;visual?:Phaser.GameObjects.Image}
+interface Mind {pickupOpportunities:WeaponPickupOpportunities;owner:string;spinAt?:number;state:EnemyAction;stunUntil:number;nextSearch:number;weapon?:Gun;reloadAt:number;target?:Drop;visual?:Phaser.GameObjects.Image}
 interface Thrown {sprite:Phaser.Physics.Arcade.Sprite;weapon:Gun;left:number;last:{x:number;y:number};collider?:Phaser.Physics.Arcade.Collider}
 export class SurvivalSystem {
  private minds=new WeakMap<Foe,Mind>();private ownerSequence=0;
@@ -24,7 +25,7 @@ export class SurvivalSystem {
  private thrown:Thrown[]=[];
  constructor(private game:Game){}
  get executing(){return !!this.playerExecution}
- mind(e:Foe):Mind {let m=this.minds.get(e);if(!m){m={owner:'enemy-'+(++this.ownerSequence),state:'esperar',stunUntil:0,reloadAt:0,nextSearch:0};this.minds.set(e,m)}return m}
+ mind(e:Foe):Mind {let m=this.minds.get(e);if(!m){m={pickupOpportunities:new WeaponPickupOpportunities(),owner:'enemy-'+(++this.ownerSequence),state:'esperar',stunUntil:0,reloadAt:0,nextSearch:0};this.minds.set(e,m)}return m}
  speed(e:Foe){return C.enemyMovementSpeed(ENEMIES[e.tier].speed,e.boss>=0)}
  private distance(e:Foe){return Phaser.Math.Distance.Between(e.sprite.x,e.sprite.y,this.game.player.x,this.game.player.y)}
  private clear(e:Foe){const s=this.game;return s.lineClear(e.sprite.x,e.sprite.y,s.player.x,s.player.y)}
@@ -33,13 +34,13 @@ export class SurvivalSystem {
  markAttack(e:Foe){if(e.boss<0)this.mind(e).state='atacar'}
  equipInitial(e:Foe){const initial=e.boss>=0?BOSS_DEFINITIONS[e.boss].weapon:ENEMIES[e.tier].weapon;if(initial===undefined)return;const g=gun(initial);if(e.boss===0){g.ammo=4;g.reserve=60}else if(e.boss>0){g.ammo=BOSS_DEFINITIONS[e.boss].mag}this.equip(e,g)}
  equip(e:Foe,g:Gun){const m=this.mind(e);if(!this.game.weaponInstances.register(g,'enemy',m.owner))return false;const old=m.weapon;m.weapon=undefined;if(old&&old!==g)this.game.addDrop(e.sprite.x,e.sprite.y,'gun',old.id,old);m.visual?.destroy();m.visual=undefined;m.weapon=g;m.reloadAt=0;m.spinAt=undefined;return true}
- died(e:Foe,drop=false){this.onHit(e);this.release(e);const m=this.mind(e),g=m.weapon;m.weapon=undefined;m.visual?.destroy();m.visual=undefined;m.state='muerto';if(g){if(drop)this.game.addDrop(e.sprite.body!.center.x,e.sprite.body!.center.y,'gun',g.id,g);else this.game.weaponInstances.retire(g,'enemy')}}
+ died(e:Foe,drop=false){this.onHit(e);this.release(e);const m=this.mind(e),g=m.weapon;m.weapon=undefined;m.visual?.destroy();m.visual=undefined;m.state='muerto';if(g){if(drop&&dropsEquippedWeapon(e.tier,e.boss))this.game.addDrop(e.sprite.body!.center.x,e.sprite.body!.center.y,'gun',g.id,g);else this.game.weaponInstances.retire(g,'enemy')}}
  onHit(e:Foe){if(this.enemyExecution?.enemy===e)this.cancelEnemyExecution()}
  stun(e:Foe,extra=0){if(e.boss>=0)return;this.onHit(e);this.release(e);const m=this.mind(e);m.spinAt=undefined;m.stunUntil=this.game.clock+C.STUN_DURATION+extra;m.state='aturdido';e.sprite.setVelocity(0)}
  tryExecute(){const s=this.game;if(this.executing||s.ended||s.paused||s.roulette.active||s.levelUp.active||s.dash.active(s.clock)||s.reloadAt)return false;const enemy=s.foes.filter(e=>e.boss<0&&e.hp>0&&e.sprite.active&&this.mind(e).stunUntil>s.clock&&this.distance(e)<=C.PLAYER_EXECUTION_RANGE&&this.clear(e)).sort((a,b)=>this.distance(a)-this.distance(b))[0];if(!enemy)return false;
   this.onHit(enemy);this.release(enemy);s.rounds.requiem.offensive('execute');this.playerExecution={enemy,until:s.clock+C.PLAYER_EXECUTION_DURATION};enemy.sprite.setVelocity(0);s.player.setVelocity(0);s.appearance.hold('melee');AudioSystem.play(s,'execute',.7);return true;
  }
- punch(angle:number){const s=this.game;if(s.ended||s.paused||s.roulette.active||s.levelUp.active||this.executing||s.dash.active(s.clock))return false;const targets=s.foes.filter(e=>e.hp>0&&e.sprite.active&&this.distance(e)<=58&&this.clear(e)&&Math.cos(Math.atan2(e.sprite.y-s.player.y,e.sprite.x-s.player.x)-angle)>.35).sort((a,b)=>this.distance(a)-this.distance(b));s.rounds.requiem.offensive('melee');s.appearance.hold('melee');if(!targets.length){const connected=s.fortune.melee(s.player.x,s.player.y,angle,58,playerDamage(20,s.run.stats,40,true));if(connected)AudioSystem.play(s,'punch',.7);return connected}const e=targets[0];s.hit(e,playerDamage(20,s.run.stats,this.distance(e),true));AudioSystem.play(s,'punch',.7);return true}
+ punch(angle:number){const s=this.game;if(s.ended||s.paused||s.roulette.active||s.levelUp.active||this.executing||s.dash.active(s.clock))return false;const targets=s.foes.filter(e=>e.hp>0&&e.sprite.active&&(e.boss>=0?bossSurfaceDistance(e.boss,e.sprite,s.player.x,s.player.y):this.distance(e))<=58&&this.clear(e)&&Math.cos(Math.atan2(e.sprite.y-s.player.y,e.sprite.x-s.player.x)-angle)>.35).sort((a,b)=>this.distance(a)-this.distance(b));s.rounds.requiem.offensive('melee');s.appearance.hold('melee');if(!targets.length){const connected=s.fortune.melee(s.player.x,s.player.y,angle,58,playerDamage(20,s.run.stats,40,true));if(connected)AudioSystem.play(s,'punch',.7);return connected}const e=targets[0];s.hit(e,playerDamage(20,s.run.stats,this.distance(e),true));AudioSystem.play(s,'punch',.7);return true}
  throwWeapon(angle:number){const s=this.game;if(s.ended||s.paused||s.roulette.active||s.levelUp.active||this.executing||s.dash.active(s.clock)||!s.guns.length)return false;
   const weapon=s.guns[s.active];if(!s.weaponInstances.fly(weapon))return false;s.rounds.requiem.offensive('throw',weapon.id);s.guns.splice(s.active,1);s.equipped.setVisible(false);s.ultimate.releaseGun(weapon);s.active=Math.min(s.active,Math.max(0,s.guns.length-1));s.reloadAt=0;
   const sprite=s.physics.add.sprite(s.player.x,s.player.y,`weapon-${weapon.id}`).setDepth(14);const width=weapon.id<2?26:44;sprite.setDisplaySize(width,width*sprite.height/sprite.width).setRotation(angle);sprite.body!.setSize(sprite.width,sprite.height);sprite.setVelocity(Math.cos(angle)*C.THROW_SPEED,Math.sin(angle)*C.THROW_SPEED);
@@ -50,7 +51,7 @@ export class SurvivalSystem {
   if(this.enemyExecution){const {enemy,until}=this.enemyExecution;if(!enemy.sprite.active||enemy.hp<=0||this.mind(enemy).stunUntil>s.clock||s.dash.active(s.clock)||this.executing||this.distance(enemy)>C.ENEMY_EXECUTION_RANGE||!this.clear(enemy))this.cancelEnemyExecution();else if(s.clock>=until){this.cancelEnemyExecution();s.damage(1000,true)}}
   if(this.playerExecution){const {enemy,until}=this.playerExecution;s.appearance.show(Math.floor(s.clock/90)%2?'melee':'hurt');if(!enemy.sprite.active||enemy.hp<=0){this.playerExecution=undefined}else if(s.clock>=until){this.playerExecution=undefined;s.hit(enemy,(enemy.hp+1)*(1+s.run.stats.meleeDamage),{...s.ultimate.shot(s.clock),method:'execute'});achievements().event({type:'execute'})}}
   for(const t of this.thrown){if(!t.sprite.active)continue;const {x,y}=t.sprite;if(!blocked(s.grid,Math.floor(x/48),Math.floor(y/48)))t.last={x,y};t.left-=Math.hypot(t.sprite.body!.velocity.x,t.sprite.body!.velocity.y)*dt/1000;t.sprite.rotation+=dt*.015;
-   const e=s.foes.find(e=>e.sprite.active&&e.hp>0&&Phaser.Math.Distance.Between(x,y,e.sprite.x,e.sprite.y)<(e.boss>=0?30:24)&&s.lineClear(t.last.x,t.last.y,e.sprite.x,e.sprite.y));if(e){s.rounds.requiem.offensive('throw',t.weapon.id);const level=s.run.upgrades.brutalThrow??0;this.stun(e,250*level);if(level)s.hit(e,10*level,{...s.ultimate.shot(s.clock),method:'throw',weaponId:t.weapon.id});this.land(t)}else if(t.left<=0)this.land(t);
+   const e=s.foes.find(e=>e.sprite.active&&e.hp>0&&(e.boss>=0?bossHitAt(e.boss,e.sprite,x,y):Phaser.Math.Distance.Between(x,y,e.sprite.x,e.sprite.y)<24)&&s.lineClear(t.last.x,t.last.y,e.sprite.x,e.sprite.y));if(e){s.rounds.requiem.offensive('throw',t.weapon.id);const level=s.run.upgrades.brutalThrow??0;this.stun(e,250*level);if(level)s.hit(e,10*level,{...s.ultimate.shot(s.clock),method:'throw',weaponId:t.weapon.id});this.land(t)}else if(t.left<=0)this.land(t);
   }this.thrown=this.thrown.filter(t=>t.sprite.active);
  }
  /** Higher priorities consume the enemy's turn; bosses always use their existing AI. */
@@ -72,7 +73,7 @@ export class SurvivalSystem {
   if(e.canPickupWeapons!==false&&ENEMIES[e.tier].pickup&&!(m.weapon&&(isMelee(m.weapon.id)||m.weapon.ammo>0||m.weapon.reserve>0))&&!(sight?.visible&&dist<=65)){
    if(m.target&&(!s.drops.includes(m.target)||!m.target.sprite.active||!enemyGroundWeaponAllowed(e.tier,e.boss,m.target.id,e.canPickupWeapons)))this.release(e);
    if(!m.target&&s.clock>=m.nextSearch){m.nextSearch=s.clock+WEAPON_SEARCH_INTERVAL;const candidates=s.drops.filter(d=>d.ground?.available&&d.weapon&&enemyGroundWeaponAllowed(e.tier,e.boss,d.id,e.canPickupWeapons)&&(!isMelee(d.id)&&(d.weapon.ammo>0||d.weapon.reserve>0))&&!this.claims.has(d)&&Phaser.Math.Distance.Between(d.sprite.x,d.sprite.y,e.sprite.x,e.sprite.y)<=C.WEAPON_DETECTION_RADIUS).sort((a,b)=>Phaser.Math.Distance.Between(a.sprite.x,a.sprite.y,e.sprite.x,e.sprite.y)-Phaser.Math.Distance.Between(b.sprite.x,b.sprite.y,e.sprite.x,e.sprite.y));
-    for(const d of candidates){const tx=Math.floor(d.sprite.x/48),ty=Math.floor(d.sprite.y/48);if(!blocked(s.grid,tx,ty)&&s.navigation.canReach(e.sprite.body!.center,{x:d.sprite.x,y:d.sprite.y})){m.target=d;this.claims.set(d,e);break}}
+    for(const d of candidates){const tx=Math.floor(d.sprite.x/48),ty=Math.floor(d.sprite.y/48);if(!blocked(s.grid,tx,ty)&&s.navigation.canReach(e.sprite.body!.center,{x:d.sprite.x,y:d.sprite.y})){if(!m.pickupOpportunities.allow(e.tier,d.weapon!))continue;m.target=d;this.claims.set(d,e);break}}
    }
    if(m.target){const d=m.target,distGun=Phaser.Math.Distance.Between(d.sprite.x,d.sprite.y,e.sprite.x,e.sprite.y);if(distGun<28&&enemyGroundWeaponAllowed(e.tier,e.boss,d.id,e.canPickupWeapons)&&s.lineClear(e.sprite.x,e.sprite.y,d.sprite.x,d.sprite.y)){m.state='recoger arma';const acquired=d.ground?s.weaponInstances.take(d.ground,'enemy',m.owner):undefined;if(acquired){const old=m.weapon;m.weapon=undefined;s.removeDrop(d);if(old)s.addDrop(e.sprite.x,e.sprite.y,'gun',old.id,old);this.equip(e,acquired);e.next=s.clock+300}this.release(e);return true}
     m.state='buscar arma';this.move(e,d.sprite.x,d.sprite.y);return true;

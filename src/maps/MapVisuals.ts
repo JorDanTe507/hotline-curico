@@ -1,3 +1,4 @@
+import {electricallyPowered} from '../atmosphere/AtmosphereStyle';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
 import {TILE,COLS,ROWS,rooms,blocked} from './apartments';
@@ -14,7 +15,7 @@ export class MapVisuals {
  readonly map:Phaser.Tilemaps.Tilemap;
  readonly floor:Phaser.Tilemaps.TilemapLayer;
  readonly structure:Phaser.Tilemaps.TilemapLayer;
- readonly objects:Phaser.GameObjects.Image[]=[];
+ readonly objects:Phaser.GameObjects.Image[]=[];readonly electrical:Phaser.GameObjects.Image[]=[];
  readonly blood:Phaser.GameObjects.Image[]=[];readonly impacts:Phaser.GameObjects.Image[]=[];
  readonly lights:{image:Phaser.GameObjects.Image;base:number;phase:number}[]=[];
  private stopped=false;private visuals:Phaser.GameObjects.GameObject[]=[];private originVisible=true;
@@ -46,7 +47,7 @@ export class MapVisuals {
   this.thresholds();this.visuals=s.children.list.filter(o=>!previous.has(o));
  }
  private image(frame:string,x:number,y:number,width:number,height:number){
-  const image=frame==='car'?this.s.add.image(x,y,`car-${['aveo','spark','lanos'][Math.abs(Math.floor(x+y+this.s.run.seed))%3]}`):this.s.add.image(x,y,'environment',frame);const scale=Math.min(width/image.width,height/image.height);return image.setScale(scale);
+  const image=frame==='car'?this.s.add.image(x,y,`car-${['aveo','spark','lanos'][Math.abs(Math.floor(x+y+this.s.run.seed))%3]}`):this.s.add.image(x,y,'environment',frame);const scale=Math.min(width/image.width,height/image.height);if(electricallyPowered(frame))this.electrical.push(image);return image.setScale(scale);
  }
  private decorateRoom(i:number){
   const s=this.s,rx=(i%4)*480,ry=Math.floor(i/4)*432,accent=[0x51deef,0xf54a99,0xf0bf74,0x6f9efb][i%4];

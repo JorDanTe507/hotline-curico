@@ -1,3 +1,4 @@
+import {BOSS_VISUAL_SCALE,BOSS_OLD_SCALE,bossAttachmentY} from './BossGeometry';
 import Phaser from 'phaser';
 import type {Game,Foe} from '../scenes/Game';
 import {BOSS_DEFINITIONS,BOSS_TUNING as T,expansionBossStats,bossAnimation} from './expansion';
@@ -8,8 +9,8 @@ export class NewBosses {
  begin(){this.graphics.clear()}
  private state(e:Foe){let m=this.states.get(e);if(!m){const image=this.s.add.image(e.sprite.x,e.sprite.y,`boss-${e.boss}-weapon`).setOrigin(.15,.5).setDepth(14);this.images.add(image);m={phase:'move',until:this.s.clock+1200,next:0,remaining:0,x:0,y:0,pattern:0,image};this.states.set(e,m)}return m}
  update(e:Foe){const s=this.s,c=BOSS_DEFINITIONS[e.boss],stats=expansionBossStats(e.boss,s.run.round),m=this.state(e),p=s.player,dist=Math.hypot(p.x-e.sprite.x,p.y-e.sprite.y),los=s.lineClear(e.sprite.x,e.sprite.y,p.x,p.y),a=Math.atan2(p.y-e.sprite.y,p.x-e.sprite.x),g=s.survival.mind(e).weapon!;
-  if(!s.tweens.isTweening(e.sprite))e.sprite.setAlpha(1);e.sprite.setVelocity(0).setFlipX(p.x<e.sprite.x);e.label.setPosition(e.sprite.x,e.sprite.y-57).setText(c.name+(m.phase==='recover'?' · ENFRIANDO':''));
-  m.image.setVisible(m.phase==='move'||m.phase==='recover');m.image.setPosition(e.sprite.x+Math.cos(a)*8,e.sprite.y+10).setDisplaySize(e.boss===4?56:64,24).setRotation(a).setFlipY(Math.cos(a)<0);
+  if(!s.tweens.isTweening(e.sprite))e.sprite.setAlpha(1);e.sprite.setVelocity(0).setFlipX(p.x<e.sprite.x);e.label.setPosition(e.sprite.x,e.sprite.y-72).setText(c.name+(m.phase==='recover'?' · ENFRIANDO':''));
+  m.image.setVisible(m.phase==='move'||m.phase==='recover');m.image.setPosition(e.sprite.x+Math.cos(a)*8*BOSS_VISUAL_SCALE/BOSS_OLD_SCALE,e.sprite.y+bossAttachmentY(e.boss,10)).setDisplaySize((e.boss===4?56:64)*BOSS_VISUAL_SCALE/BOSS_OLD_SCALE,24*BOSS_VISUAL_SCALE/BOSS_OLD_SCALE).setRotation(a).setFlipY(Math.cos(a)<0);
   if(c.mag>0&&!g.ammo&&!g.reserve){s.navigation.move(e,p.x,p.y,stats.speed);if(dist<65&&los&&s.clock>=m.next){s.damage(T.contactDamage);m.next=s.clock+T.contactCooldown}return}
   if(m.phase==='recover'){e.sprite.play(bossAnimation(e.boss,'reload'),true);if(s.clock<m.until)return;if(g.ammo===0&&c.mag>0){const n=Math.min(c.mag,g.reserve);g.ammo=n;g.reserve-=n}m.phase='move';m.until=s.clock+400}
   if(m.phase==='move'){
