@@ -1,5 +1,5 @@
 import type {Gun} from '../weapons/arsenal';
-export interface StoredDrop {x:number;y:number;kind:'gun'|'ammo'|'med'|'armor';id:number;weapon?:Gun}
+export interface StoredDrop {x:number;y:number;kind:'gun'|'ammo'|'med'|'armor'|'adrenaline';id:number;weapon?:Gun}
 /** Dormant loot lives in session storage, not in active Phaser objects. Cleared per run. */
 export class ChunkLootStore {
  private memory=new Map<string,StoredDrop[]>();private prefix:string;private storage?:Storage;

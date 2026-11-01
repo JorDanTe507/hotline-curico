@@ -12,3 +12,9 @@
 .mobile-menu .upgrade-icon{width:36px;height:36px;object-fit:contain;image-rendering:pixelated;flex:none}
 @media(max-height:450px){.mobile-orientation section{gap:8px}.mobile-orientation .rotate-phone{width:28px;height:44px;border-width:2px}.mobile-orientation .rotate-phone:before{left:6px;width:10px}.mobile-orientation .rotate-phone:after{left:9px}.mobile-orientation strong{font-size:15px}.mobile-orientation p{font-size:12px}.mobile-orientation small{font-size:11px}}
 @media(max-height:350px){.mobile-context{bottom:120px}}
+
+.mobile-controls .adrenaline{position:absolute;right:calc(7px + var(--safe-r));top:calc(54px + var(--safe-t));width:46px;min-height:50px;padding:2px;display:grid;justify-items:center;font-size:9px;color:#ffdd75}.mobile-controls .adrenaline img{width:26px;height:26px;image-rendering:pixelated;pointer-events:none}.mobile-controls .adrenaline span{pointer-events:none}
+
+.mobile-menu.main-menu{background:transparent;justify-content:flex-end}.mobile-menu.main-menu header{position:absolute;top:12px;left:18px;text-shadow:2px 2px 3px #080511}.mobile-menu.main-menu .scroll{flex:0 1 auto;background:#080511ad;max-height:42%;padding:10px;border-radius:8px}.mobile-menu.main-menu .menu-grid{max-width:none;gap:6px}.mobile-menu.main-menu .menu-grid button{min-height:44px;font-size:13px}.mobile-menu.main-menu small{font-size:10px}
+
+.mobile-menu.pause-settings{inset:5%;background:rgba(9,6,18,.82);border:1px solid #713450}

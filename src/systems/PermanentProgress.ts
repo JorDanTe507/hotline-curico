@@ -17,6 +17,7 @@ export class PermanentProgress {
  private save(){if(this.testing){this.persisted=true;return}try{if(this.storage)this.storage.setItem(ECONOMY.key,JSON.stringify(this.data));this.persisted=!!this.storage}catch{this.persisted=false}}
  level(id:PermanentCharacter,key:string){return this.data.characters[id][key]??0}
  purchase(id:PermanentCharacter,key:string){const definition=PERMANENT[id].find(d=>d[0]===key);if(!definition)return false;const level=this.level(id,key),cost=upgradeCost(level);if(level>=definition[3]||this.data.currency<cost)return false;this.data.currency-=cost;this.data.characters[id][key]=level+1;this.save();if(!this.testing)achievements().event({type:'purchase',character:id,maxed:PERMANENT[id].every(d=>this.level(id,d[0])>=d[3])});return true}
+ spend(amount:number){if(!Number.isSafeInteger(amount)||amount<=0||this.data.currency<amount)return false;this.data.currency-=amount;this.save();return true}
  award(amount:number){const valid=integer(amount,Number.MAX_SAFE_INTEGER-this.data.currency);this.data.currency+=valid;this.save();return valid}
  apply(id:PermanentCharacter,stats:PlayerStats){const l=this.data.characters[id];stats.rerolls=1+(l.rerolls??0);stats.permanentHealth=10*l.vitality;stats.maxHealth+=stats.permanentHealth;stats.permanentFireDamage=(id==='cervela'?.03:.04)*l.damage;stats.permanentDash=.03*l.dash;stats.dashReduction+=stats.permanentDash;
  if(id==='cervela'){stats.ultimateHeal+=l.regeneration;stats.ultimateDuration+=500*l.ultimateDuration;stats.caladaReduction=.4+.02*l.damageReduction}
@@ -30,6 +31,7 @@ export class RunEconomy {
  constructor(private progress:PermanentProgress){}
  private grant(amount:number){this.earned+=this.progress.award(amount)}
  defeated(enemy:{hp:number;boss:number}){if(enemy.hp>0||this.enemies.has(enemy))return false;this.enemies.add(enemy);this.grant(enemy.boss>=0?ECONOMY.bossKill:ECONOMY.normalKill);return true}
+ supply(amount:number){this.grant(amount)}
  special(){this.grant(50)}
  reached(round:number){if(round>0&&round%5===0&&!this.milestones.has(round)){this.milestones.add(round);this.grant(ECONOMY.milestone)}}
  complete(round:number,type:string){if(this.completed.has(round))return false;this.completed.add(round);this.completedRounds++;this.grant(type==='EXTERMINIO'?ECONOMY.extermination:type==='SUPERVIVENCIA'?ECONOMY.survival:0);return true}

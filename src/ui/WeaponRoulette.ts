@@ -41,7 +41,7 @@ export class WeaponRoulette {
  update(delta:number){if(!this.active)return;this.elapsed+=Math.max(0,delta);for(const glow of this.glows)glow.setAlpha(.55+.35*Math.sin(this.elapsed/130));
   const t=Math.min(1,this.elapsed/ROULETTE_SPIN_MS),ease=1-Math.pow(1-t,4);
   this.strip!.x=640-this.winningIndex*this.spacing*ease;
-  if(t===1&&!this.revealed){this.revealed=true;this.title!.setText('¡ARMA OBTENIDA!');this.result!.setText(WEAPONS[this.winner].name.toUpperCase());AudioSystem.play(this.s,'reward')}
+  if(t===1&&!this.revealed){this.revealed=true;this.title!.setText('¡ARMA OBTENIDA!');this.result!.setText(WEAPONS[this.winner].name.toUpperCase()+(isLegendary(this.winner)?' · LEGENDARIA':''));AudioSystem.play(this.s,'reward')}
   if(this.elapsed>=ROULETTE_TOTAL_MS){const done=this.done;this.cancel();this.s.blockPointerUntilRelease=true;done?.();this.s.levelUp.openIfNeeded()}
  }
  cancel(){this.glows=[];this.done=undefined;const wasActive=this.active;this.active=false;this.strip?.clearMask();this.strip?.destroy(true);this.view?.destroy(true);this.mask?.destroy();this.maskShape?.destroy();this.strip=undefined;this.view=undefined;this.mask=undefined;this.maskShape=undefined;

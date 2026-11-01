@@ -1,12 +1,11 @@
-import {maxHealth} from '../systems/HealthCapacity';
 import type {Game} from '../scenes/Game';
 import type {PlayerPose} from './catalog';
+import {ACTOR_SCALE,facing,directionalFrames,type Facing,type VisualPose} from './directional';
 export class PlayerAppearance {
- private held?:{pose:PlayerPose;until:number};
- constructor(private s:Game){}
- private get wounded(){return this.s.run.health<=maxHealth(this.s.run)*.25}
- show(pose:PlayerPose){const s=this.s,set=this.wounded?s.character.wounded:s.character.normal,frames=set[pose];s.player.setTexture(frames[Math.floor(s.clock/110)%frames.length])}
- hold(pose:PlayerPose,duration=170){this.held={pose,until:this.s.clock+duration};this.show(pose)}
- movement(dx:number,dy:number,angle:number){const s=this.s;if(s.dash.active(s.clock)){this.show('run');return}if(s.reloadAt){this.show('reload');return}if(s.clock<s.hurtAt&&s.hurtAt!==Infinity){this.show('hurt');return}if(this.held&&s.clock<this.held.until){this.show(this.held.pose);return}this.show(dx||dy?'walk':Math.sin(angle)<-.65?'back':'idle')}
- death(){const s=this.s;this.held=undefined;s.player.play(`${s.character.id}-${this.wounded?'wounded':'normal'}-death`).setDisplaySize(...s.character.deathSize)}
+ private held?:{pose:PlayerPose;until:number;start:number};private dir:Facing='down';
+ constructor(private s:Game){const sprite=s.player,body=sprite.body!;body.updateFromGameObject();const w=body.width,h=body.height,dx=body.center.x-sprite.x,dy=body.center.y-sprite.y;const originY=(102-(dy+h/2)/ACTOR_SCALE)/112;sprite.setTexture(`actor-${s.character.id}`,0).setScale(ACTOR_SCALE).setOrigin(.5,originY);body.updateFromGameObject();body.setSize(w/ACTOR_SCALE,h/ACTOR_SCALE).setOffset(48+dx/ACTOR_SCALE-w/ACTOR_SCALE/2,112*originY+dy/ACTOR_SCALE-h/ACTOR_SCALE/2);body.updateFromGameObject();this.show('idle')}
+ show(pose:PlayerPose){const actual:VisualPose=pose==='back'?'idle':['pistol','heavy','reload'].includes(pose)?'idle':pose as VisualPose,dir=pose==='back'?'up':this.dir,frames=directionalFrames(this.s.character.id,actual,dir);const elapsed=this.held&&this.held.pose===pose?this.s.clock-this.held.start:this.s.clock,interval=this.held&&this.held.pose===pose?(this.held.until-this.held.start)/Math.max(1,frames.length):100;const i=this.held&&this.held.pose===pose?Math.min(frames.length-1,Math.floor(elapsed/interval)):Math.floor(elapsed/interval)%frames.length;this.s.player.setTexture(`actor-${this.s.character.id}`,frames[Math.max(0,i)]??0).setFlipX(false)}
+ hold(pose:PlayerPose,duration=pose==='melee'?360:170){this.held={pose,until:this.s.clock+duration,start:this.s.clock};this.show(pose)}
+ movement(dx:number,dy:number,angle:number){const s=this.s;this.dir=facing(angle);if(s.dash.active(s.clock)){this.show('run');return}if(s.reloadAt){this.show('reload');return}if(s.clock<s.hurtAt&&s.hurtAt!==Infinity){if(this.held?.pose!=='hurt')this.held={pose:'hurt',start:s.clock,until:s.hurtAt};this.show('hurt');return}if(this.held&&s.clock<this.held.until){this.show(this.held.pose);return}this.held=undefined;this.show(dx||dy?s.ultimate.active(s.clock)&&s.ultimate.movementMultiplier>1?'run':'walk':'idle')}
+ death(){const s=this.s;this.held=undefined;if(directionalFrames(s.character.id,'dead',this.dir).length)s.player.setFlipX(false).play(`actor-${s.character.id}-death-${this.dir}`);else s.player.setOrigin(.5).play(`${s.character.id}-normal-death`).setDisplaySize(s.character.deathSize[0]*1.08,s.character.deathSize[1]*1.08)}
 }

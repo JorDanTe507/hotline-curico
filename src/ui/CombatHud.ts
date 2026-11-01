@@ -1,8 +1,12 @@
+import {reloadStatus} from './ReloadFeedback';
+import {permanentProgress} from '../systems/PermanentProgress';
 import {inputHub} from '../input/InputHub';
 import {maxHealth,healthMultiplier} from '../systems/HealthCapacity';
 import {xpRequired} from '../config/progression';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
+import {bossName} from '../bosses/expansion';
+import {MEDKIT_CAPACITY} from '../config/instinct';
 import {WEAPONS,isMelee} from '../weapons/arsenal';
 import {ARMOR_CAPACITY} from '../config/armor';
 function label(s:Phaser.Scene,x:number,y:number,value:string,size=17,color='#fff1fa'){
@@ -12,10 +16,10 @@ export class CombatHud {
  name:Phaser.GameObjects.Text;weapon:Phaser.GameObjects.Text;round:Phaser.GameObjects.Text;dash:Phaser.GameObjects.Text;boss:Phaser.GameObjects.Text;
  healthBar:Phaser.GameObjects.Rectangle;armorBar:Phaser.GameObjects.Rectangle;dashBar:Phaser.GameObjects.Rectangle;bossBar:Phaser.GameObjects.Rectangle;
  xpLabel:Phaser.GameObjects.Text;xpBar:Phaser.GameObjects.Rectangle;private minigunIcon:Phaser.GameObjects.Image;private armorLabel:Phaser.GameObjects.Text;private enemies:Phaser.GameObjects.Text;
- private mobile=false;private parts:Phaser.GameObjects.GameObject[]=[];
+ private reloadLabel:Phaser.GameObjects.Text;private adrenaline:Phaser.GameObjects.Text;private currency:Phaser.GameObjects.Text;private mobile=false;private parts:Phaser.GameObjects.GameObject[]=[];
  setMobile(value:boolean){if(this.mobile===value)return;this.mobile=value;for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(!value&&!this.s.ended)}
- constructor(private s:Game){const before=new Set(s.children.list);
-  this.minigunIcon=s.add.image(444,31,'minigun-hud').setDisplaySize(32,32).setScrollFactor(0).setDepth(92).setVisible(false);
+ constructor(private s:Game){this.reloadLabel=label(s,640,59,'',14,'#80f3e5').setOrigin(.5,0);const before=new Set(s.children.list);
+  s.add.image(510,86,'adrenaline').setDisplaySize(24,24).setScrollFactor(0).setDepth(92);this.adrenaline=label(s,530,78,'ADRENALINA 0/1 [H]',14,'#ffe27d');this.currency=label(s,1000,70,'HC: 0',17,'#ffdb79');this.minigunIcon=s.add.image(444,31,'minigun-hud').setDisplaySize(32,32).setScrollFactor(0).setDepth(92).setVisible(false);
   this.xpLabel=label(s,24,190,'NIVEL 1 · XP 0/100',13,'#98e9b8');s.add.rectangle(24,213,280,5,0x22483b,.25).setOrigin(0,.5).setScrollFactor(0).setDepth(91);this.xpBar=s.add.rectangle(24,213,0,5,0x77efb0).setOrigin(0,.5).setScrollFactor(0).setDepth(92);
   this.name=label(s,110,14,s.character.name+'  ♥ 100',19);
   s.add.rectangle(110,48,180,11,0x9b245d,.18).setOrigin(0,.5).setStrokeStyle(1,0xff76b7,.8).setScrollFactor(0).setDepth(91);
@@ -32,13 +36,13 @@ export class CombatHud {
   this.boss=label(s,640,113,'',18,'#ff8cb7').setOrigin(.5);
   this.bossBar=s.add.rectangle(330,139,620,8,0xff327d).setOrigin(0,.5).setScrollFactor(0).setDepth(92).setVisible(false);this.parts=s.children.list.filter(o=>!before.has(o));
  }
- update(){const s=this.s,g=s.guns[s.active],w=g?WEAPONS[g.id]:undefined,health=Math.max(0,s.run.health),armor=Math.max(0,s.run.armor);
+ update(){this.reloadLabel.setText(reloadStatus(this.s)).setVisible(!this.mobile&&!this.s.ended);this.adrenaline.setText(`ADRENALINA ${this.s.run.adrenaline??0}/1 ${inputHub(this.s.game).last==='gamepad'?'[R3]':'[H]'}`);this.currency.setText(`HC: ${permanentProgress().data.currency.toLocaleString('es-CL')}`);const s=this.s,g=s.guns[s.active],w=g?WEAPONS[g.id]:undefined,health=Math.max(0,s.run.health),armor=Math.max(0,s.run.armor);
   this.xpLabel.setText(`NIVEL ${s.run.level} · XP ${s.run.xp}/${xpRequired(s.run.level)}`);this.xpBar.width=280*s.run.xp/xpRequired(s.run.level);this.minigunIcon.setVisible(g?.id===7);this.name.setText(`${s.character.name}  ♥ ${Math.ceil(health)}/${maxHealth(s.run)} HP`);this.healthBar.width=180*health/maxHealth(s.run);this.healthBar.setFillStyle(healthMultiplier(s.run)>1?0x6c99ff:health>0&&health<=maxHealth(s.run)*.25?0xff173f:0xff328d);this.armorBar.width=180*armor/s.run.stats.maxArmor;this.armorLabel.setText(`CHALECO ${Math.ceil(armor)}/${s.run.stats.maxArmor}${s.perks.temporaryArmor?` +${Math.ceil(s.perks.temporaryArmor)} TEMP`:""}`);
   this.enemies.setText(`ENEMIGOS: ${s.foes.length}`);this.round.setText(s.rounds.label);
-  if(g)this.minigunIcon.setVisible(true).setTexture(g.id===7?'minigun-hud':g.id>=8?`weapon-${g.id}-hud`:`weapon-${g.id}`);this.weapon.setText(`${w?w.name.toUpperCase():'DESARMADO'}  ${g?(isMelee(g.id)?'CUERPO A CUERPO':s.ultimate.active(s.clock)&&s.ultimate.infiniteAmmo?'∞':(g.id===12?'FUEL ':'')+g.ammo+'/'+g.reserve):'—'}${s.reloadAt?' · RECARGANDO':''}\nBOTIQUINES: ${s.run.medkits}/2 ${inputHub(s.game).last==='gamepad'?'[SHARE]   [R1]':'[F]   [Q]'} ARMA ${s.guns.length?s.active+1:0}/${s.guns.length}`);
+  if(g)this.minigunIcon.setVisible(true).setTexture(g.id===7?'minigun-hud':g.id>=8?`weapon-${g.id}-hud`:`weapon-${g.id}`);this.weapon.setText(`${w?w.name.toUpperCase():'DESARMADO'}  ${g?(isMelee(g.id)?'CUERPO A CUERPO':s.ultimate.active(s.clock)&&s.ultimate.infiniteAmmo?'∞':(g.id===12?'FUEL ':'')+g.ammo+'/'+g.reserve):'—'}${s.reloadAt?' · RECARGANDO':''}\nBOTIQUINES: ${s.run.medkits}/${MEDKIT_CAPACITY} ${inputHub(s.game).last==='gamepad'?'[SHARE]   [R1]':'[F]   [Q]'} ARMA ${s.guns.length?s.active+1:0}/${s.guns.length}`);
   this.minigunIcon.setPosition(640-this.weapon.width/2-24,31);
   this.dash.setText(s.clock>=s.dash.readyAt?'DASH LISTO':'DASH RECARGANDO');this.dashBar.width=220*s.dash.progress(s.clock);
-  const boss=s.foes.find(e=>e.boss>=0);this.boss.setText(boss?`EL TORTURADO — ${Math.ceil(boss.hp)}/${boss.max} HP`:'');this.bossBar.setVisible(!!boss);if(boss)this.bossBar.width=620*boss.hp/boss.max;if(this.mobile)for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(false);
+  const boss=s.foes.find(e=>e.boss>=0);this.boss.setText(boss?`${bossName(boss.boss)} — ${Math.ceil(boss.hp)}/${boss.max} HP`:'');this.bossBar.setVisible(!!boss);if(boss)this.bossBar.width=620*boss.hp/boss.max;if(this.mobile)for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(false);
  }
 }
 

@@ -1,0 +1,1 @@
+export const presentationPreferences={get animated(){try{return localStorage.getItem('hotline-animated-menu')!=='false'}catch{return true}},set animated(value:boolean){try{localStorage.setItem('hotline-animated-menu',String(value))}catch{}}};

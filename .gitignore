@@ -22,3 +22,6 @@ Thumbs.db
 # Local publication inventory is regenerated before pushing.
 /PUBLICACION-ARCHIVOS.txt
 /.publication-lock/
+
+# Original character sheets are local preparation inputs; runtime uses prepared atlases.
+/public/assets/v163/*-source.png

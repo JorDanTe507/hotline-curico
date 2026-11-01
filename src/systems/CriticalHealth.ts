@@ -12,7 +12,7 @@ export class CriticalHealth {
  constructor(private scene:Game){
   this.warning=scene.add.text(640,82,'VIDA CRÍTICA',{fontFamily:'monospace',fontSize:28,fontStyle:'bold',color:'#ff3155',stroke:'#16010b',strokeThickness:3}).setOrigin(.5).setScrollFactor(0).setDepth(93).setVisible(false);
   this.border=scene.add.graphics().setScrollFactor(0).setDepth(89).setVisible(false);
-  for(let i=0;i<5;i++)this.border.lineStyle(4,0xff2255,.25-i*.04).strokeRect(i*4,i*4,1280-i*8,720-i*8);
+  for(let i=0;i<5;i++)this.border.lineStyle(4,0xff2255,(.25-i*.04)*1.25).strokeRect(i*4,i*4,1280-i*8,720-i*8);
   const bg=scene.add.rectangle(0,0,380,116,0x100916,.92).setOrigin(0).setStrokeStyle(1,0xa6265a);
   const portrait=scene.add.image(57,58,scene.character.woundedPortraits[0]);portrait.setScale(Math.min(104/portrait.width,104/portrait.height));
   const line=scene.add.text(120,25,'',{fontFamily:'monospace',fontSize:18,color:'#fff0f4',wordWrap:{width:245}});
@@ -26,7 +26,7 @@ export class CriticalHealth {
   let clearCorner=false;if(critical&&now<this.dialogueUntil){const cam=this.scene.cameras.main,objects=[this.scene.player,...this.scene.foes.map(e=>e.sprite),...this.scene.shots.map(p=>p.sprite)];for(const [x,y] of [[880,535],[20,190],[880,190]]){if(!objects.some(o=>o.active&&o.x-cam.scrollX>x-25&&o.x-cam.scrollX<x+405&&o.y-cam.scrollY>y-35&&o.y-cam.scrollY<y+145)){this.dialogue.setPosition(x,y);clearCorner=true;break}}}
   this.dialogue.setVisible(critical&&now<this.dialogueUntil&&clearCorner);
   if(s.registry.get('mobileUI')){this.warning.setY(170);this.dialogue.setPosition(450,175).setScale(.85)}else{this.warning.setY(82);this.dialogue.setScale(1)}
-  if(beat&&!this.scene.sound.getAll('sfx-critical').some(sound=>sound.isPlaying))AudioSystem.play(this.scene,'critical',.6);
+  if(beat&&!this.scene.sound.getAll('sfx-critical').some(sound=>sound.isPlaying))AudioSystem.play(this.scene,'critical',.75);
   if(!critical)this.scene.sound.stopByKey('sfx-critical');
  }
  suspend(){this.warning.setVisible(false);this.border.setVisible(false);this.dialogue.setVisible(false);this.scene.sound.stopByKey('sfx-critical')}

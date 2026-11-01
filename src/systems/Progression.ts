@@ -1,10 +1,13 @@
+import {HIT_XP_BASE,HIT_XP_MULTIPLIER} from '../config/progression';
+import type {ShotCredit} from './Ultimate';
 import {BOSS_XP,XP_BY_TIER,RARITY_WEIGHTS,xpRequired,type Rarity} from '../config/progression';
 import {UPGRADES,EMERGENCY_UPGRADES,type Upgrade,type UpgradeContext} from './UpgradeCatalog';
 import type {Run} from './run';
 export class Progression {
- private rewarded=new WeakSet<object>();
+ private rewarded=new WeakSet<object>();private impactTargets=new WeakMap<ShotCredit,WeakSet<object>>();private impactFraction=0;
  constructor(readonly run:Run){}
  defeated(enemy:{hp:number;tier:number;boss:number}){if(enemy.hp>0||this.rewarded.has(enemy))return 0;this.rewarded.add(enemy);const xp=enemy.boss>=0?BOSS_XP:XP_BY_TIER[enemy.tier]??10;this.addXP(xp);return xp}
+ impact(enemy:object,shot:ShotCredit,damage:number){if(damage<=0||!Number.isFinite(damage)||shot.fromPlayer!==true||shot.method!=='shot'||shot.secondary||shot.weaponId===undefined||shot.weaponId>=13)return 0;let targets=this.impactTargets.get(shot);if(!targets){targets=new WeakSet();this.impactTargets.set(shot,targets)}if(targets.has(enemy))return 0;targets.add(enemy);this.impactFraction+=HIT_XP_BASE*HIT_XP_MULTIPLIER;const xp=Math.floor(this.impactFraction+1e-8);this.impactFraction-=xp;this.addXP(xp);return xp}
  addXP(amount:number){if(!Number.isFinite(amount)||amount<=0)return 0;const r=this.run;let levels=0;r.xp+=Math.floor(amount);while(r.xp>=xpRequired(r.level)){r.xp-=xpRequired(r.level);r.level++;r.pendingLevels++;levels++}return levels}
  options(context:UpgradeContext,random=Math.random,exclude:readonly string[]=[]){
   const pool=UPGRADES.filter(u=>u.available(context)&&!exclude.includes(u.id)).map(u=>context.abilityModule==='tryhard'&&u.id==='charge'?{...u,name:'Tryhard acelerado'}:context.abilityModule==='tryhard'&&u.id==='duration'?{...u,name:'Tiempo Tryhard',description:'+1 s de duración inicial. Límite total 14 s.'}:u),chosen:Upgrade[]=[];

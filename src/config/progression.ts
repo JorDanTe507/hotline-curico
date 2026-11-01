@@ -1,3 +1,5 @@
+export const HIT_XP_BASE=2;
+export const HIT_XP_MULTIPLIER=1.20;
 export const RARITY_WEIGHTS={common:65,rare:28,epic:7} as const;
 export type Rarity=keyof typeof RARITY_WEIGHTS;
 export const XP_BY_TIER=[10,15,15,25,25,20,20,12,15,30,20,15,100,30,25,12];

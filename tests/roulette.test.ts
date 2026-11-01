@@ -19,7 +19,7 @@ test('selección ponderada recorre todos los intervalos y no entrega armas incom
  for(const w of weights){assert.equal(chooseWeapon(()=>(left+w.weight/2)/100),w.id);left+=w.weight}
  assert.equal(chooseWeapon(()=>0),0);assert.equal(chooseWeapon(()=>1),15);
  const counts=new Array(16).fill(0);for(let n=0;n<100000;n++)counts[chooseWeapon(()=>(n+.5)/100000)]++;
- assert.deepEqual(counts,[18000,13000,12000,11000,9000,5000,1000,1000,9000,7000,6000,3000,3000,700,700,600]);
+ assert.deepEqual(counts,[24000,13000,12000,11000,9000,5000,1000,1000,9000,1000,6000,3000,3000,700,700,600]);
 });
 test('RPG y minigun tienen cada uno 1% de botín normal, sin alterar la recompensa especial del boss',()=>{
  assert.equal(normalReward(()=>.009999).id,6);assert.equal(normalReward(()=>.01).id,7);

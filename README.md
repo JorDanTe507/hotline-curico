@@ -1,4 +1,68 @@
-# Hotline Curicó — versión 1.5.1 · Compatibilidad móvil
+# Hotline Curicó — 1.7 · Curicó nunca duerme
+
+Clima por rondas, apagones sectoriales, Director de Eventos, refuerzos integrados, cuatro zonas nuevas y recarga con progreso real. Se conservan los personajes, combate, controles táctiles/mando, guardados y menú animado.
+
+[Validación 1.7](VALIDACION-1.7.md) · [Recursos gráficos](RECURSOS-1.7.md)
+
+En PROJECT507: pausa → CIUDAD 1.7 · PRUEBAS. Los ajustes y límites del clima/director/calidad están en src/atmosphere/CityState.ts.
+
+## Base local conservada: 1.6.3
+
+# Hotline Curicó — versión local 1.6.3 · Renovación visual
+
+Nuevos atlas desarmados de Cervela y Nicolás, video silenciado con alternativa estática, configuración compartida desde pausa y alerta crítica reforzada. Se conservan el equilibrio, colisiones y guardados. Algunas muertes usan respaldo anterior por poses incompletas en las láminas.
+
+Validación y lista de archivos: [VALIDACION-1.6.3.md](VALIDACION-1.6.3.md). Trabajo local, sin publicación.
+
+## Cambios conservados de 1.6.2
+
+Continuación del trabajo local existente: recortes individuales de jefes, cuerpos opacos sobre fondo transparente y ancla centrada para evitar desplazamientos al girar. Los nuevos protagonistas se integraron después, en 1.6.3.
+
+Nicolás termina Modo Tryhard **vivo y por expiración normal** con su vida base completa, incluidas mejoras legítimas. No cura al activar/cancelar, no repite la curación y no revive. Cervela conserva su definitiva.
+
+Una tirada por edificio accesible: **farmacia 75%**, **supermercado 50%**. Hospital/centro médico 80% preparado en configuración; esas estructuras no existen todavía y no se añadieron. Los botiquines recogidos no reaparecen al volver al sector. Inventario máximo tres.
+
+Las cajas de suministros de 30 HP se rompen con **cuatro puñetazos normales de 7,5**, usando el mismo ataque. No cambian el daño a enemigos ni los disparos. Cajas fuertes, cofres y decoración no se rompen a puñetazos.
+
+Se conservan adrenalina, HC, caja misteriosa de 500 HC, XP y dificultad. [Informe de recuperación y validación 1.6.2](VALIDACION-1.6.2.md). Sin commit, push ni publicación.
+
+## Historial local 1.6.1 · Correcciones y adrenalina
+
+Selector desarrollador paginado sin límite en ronda 30, corrección del recorte oscuro del Comandante, HC visible y caja misteriosa por **500 HC**. Nueva ilustración principal de Cervela y Nicolás, conservando música, botones y navegación.
+
+**ADRENALINA 0/1:** recoge con E/cruz/RECOGER y úsala con **H**, **R3** o el botón táctil de jeringa. Recarga la definitiva sin activarla; no se consume si ya está llena, activa, en transición o si el juego no permite consumibles. G sigue lanzando armas. La inyección se conserva entre rondas y se reinicia al comenzar una partida.
+
+Suministros: **45% munición, 22,5% botiquín, 7,5% adrenalina, 20% HC, 5% vacío**. Un inventario lleno deja la jeringa en el suelo. Las categorías de cajas fuertes y la ruleta mantienen sus pesos.
+
+La inspección encontró XP por bajas pero no por impactos. Se añadió una base configurable de 2 XP por impacto válido y multiplicador ×1,20 (2,4 acumulables, sin perder fracciones). No es un aumento del 20% de la XP total de una partida previa: la fuente por impactos no existía. Bajas y curva de niveles siguen iguales. Los créditos compartidos evitan XP repetida por perdigones, DoT o reprocesamiento del mismo objetivo; cada objetivo penetrado por Requiem cuenta una vez.
+
+Cambios, pruebas y límites: [VALIDACION-1.6.1.md](VALIDACION-1.6.1.md). No se hizo commit ni publicación.
+
+## Historial local 1.6 · Sangre y Fortuna
+
+Cuatro nuevos jefes en las rondas 10/15/20/25; El Torturado sigue en la 5. Cajas destruibles exteriores, cajas fuertes interiores (mantén E, clic sobre la caja, cruz del mando o INTERACTUAR táctil durante seis segundos) y cofres misteriosos por 1.500 HC durante el descanso. El progreso de las cajas permanece al descargar sectores durante la partida.
+
+La ruleta inicial se conserva. Después de combatir tienes 30 segundos de descanso para comprar una tirada o acercarte al punto SIGUIENTE RONDA y continuar sin pagar. Una tirada activa detiene el cambio de ronda. Los enemigos comunes solamente recogen armas comunes; se conservan el daño enemigo ×0,55, los tres botiquines y las defensas existentes.
+
+El logro ahora se titula **Salud para los vivos, Requiem para los muertos**, con descripción «Completa una ronda de combate utilizando exclusivamente la Requiem.». Conserva su identificador y progreso. No se publicaron estos cambios. Parámetros provisionales, archivos y pruebas: [VALIDACION-1.6.md](VALIDACION-1.6.md).
+
+## Funcionalidades conservadas de 1.5.3
+
+Requiem atraviesa hasta cuatro enemigos distintos por proyectil: 100%, 85%, 70% y 55% del daño original, sin repetir objetivo ni atravesar paredes. Cada disparo tiene su contador, también con dos Requiem en Última Calada y con Modo Tryhard. Los porcentajes están en `src/weapons/RequiemPenetration.ts`.
+
+El logro legendario de Requiem mantiene estas condiciones: Debes empezar una ronda con Requiem activa y completarla atacando únicamente con ella. Disparar otra arma (aunque falle), golpear, ejecutar, lanzar armas o generar una explosión ofensiva invalida esa ronda. Curarte, recargar, usar chaleco, hacer dash o activar la definitiva no la invalidan. El modo desarrollador siempre impide el desbloqueo. Se conservan los 40 logros previos y sus fechas; el catálogo ahora tiene 41 entradas, 37 activas y cuatro futuras.
+
+Obtener Requiem de la ruleta cuando la ronda ya comenzó no concede elegibilidad retroactiva. Equípala antes de la siguiente ronda. No basta con sostenerla al terminar ni con adelantar el contador de la ronda.
+
+Resultados y archivos de esta versión: [VALIDACION-1.5.3.md](VALIDACION-1.5.3.md).
+
+## Equilibrio conservado de 1.5.2
+
+Requiem legendaria sustituye al Revólver Magnum (ID 9): 90 de daño, 6/12 de munición, 1000 ms entre disparos y recarga de 2400 ms. El revólver básico sigue disponible. La ruleta asigna a Requiem un 1% de probabilidad; ningún enemigo empieza equipado con ella.
+
+El daño de armas de fuego de matones comunes se multiplica por 0,55 antes de chaleco/resistencias. Jefes, explosiones, melee y comportamientos especiales conservan sus reglas. Al generar cada matón básico, una sola tirada decide si pertenece al 10% que no recoge armas. Capacidad de botiquines: tres, con la curación anterior.
+
+Las versiones 1.5.2 a 1.6 son exclusivamente locales; GitHub Pages conserva la 1.5.1 hasta una autorización expresa. Informe anterior: [VALIDACION-1.5.2.md](VALIDACION-1.5.2.md).
 
 Juego local para PC con Phaser 3, TypeScript y Vite. La ruleta existente se conserva intacta en la carpeta superior.
 
@@ -15,7 +79,7 @@ Abrir la dirección que indique Vite. Alternativamente usar `pnpm install` y `pn
 
 ## Controles
 
-WASD mover; ratón apuntar; mantener clic izquierdo disparar o golpear si estás desarmado; R recargar; E recoger; Q alternar entre dos armas; F botiquín; ESPACIO dash; G lanzar arma; V ejecutar aturdido; X habilidad del protagonista; ESC pausa. Con dos armas, E sustituye el arma activa. Dos botiquines como máximo. La salud persiste entre rondas. Ambos comienzan desarmados: recoge con E el premio de la ruleta.
+WASD mover; ratón apuntar; mantener clic izquierdo disparar o golpear si estás desarmado; R recargar; E recoger; Q alternar entre dos armas; F botiquín; ESPACIO dash; G lanzar arma; V ejecutar aturdido; X habilidad del protagonista; ESC pausa. Con dos armas, E sustituye el arma activa. Tres botiquines como máximo. La salud persiste entre rondas. Ambos comienzan desarmados: recoge con E el premio de la ruleta.
 
 ## Funcionalidades conservadas de 1.1
 

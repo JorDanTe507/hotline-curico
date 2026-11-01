@@ -14,7 +14,7 @@ export class Tryhard extends Ultimate {
  override get temporaryDashCooldown(){return Math.max(400,500*(1-(this.currentRun?.().stats.permanentDash??0)))}
  protected override get maximumHealth(){return this.currentRun?maxHealth(this.currentRun()):super.maximumHealth}
  override activate(now:number,guns:Gun[]=[]){if(!super.activate(now,guns))return false;this.startedAt=now;if(this.currentRun)setHealthMultiplier(this.currentRun(),this.currentRun().stats.tryhardMultiplier??5);return true}
- override tick(now:number,health:number,guns:Gun[]=[]){const run=this.currentRun?.();if(!run)return super.tick(now,health,guns);run.health=health;run.health=super.tick(now,health,guns);if(!this.active(now))setHealthMultiplier(run,1);return run.health}
+ override tick(now:number,health:number,guns:Gun[]=[]){const run=this.currentRun?.();if(!run)return super.tick(now,health,guns);const finishes=this.until>0&&now>=this.until&&health>0;run.health=health;run.health=super.tick(now,health,guns);if(!this.active(now)){setHealthMultiplier(run,1);if(finishes&&run.health>0)run.health=maxHealth(run)}return run.health}
  override stop(){super.stop();if(this.currentRun)setHealthMultiplier(this.currentRun(),1)}
  override trackGun(_gun:Gun,_now:number){}
  override extend(ms:number,now:number){if(ms<=0||!this.active(now))return;this.until=Math.min(this.startedAt+14000,this.until+ms);this.activeDuration=this.until-this.startedAt}
