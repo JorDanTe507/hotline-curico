@@ -1,3 +1,4 @@
+import {hudPreferences} from '../ui/HudPreferences';
 import {events19} from '../v19/Events';
 import {hash,type Chunk} from '../world/WorldModel';
 import Phaser from 'phaser';
@@ -59,7 +60,7 @@ export class ChaosSystem {
   for(const [e,m] of this.marks){if(!e.sprite.active||e.hp<=0||s.clock>=m.until){m.image.destroy();this.marks.delete(e)}else m.image.setPosition(e.sprite.x,e.sprite.y+4).setTexture('chaos-fire-'+Math.floor(s.clock/100)%8)}
   for(const [e,c] of this.controls){if(!e.sprite.active||e.hp<=0||s.clock>=Math.max(c.until,c.immune)){this.controls.delete(e);continue}if(s.clock<c.until)this.indicators.lineStyle(2,0x64deff,.8).strokeCircle(e.sprite.x,e.sprite.y+7,22).lineBetween(e.sprite.x-8,e.sprite.y-18,e.sprite.x+7,e.sprite.y-28)}
   for(let i=this.effects.length-1;i>=0;i--){const e=this.effects[i],t=(s.clock-e.start)/e.duration;if(t>=1){e.image.destroy();this.effects.splice(i,1)}else e.image.setTexture('chaos-'+e.name+'-'+Math.min(7,Math.floor(t*8))).setAlpha(1-t*.55)}
-  this.hud.setVisible(!s.registry.get('mobileUI')&&!s.ended&&!s.coop);this.selection.x=this.inventory.selected*38;const selected=this.inventory.selected;this.caption.setText(['FRAGMENTACIÓN','MOLOTOV','CEGADORA','ELÉCTRICA','CUCHILLO'][selected]+' '+this.inventory.counts[selected]+'/'+THROWABLES[selected].capacity+'\n'+(playerInput(s).last==='gamepad'?'L3: APUNTAR · CRUCETA: TIPO':'B / DER: APUNTAR · C: TIPO'));for(let i=0;i<5;i++){this.counts[i].setText(String(this.inventory.counts[i]));this.icons[i].setAlpha(this.inventory.counts[i]?1:.4)}
+  this.hud.setVisible(!s.registry.get('mobileUI')&&!s.ended&&!s.coop);this.selection.x=this.inventory.selected*38;const selected=this.inventory.selected;this.caption.setText(['FRAGMENTACIÓN','MOLOTOV','CEGADORA','ELÉCTRICA','CUCHILLO'][selected]+' '+this.inventory.counts[selected]+'/'+THROWABLES[selected].capacity+'\n'+(playerInput(s).last==='gamepad'?'L3: APUNTAR · CRUCETA: TIPO':'B / DER: APUNTAR · C: TIPO'));if(!hudPreferences.helpers)this.caption.setText(this.caption.text.split('\n')[0]);for(let i=0;i<5;i++){this.counts[i].setText(String(this.inventory.counts[i]));this.icons[i].setAlpha(this.inventory.counts[i]?1:.4)}
  }
  isBurning(e:Foe){return this.marks.has(e)}
  spreadFire(e:Foe,_attack?:ShotCredit){const mark=this.marks.get(e),target=this.s.foes.find(f=>f!==e&&f.hp>0&&Math.hypot(f.sprite.x-e.sprite.x,f.sprite.y-e.sprite.y)<130&&this.s.lineClear(e.sprite.x,e.sprite.y,f.sprite.x,f.sprite.y));if(mark&&target)this.ignite(target,mark.root)}

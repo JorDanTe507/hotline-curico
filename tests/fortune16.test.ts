@@ -21,9 +21,9 @@ test('suministros 45/22.5/7.5/20/5, daño pequeño, premio y apertura se reclama
  const counts={ammo:0,med:0,adrenaline:0,hc:0,none:0};for(let i=0;i<10000;i++)counts[crateReward(()=>(i+.5)/10000)]++;assert.deepEqual(counts,{ammo:4500,med:2250,adrenaline:750,hc:2000,none:500});
  const l=new FortuneLedger(),b=box('crate');assert.equal(l.damage(b,15),false);assert.equal(l.damage(b,15),true);assert.equal(l.damage(b,100),false);assert.ok(l.claim(b));assert.equal(l.claim(b),false);
 });
-test('caja fuerte seis segundos, suelta/aleja pausa y luego reanuda sin recompensas duplicadas',()=>{
- const l=new FortuneLedger(),b=box('safe');assert.equal(l.advance(b,2000,true,true),false);assert.equal(b.progress,2000);l.advance(b,2000,false,true);l.advance(b,2000,true,false);assert.equal(b.progress,2000);
- assert.equal(l.advance(b,3999,true,true),false);assert.equal(l.advance(b,1,true,true),true);assert.equal(b.progress,6000);assert.ok(l.claim(b));assert.equal(l.advance(b,6000,true,true),false);assert.equal(l.claim(b),false);
+test('caja fuerte automática seis segundos, alejarse reinicia y no duplica recompensas',()=>{
+ const l=new FortuneLedger(),b=box('safe');assert.equal(l.advance(b,2000,true),false);assert.equal(b.progress,2000);l.advance(b,2000,false);assert.equal(b.progress,0);
+ assert.equal(l.advance(b,5999,true),false);assert.equal(l.advance(b,1,true),true);assert.equal(b.progress,6000);assert.ok(l.claim(b));assert.equal(l.advance(b,6000,true),false);assert.equal(l.claim(b),false);
 });
 test('categorías de caja fuerte renormalizadas sin inventar míticas, todas las armas válidas',()=>{
  assert.ok(!WEAPONS.some(w=>w.rarity==='mythic'));const counts={rare:0,epic:0,legendary:0};for(let i=0;i<9900;i++){let call=0;const id=safeWeapon(()=>call++===0?(i+.5)/9900:.5),rarity=WEAPONS[id].rarity as keyof typeof counts;assert.ok(rarity in counts);counts[rarity]++}assert.deepEqual(counts,{rare:5500,epic:3500,legendary:900});

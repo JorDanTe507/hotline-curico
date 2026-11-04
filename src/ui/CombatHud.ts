@@ -1,3 +1,4 @@
+import {hudPreferences} from './HudPreferences';
 import {ammoCount} from '../weapons/arsenal';
 import {reloadStatus} from './ReloadFeedback';
 import {permanentProgress} from '../systems/PermanentProgress';
@@ -41,7 +42,7 @@ export class CombatHud {
   this.xpLabel.setText(`NIVEL ${s.run.level} · XP ${s.run.xp}/${xpRequired(s.run.level)}`);this.xpBar.width=280*s.run.xp/xpRequired(s.run.level);this.minigunIcon.setVisible(g?.id===7);this.name.setText(`${s.character.name}  ♥ ${Math.ceil(health)}/${maxHealth(s.run)} HP`);this.healthBar.width=180*health/maxHealth(s.run);this.healthBar.setFillStyle(healthMultiplier(s.run)>1?0x6c99ff:health>0&&health<=maxHealth(s.run)*.25?0xff173f:0xff328d);this.armorBar.width=180*armor/s.run.stats.maxArmor;this.armorLabel.setText(`CHALECO ${Math.ceil(armor)}/${s.run.stats.maxArmor}${s.perks.temporaryArmor?` +${Math.ceil(s.perks.temporaryArmor)} TEMP`:""}`);
   this.enemies.setText(`ENEMIGOS: ${s.foes.length}`);this.round.setText(s.rounds.label);
   if(g)this.minigunIcon.setVisible(true).setTexture(g.id===7?'minigun-hud':g.id>=8?`weapon-${g.id}-hud`:`weapon-${g.id}`);this.weapon.setText(`${w?w.name.toUpperCase():'DESARMADO'}  ${g?(isMelee(g.id)?'CUERPO A CUERPO':s.ultimate.active(s.clock)&&s.ultimate.infiniteAmmo?'∞':(g.id===12?'FUEL ':'')+ammoCount(g)):'—'}${s.reloadAt?' · RECARGANDO':''}\nBOTIQUINES: ${s.run.medkits}/${MEDKIT_CAPACITY} ${inputHub(s.game).last==='gamepad'?'[SHARE]   [R1]':'[F]   [Q]'} ARMA ${s.guns.length?s.active+1:0}/${s.guns.length}`);
-  this.minigunIcon.setPosition(640-this.weapon.width/2-24,31);
+  if(!hudPreferences.helpers){this.weapon.setText(this.weapon.text.replace(/\s*\[[^\]]*\]/g,''));this.adrenaline.setText(this.adrenaline.text.replace(/\s*\[[^\]]*\]/g,''))}this.minigunIcon.setPosition(640-this.weapon.width/2-24,31);
   this.dash.setText(s.clock>=s.dash.readyAt?'DASH LISTO':'DASH RECARGANDO');this.dashBar.width=220*s.dash.progress(s.clock);
   const boss=s.foes.find(e=>e.boss>=0);this.boss.setText(boss?`${bossName(boss.boss)} — ${Math.ceil(boss.hp)}/${boss.max} HP`:'');this.bossBar.setVisible(!!boss);if(boss)this.bossBar.width=620*boss.hp/boss.max;if(this.mobile)for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(false);
  }

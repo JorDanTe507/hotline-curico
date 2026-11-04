@@ -39,7 +39,7 @@ export class FortuneLedger {
  readonly objects=new Map<string,FortuneObject>();private generated=new Set<string>();
  load(world:WorldModel,chunk:Chunk){if(!this.generated.has(chunk.key)){this.generated.add(chunk.key);for(const item of fortuneCandidates(world,chunk))this.objects.set(item.id,item)}return [...this.objects.values()].filter(p=>p.chunk===chunk.key)}
  damage(item:FortuneObject,amount:number){if(item.opened||item.kind!=='crate'||amount<=0)return false;item.hp=Math.max(0,item.hp-amount);if(item.hp>0)return false;item.opened=true;return true}
- advance(item:FortuneObject,delta:number,holding:boolean,near:boolean){if(item.kind!=='safe'||item.opened||!holding||!near)return false;item.progress=Math.min(FORTUNE.safeTime,item.progress+Math.max(0,delta));if(item.progress<FORTUNE.safeTime)return false;item.opened=true;return true}
+ advance(item:FortuneObject,delta:number,near:boolean){if(item.kind!=='safe'||item.opened)return false;if(!near){item.progress=0;return false}item.progress=Math.min(FORTUNE.safeTime,item.progress+Math.max(0,delta));if(item.progress<FORTUNE.safeTime)return false;item.opened=true;return true}
  claim(item:FortuneObject){if(!item.opened||item.rewarded)return false;item.rewarded=true;return true}
  clear(){this.objects.clear();this.generated.clear()}
 }

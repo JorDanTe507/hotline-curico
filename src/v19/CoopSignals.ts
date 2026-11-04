@@ -4,7 +4,7 @@ import {CriticalAlert,CRITICAL_BEAT_INTERVAL} from '../systems/CriticalAlert';
 import {maxHealth} from '../systems/HealthCapacity';
 import {AudioSystem} from '../systems/AudioSystem';
 
-const color=(id:string)=>id==='cervela'?0xff2244:id==='jordan'?0x34dbff:0x2865ff;
+import {characterColor as color} from '../characters/colors';
 /** World markers use the gameplay camera; danger borders use the fixed HUD camera. */
 export class CoopSignals {
  readonly names:Phaser.GameObjects.Text[]=[];

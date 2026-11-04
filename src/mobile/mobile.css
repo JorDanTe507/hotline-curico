@@ -22,3 +22,8 @@
 .chaos-hud{position:fixed;left:50%;bottom:calc(118px + var(--safe-b));transform:translateX(-50%);display:flex;gap:4px;pointer-events:none}.chaos-hud span{display:flex;align-items:center;border:1px solid #674365;background:#170d23a8;font-size:11px;padding:1px}.chaos-hud span.selected{border-color:#ffdb65}.chaos-hud img{width:24px;height:24px;object-fit:contain;image-rendering:pixelated}.mobile-controls .chaos-throw,.mobile-controls .chaos-cycle{position:absolute;bottom:calc(150px + var(--safe-b));width:58px;height:45px;padding:2px;font-size:10px;white-space:pre-line}.mobile-controls .chaos-throw{right:calc(92px + var(--safe-r))}.mobile-controls .chaos-cycle{right:calc(155px + var(--safe-r))}.mobile-context{bottom:calc(158px + var(--safe-b))}
 
 .mobile-menu .jordan-death{flex:1;min-height:0;display:grid;place-items:center}.jordan-death-frame{position:relative;width:min(100%,calc((100dvh - 90px)*1.7778));aspect-ratio:1671/941}.jordan-death-frame img{position:absolute;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.jordan-death-frame button{position:absolute;left:70.3%;width:24.8%;height:7.4%;min-height:0;background:transparent;border-color:transparent;color:transparent;padding:0}.jordan-death-frame button:focus-visible{outline:2px solid #63edff}
+
+/* Radar reserves space beside the essential mobile HUD; its canvas receives no input. */
+body.radar-mobile-visible .mobile-hud{right:calc(152px + var(--safe-r))}
+
+body.radar-mobile-visible .mobile-hud .weapons{min-width:0;overflow-wrap:anywhere}body.radar-mobile-visible .mobile-hud .weapons span{white-space:normal}

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
 import {WEAPONS,isLegendary} from '../weapons/arsenal';
-import {availableWeights,chooseWeapon} from '../systems/WeaponLottery';
+import {availableWeights,chooseWeapon,type WeightedWeapon} from '../systems/WeaponLottery';
 import {ROULETTE_SPIN_MS,ROULETTE_TOTAL_MS} from '../config/roulette';
 import {AudioSystem} from '../systems/AudioSystem';
 /** Runs on real frame delta while the simulation, scene timers and tweens are frozen. */
@@ -12,8 +12,8 @@ export class WeaponRoulette {
  private glows:Phaser.GameObjects.Rectangle[]=[];private result?:Phaser.GameObjects.Text;private done?:()=>void;private revealed=false;
  private readonly spacing=146;private readonly winningIndex=24;
  constructor(private s:Game,private random=Math.random){}
- start(done:()=>void){if(this.active||this.s.ended||this.s.levelUp.active)return false;
-  this.glows=[];this.winner=chooseWeapon(this.random);this.elapsed=0;this.revealed=false;this.done=done;this.active=true;
+ start(done:()=>void,weights:WeightedWeapon[]=availableWeights()){if(this.active||this.s.ended||this.s.levelUp.active)return false;
+  this.glows=[];this.winner=chooseWeapon(this.random,weights);this.elapsed=0;this.revealed=false;this.done=done;this.active=true;
   const s=this.s;s.critical.suspend();s.stopMinigun();s.physics.world.pause();s.time.paused=true;s.tweens.pauseAll();
   s.player.anims.pause();for(const e of s.foes)e.sprite.anims.pause();
   const panel=s.add.rectangle(640,350,1080,286,0x10091d,.9).setStrokeStyle(2,0xff2887);
@@ -23,7 +23,7 @@ export class WeaponRoulette {
   this.result=s.add.text(640,463,'',{...style,fontSize:20,color:'#ff70ad'}).setOrigin(.5);
   this.view=s.add.container(0,0,[panel,edge,this.title,this.result]).setScrollFactor(0).setDepth(150);
   this.strip=s.add.container(640,350);this.view.add(this.strip);
-  const choices=availableWeights();
+  const choices=weights;
   for(let i=0;i<=this.winningIndex+5;i++){
    const id=i===this.winningIndex?this.winner:choices[Math.floor(Math.random()*choices.length)].id,legendary=isLegendary(id),x=i*this.spacing;
    if(legendary){const glow=s.add.rectangle(x,0,142,151,0xffc95b,.1).setStrokeStyle(4,0xffda72,.35);this.glows.push(glow);this.strip.add(glow)}
