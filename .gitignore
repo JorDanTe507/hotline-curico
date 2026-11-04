@@ -25,3 +25,7 @@ Thumbs.db
 
 # Original character sheets are local preparation inputs; runtime uses prepared atlases.
 /public/assets/v163/*-source.png
+
+# Local Python preparation caches.
+__pycache__/
+*.py[cod]

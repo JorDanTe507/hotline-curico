@@ -1,3 +1,4 @@
+import {normalizeAmmo} from './arsenal';
 import type {Gun} from './arsenal';
 export type WeaponOwner='player'|'enemy'|'ground'|'flying';
 export class GroundWeapon {
@@ -15,13 +16,13 @@ export class WeaponInstances {
  constructor(private prefix:string){}
  register(weapon:Gun,owner:WeaponOwner,ownerId?:string){
   weapon.instanceId??=`${this.prefix}-${++this.sequence}`;
-  const existing=this.records.get(weapon.instanceId);if(existing){if(existing.weapon!==weapon||existing.owner!==owner||(ownerId!==undefined&&existing.ownerId!==undefined&&existing.ownerId!==ownerId))return false;existing.ownerId??=ownerId;return true}
-  this.records.set(weapon.instanceId,{weapon,owner,ownerId});return true;
+  const existing=this.records.get(weapon.instanceId);if(existing){if(existing.weapon!==weapon||existing.owner!==owner||(ownerId!==undefined&&existing.ownerId!==undefined&&existing.ownerId!==ownerId))return false;normalizeAmmo(weapon);existing.ownerId??=ownerId;return true}
+  normalizeAmmo(weapon);this.records.set(weapon.instanceId,{weapon,owner,ownerId});return true;
  }
  place(weapon:Gun,x:number,y:number){
   weapon.instanceId??=`${this.prefix}-${++this.sequence}`;const record=this.records.get(weapon.instanceId);
   if(record&&record.weapon!==weapon)return undefined;if(record?.owner==='ground')return undefined;
-  const ground=new GroundWeapon(weapon,x,y,record?.owner??'ground',`${Math.floor(x/1536)},${Math.floor(y/1536)}`);
+  normalizeAmmo(weapon);const ground=new GroundWeapon(weapon,x,y,record?.owner??'ground',`${Math.floor(x/1536)},${Math.floor(y/1536)}`);
   this.records.set(weapon.instanceId,{weapon,owner:'ground',ground});return ground;
  }
  take(ground:GroundWeapon,owner:'player'|'enemy',ownerId?:string){const record=this.records.get(ground.instanceId);if(!record||record.owner!=='ground'||record.ground!==ground||!ground.available)return undefined;ground.available=false;record.owner=owner;record.ownerId=ownerId;record.ground=undefined;return record.weapon}

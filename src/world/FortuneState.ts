@@ -3,7 +3,7 @@ import {WEAPONS} from '../weapons/arsenal';
 import {hash,type Chunk,WorldModel} from './WorldModel';
 export type FortuneKind='crate'|'safe'|'mystery';
 export interface FortuneObject {id:string;chunk:string;kind:FortuneKind;x:number;y:number;hp:number;progress:number;opened:boolean;rewarded:boolean}
-export function crateReward(random=Math.random){let ticket=random()*100;for(const r of CRATE_REWARDS){ticket-=r.weight;if(ticket<0)return r.kind}return 'none'}
+export function crateReward(random=Math.random,scrapper=false){let ticket=random()*100;for(const r of CRATE_REWARDS){ticket-=scrapper?(r.kind==='ammo'?55:r.kind==='hc'?10:r.weight):r.weight;if(ticket<0)return r.kind}return 'none'}
 export function safeWeapon(random=Math.random){
  const rarities=SAFE_RARITIES.filter(r=>WEAPONS.some(w=>w.rarity===r.rarity));const total=rarities.reduce((n,r)=>n+r.weight,0);
  let ticket=random()*total;let rarity=rarities.at(-1)?.rarity;

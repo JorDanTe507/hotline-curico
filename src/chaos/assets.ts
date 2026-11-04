@@ -1,0 +1,2 @@
+import type Phaser from 'phaser';
+export function loadChaos(s:Phaser.Scene){const keys:string[]=[];for(let i=0;i<5;i++)for(const role of ['icon','pickup','flight','barrel'])keys.push(`${role}-${i}`);for(const name of ['blast','fire','flash','electric','barrel-blast'])for(let i=0;i<8;i++)keys.push(`${name}-${i}`);keys.push('barrel-debris','knife-ground');for(const key of keys)s.load.image('chaos-'+key,`assets/v18/${key}.png`)}

@@ -8,7 +8,7 @@ export const WEAPONS:Weapon[]=[
 {name:'Rifle de asalto',rarity:'rare',damage:22,mag:20,reserve:100,rate:160,range:800,spread:.055,reload:1600,pellets:1},
 {name:'Rifle de precisión',rarity:'epic',damage:85,mag:5,reserve:25,rate:1100,range:1200,spread:.005,reload:2200,pellets:1},
 {name:'RPG',rarity:'legendary',damage:150,mag:1,reserve:0,rate:1500,range:1300,spread:0,reload:2500,pellets:1,explosive:true},
-{name:'MINIGUN «LA BARREDORA»',rarity:'legendary',damage:12,mag:200,reserve:400,rate:50,range:850,spread:.08,reload:4000,pellets:1},
+{name:'MINIGUN «LA BARREDORA»',rarity:'legendary',damage:12,mag:1000,reserve:0,rate:50,range:850,spread:.08,reload:0,pellets:1},
 {name:'Mini Uzi',damage:8,mag:30,reserve:150,rate:70,range:500,spread:.17,reload:1400,pellets:1,minInterval:50,width:32,rarity:'common'},
 {name:'Requiem',damage:90,mag:6,reserve:12,rate:1000,range:850,spread:.018,reload:2400,pellets:1,minInterval:800,width:38,rarity:'legendary'},
 {name:'Escopeta recortada',damage:10,mag:2,reserve:24,rate:850,range:280,spread:.43,reload:2100,pellets:7,minInterval:500,width:38,rarity:'rare'},
@@ -22,5 +22,11 @@ export const isMelee=(id:number)=>weaponKind(id)==='melee';
 export const weaponWidth=(id:number)=>WEAPONS[id].width??[24,26,38,45,44,48,47,52][id]??40;
 export const isLegendary=(id:number)=>id===6||id===7||WEAPONS[id]?.rarity==='legendary';
 export interface Gun {reserveBonusApplied?:boolean;id:number;ammo:number;reserve:number;instanceId?:string}
-export const gun=(id:number,capacity=WEAPONS[id].mag):Gun=>({id,ammo:capacity,reserve:WEAPONS[id].reserve});
-export function reload(g:Gun,capacity=WEAPONS[g.id].mag){if(isMelee(g.id))return 0;const n=Math.max(0,Math.min(capacity-g.ammo,g.reserve));g.ammo+=n;g.reserve-=n;return n}
+export const MINIGUN_CAPACITY=1000;
+export const singleTank=(id:number)=>id===7;
+export const gun=(id:number,capacity=WEAPONS[id].mag):Gun=>({id,ammo:singleTank(id)?MINIGUN_CAPACITY:capacity,reserve:WEAPONS[id].reserve});
+/** Migrate legacy carried/sleeping miniguns by combining ammunition, never refilling them. */
+export function normalizeAmmo(g:Gun){if(singleTank(g.id)){g.ammo=Math.min(MINIGUN_CAPACITY,Math.floor((Number.isFinite(g.ammo)?Math.max(0,g.ammo):0)+(Number.isFinite(g.reserve)?Math.max(0,g.reserve):0)));g.reserve=0}return g}
+export function addGunAmmo(g:Gun,amount:number){if(!Number.isFinite(amount)||amount<=0)return 0;if(singleTank(g.id)){normalizeAmmo(g);const before=g.ammo;g.ammo=Math.min(MINIGUN_CAPACITY,g.ammo+Math.floor(amount));return g.ammo-before}g.reserve+=amount;return amount}
+export const ammoCount=(g:Gun)=>singleTank(g.id)?String(g.ammo):`${g.ammo}/${g.reserve}`;
+export function reload(g:Gun,capacity=WEAPONS[g.id].mag){if(isMelee(g.id)||singleTank(g.id))return 0;const n=Math.max(0,Math.min(capacity-g.ammo,g.reserve));g.ammo+=n;g.reserve-=n;return n}

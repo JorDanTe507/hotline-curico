@@ -59,7 +59,7 @@ test('no exige bajas personales: daño de enemigos a otros enemigos no es una of
  c.tick(16);assert.ok(c.complete(1,true));
 });
 test('logro 41 legendario, quote exacta, icono propio y guardado anterior conservado',()=>{
- assert.equal(ACHIEVEMENTS.length,41);const def=ACHIEVEMENTS.at(-1)!;assert.equal(def.id,'requiem-round');assert.equal(def.name,'Salud para los vivos, Requiem para los muertos');assert.equal(def.description,'Completa una ronda de combate utilizando exclusivamente la Requiem.');assert.equal(def.rarity,'legendary');assert.equal(def.icon,12);
+ assert.equal(ACHIEVEMENTS.length,64);const def=ACHIEVEMENTS.find(a=>a.id==='requiem-round')!;assert.equal(def.id,'requiem-round');assert.equal(def.name,'Salud para los vivos, Requiem para los muertos');assert.equal(def.description,'Completa una ronda de combate utilizando exclusivamente la Requiem.');assert.equal(def.rarity,'legendary');assert.equal(def.icon,12);
  let saved=JSON.stringify({version:1,kills:507,unlocked:{kill:'2026-10-28T12:00:00.000Z'},progress:{},rerolls:{cervela:2,nicolas:1}});
  const storage={getItem:()=>saved,setItem:(k:string,v:string)=>{assert.equal(k,ACHIEVEMENT_KEY);saved=v}},a=new AchievementService(storage,()=>false);
  a.event({type:'start'});a.event({type:'roundComplete'});assert.ok(!a.data.unlocked['requiem-round']);a.event({type:'requiemRoundComplete'});a.event({type:'requiemRoundComplete'});

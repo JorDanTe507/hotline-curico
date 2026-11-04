@@ -1,3 +1,4 @@
+import {CHAOS} from '../chaos/config';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
 import type {ShotCredit} from '../systems/Ultimate';
@@ -27,10 +28,10 @@ export class FortuneObjects {
  atPoint(x:number,y:number){return [...this.views.values()].find(v=>v.item.kind==='crate'&&!v.item.opened&&Math.floor(v.item.x/48)===Math.floor(x/48)&&Math.floor(v.item.y/48)===Math.floor(y/48))?.item}
  damage(item:FortuneObject,amount:number,_credit?:ShotCredit){if(!this.ledger.damage(item,amount)){const view=this.views.get(item.id);if(view&&item.hp<FORTUNE.crateHP)view.image.setTexture('fortune-crate-hurt');return false}
   const s=this.s;this.hide(item.id);const debris=s.add.image(item.x,item.y,'fortune-crate-dead').setDepth(2);s.tweens.add({targets:debris,alpha:0,duration:550,onComplete:()=>debris.destroy()});
-  if(this.ledger.claim(item)){const kind=crateReward();if(kind==='hc')s.economy.supply(FORTUNE.crateHC);else if(kind!=='none')s.addDrop(item.x,item.y,kind,0)}return true;
+  if(this.ledger.claim(item)){const owner=s.coop?.actor(_credit?.playerId??1)??s,kind=crateReward(Math.random,owner.rogue?.has('scrapper'));if(kind==='hc')s.economy.supply(FORTUNE.crateHC);else if(kind!=='none')s.addDrop(item.x,item.y,kind,0);if(Math.random()<CHAOS.crateChance)s.addDrop(item.x+25,item.y,'throwable',Math.floor(Math.random()*5))}return true;
  }
  melee(x:number,y:number,angle:number,range:number,damage:number){const view=[...this.views.values()].filter(v=>v.item.kind==='crate'&&!v.item.opened&&Math.hypot(v.item.x-x,v.item.y-y)<=range&&Math.cos(Math.atan2(v.item.y-y,v.item.x-x)-angle)>.35&&this.s.lineClear(x,y,v.item.x+(x-v.item.x)*.6,v.item.y+(y-v.item.y)*.6)).sort((a,b)=>Math.hypot(a.item.x-x,a.item.y-y)-Math.hypot(b.item.x-x,b.item.y-y))[0];if(!view)return false;this.s.mapVisuals.impactAt(view.item.x,view.item.y);return this.damage(view.item,damage*CRATE_MELEE_DAMAGE_MULTIPLIER)}
- blast(x:number,y:number,radius:number,damage:number){for(const {item} of [...this.views.values()])if(item.kind==='crate'&&!item.opened&&Math.hypot(item.x-x,item.y-y)<radius)this.damage(item,damage)}
+ blast(x:number,y:number,radius:number,damage:number,credit?:ShotCredit){for(const {item} of [...this.views.values()])if(item.kind==='crate'&&!item.opened&&Math.hypot(item.x-x,item.y-y)<radius)this.damage(item,damage,credit)}
  private nearest(){return [...this.views.values()].filter(v=>v.item.kind!=='crate'&&!v.item.opened&&Math.hypot(v.item.x-this.s.player.x,v.item.y-this.s.player.y)<FORTUNE.range&&this.s.lineClear(this.s.player.x,this.s.player.y,v.item.x,v.item.y)).sort((a,b)=>Math.hypot(a.item.x-this.s.player.x,a.item.y-this.s.player.y)-Math.hypot(b.item.x-this.s.player.x,b.item.y-this.s.player.y))[0]}
  interact(){const s=this.s,view=this.nearest(),point=this.continuePoint;
   if(point&&Math.hypot(point.x-s.player.x,point.y-s.player.y)<80&&(!view||Math.hypot(point.x-s.player.x,point.y-s.player.y)<Math.hypot(view.item.x-s.player.x,view.item.y-s.player.y))){s.rounds.continueNow();return true}
@@ -45,7 +46,7 @@ export class FortuneObjects {
   if(view){const item=view.item;if(item.kind==='safe'){
     const hub=inputHub(s.game),p=s.input.activePointer,world=s.cameras.main.getWorldPoint(p.x,p.y),mouse=!p.wasTouch&&p.isDown&&Math.hypot(world.x-item.x,world.y-item.y)<45;
     const held=hub.holding(s.keys.E,'interact')||mouse;
-    if(this.ledger.advance(item,delta,held,true)&&this.ledger.claim(item)){view.image.setTexture('fortune-safe-open');s.awardWeapon(safeWeapon())}
+    if(this.ledger.advance(item,delta,held,true)&&this.ledger.claim(item)){view.image.setTexture('fortune-safe-open');s.awardWeapon(safeWeapon());if(Math.random()<CHAOS.safeChance)s.addDrop(item.x+40,item.y,'throwable',Math.floor(Math.random()*5))}
     this.graphics.lineStyle(3,0x514b41,.7).strokeCircle(item.x,item.y,53);this.graphics.lineStyle(4,0xffd343,1).beginPath().arc(item.x,item.y,53,-Math.PI/2,-Math.PI/2+2*Math.PI*item.progress/FORTUNE.safeTime).strokePath();
     s.hint.setText(`CAJA FUERTE · MANTÉN INTERACCIÓN · ${Math.ceil(item.progress/FORTUNE.safeTime*100)}%`);
    }else{s.hint.setText(`CAJA MISTERIOSA · [E / ×] ${FORTUNE.mysteryCost} HC${s.rounds.state.phase==='rest'?'':' · EN DESCANSO'}`);this.graphics.lineStyle(2,0xffd34b,.55).strokeCircle(item.x,item.y,58+Math.sin(s.clock/180)*2)}

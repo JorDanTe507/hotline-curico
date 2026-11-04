@@ -34,8 +34,8 @@ test('minigun: 600 ms continuos; soltar y cambiar de arma reinician; dos instanc
 test('minigun entrega 20 balas por segundo a 60 FPS sin acumular deriva',()=>{
  const c=new WeaponCadence(),g=gun(7),trigger=new MinigunTrigger();let fired=0;
  for(let frame=0;frame<96;frame++){const now=frame*1000/60+.00001;if(trigger.hold(g,now)&&c.fire(g,now,50,true))fired++}
- assert.equal(fired,20);assert.equal(WEAPONS[7].damage,12);assert.equal(WEAPONS[7].mag,200);assert.equal(WEAPONS[7].reload,4000);
- g.ammo=0;g.reserve=230;assert.equal(reload(g),200);assert.equal(g.reserve,30);
+ assert.equal(fired,20);assert.equal(WEAPONS[7].damage,12);assert.equal(WEAPONS[7].mag,1000);assert.equal(WEAPONS[7].reload,0);
+ g.ammo=0;assert.equal(reload(g),0);assert.equal(g.ammo,0);assert.equal(g.reserve,0);
 });
 test('minigun tiene recursos individuales, cuadros 32×32 y audio PCM',()=>{
  for(const name of ['pickup','hud','spin-0','spin-1','fire-0','fire-1','flash']){const png=readFileSync(`public/assets/weapons/minigun/${name}.png`);assert.equal(png.readUInt32BE(16),32);assert.equal(png.readUInt32BE(20),32)}

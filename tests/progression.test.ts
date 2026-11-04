@@ -4,27 +4,27 @@ import {Progression} from '../src/systems/Progression';
 import {UPGRADES,EMERGENCY_UPGRADES,type UpgradeContext} from '../src/systems/UpgradeCatalog';
 import {xpRequired,RARITY_WEIGHTS} from '../src/config/progression';
 import {magazineCapacity,fireInterval,playerDamage,dashCooldown} from '../src/systems/PlayerModifiers';
-import {gun,reload,WEAPONS} from '../src/weapons/arsenal';
+import {gun,reload,WEAPONS,addGunAmmo} from '../src/weapons/arsenal';
 import {receiveDamage,takeArmor} from '../src/systems/Armor';
 import {Ultimate} from '../src/systems/Ultimate';
 import {Dash} from '../src/systems/Dash';
-function setup(){const run=newRun(),progression=new Progression(run),guns=[gun(7)],supplies:string[]=[];const c:UpgradeContext={run,guns,addAmmo:(g,n)=>g.reserve+=n,spawnSupply:k=>supplies.push(k)};return {run,p:progression,c,supplies}}
+function setup(){const run=newRun(),progression=new Progression(run),guns=[gun(7)],supplies:string[]=[];const c:UpgradeContext={run,guns,addAmmo:addGunAmmo,spawnSupply:k=>supplies.push(k)};return {run,p:progression,c,supplies}}
 function applyAll(id:string){const v=setup(),item=UPGRADES.find(u=>u.id===id)!;for(let i=0;i<item.maxLevel;i++){v.run.pendingLevels++;assert.ok(v.p.apply(id,[item],v.c))}v.run.pendingLevels=1;assert.equal(v.p.apply(id,[item],v.c),false);v.run.pendingLevels=0;return v}
 test('XP solo por muerte, una vez por objeto, con categorías y sobrante/múltiples niveles',()=>{
  const {run,p}=setup();assert.equal(run.level,1);assert.equal(run.xp,0);const e={hp:1,tier:0,boss:-1};assert.equal(p.defeated(e),0);e.hp=0;assert.equal(p.defeated(e),10);assert.equal(p.defeated(e),0);
- for(const [tier,xp] of [[1,15],[2,15],[3,25],[4,25]])assert.equal(p.defeated({hp:0,tier,boss:-1}),xp);
- assert.equal(p.defeated({hp:0,tier:4,boss:0}),150);assert.equal(run.level,3);assert.equal(run.xp,22);assert.equal(run.pendingLevels,2);assert.deepEqual([1,2,3,4].map(xpRequired),[100,118,139,164]);
+ for(const [tier,xp] of [[1,18],[2,28],[3,48],[4,64]])assert.equal(p.defeated({hp:0,tier,boss:-1}),xp);
+ assert.equal(p.defeated({hp:0,tier:4,boss:0}),180);assert.equal(run.level,3);assert.equal(run.xp,130);assert.equal(run.pendingLevels,2);assert.deepEqual([1,2,3,4].map(xpRequired),[100,118,139,164]);
  assert.equal(p.addXP(NaN),0);assert.equal(p.addXP(-10),0);
 });
-test('catálogo 24 mejoras, rarezas 65/28/7 y elecciones únicas',()=>{
- const {p,c}=setup();assert.equal(UPGRADES.length,24);assert.equal(new Set(UPGRADES.map(u=>u.id)).size,24);assert.deepEqual(RARITY_WEIGHTS,{common:65,rare:28,epic:7});
+test('catálogo ampliado, cinco rarezas y elecciones únicas',()=>{
+ const {p,c}=setup();assert.equal(UPGRADES.length,60);assert.equal(new Set(UPGRADES.map(u=>u.id)).size,60);assert.deepEqual(RARITY_WEIGHTS,{common:60,uncommon:22,rare:13,epic:4.5,legendary:.5});
  for(let seed=0;seed<100;seed++){let state=seed+1;const random=()=>((state=(state*1664525+1013904223)>>>0)/4294967296);const items=p.options(c,random);assert.equal(items.length,3);assert.equal(new Set(items.map(u=>u.id)).size,3);assert.ok(items.every(u=>u.available(c)))}
- const counts={common:0,rare:0,epic:0};for(let i=0;i<1000;i++){let n=0;const items=p.options(c,()=>n++===0?(i+.5)/1000:.3);counts[items[0].rarity]++}assert.deepEqual(counts,{common:650,rare:280,epic:70});
+ const counts={common:0,uncommon:0,rare:0,epic:0,legendary:0};for(let i=0;i<1000;i++){let n=0;const items=p.options(c,()=>n++===0?(i+.5)/1000:.3);counts[items[0].rarity]++}assert.deepEqual(counts,{common:600,uncommon:220,rare:130,epic:45,legendary:5});
 });
 test('todos los máximos excluyen mejoras; emergencias siempre tres válidas y con efecto incluso a tope',()=>{
  const {p,c,run,supplies}=setup();for(const u of UPGRADES)run.upgrades[u.id]=u.maxLevel;
  const options=p.options(c);assert.deepEqual(options.map(u=>u.id),EMERGENCY_UPGRADES.map(u=>u.id));
- run.armor=50;for(const item of options){run.pendingLevels++;assert.ok(p.apply(item.id,options,c))}assert.deepEqual(supplies,['med','armor']);assert.equal(c.guns[0].reserve,600);
+ run.armor=50;for(const item of options){run.pendingLevels++;assert.ok(p.apply(item.id,options,c))}assert.deepEqual(supplies,['med','armor']);assert.equal(c.guns[0].ammo,1000);
  c.guns=[];run.pendingLevels++;assert.ok(p.apply('emergency-ammo',options,c));assert.equal(supplies.at(-1),'ammo');
  delete run.upgrades.heart;assert.equal(p.options(c).length,3);assert.ok(p.options(c).some(u=>u.id==='heart'));
 });
@@ -38,7 +38,7 @@ test('límites vida/chaleco, 25 de protección por nivel y botiquín con vida am
 });
 test('modificadores todas las armas incluida minigun, cargadores y límites técnicos',()=>{
  const {run}=applyAll('rate');const base=run.stats;for(let id=0;id<8;id++){assert.ok(fireInterval(id,base)<WEAPONS[id].rate);assert.ok(playerDamage(WEAPONS[id].damage,applyAll('damage').run.stats,500,false,()=>1)>WEAPONS[id].damage)}assert.ok(Math.abs(fireInterval(7,base)-50/1.32)<1e-8);
- const mag=applyAll('magazine');assert.equal(magazineCapacity(7,mag.run.stats),320);assert.equal(magazineCapacity(0,mag.run.stats),16);const g=gun(7);g.ammo=0;g.reserve=400;assert.equal(reload(g,magazineCapacity(7,mag.run.stats)),320);assert.equal(g.reserve,80);
+ const mag=applyAll('magazine');assert.equal(magazineCapacity(7,mag.run.stats),1000);assert.equal(magazineCapacity(0,mag.run.stats),16);const g=gun(7);g.ammo=0;assert.equal(reload(g,magazineCapacity(7,mag.run.stats)),0);assert.equal(g.reserve,0);assert.equal(g.ammo,0);
  const close=applyAll('close').run.stats;assert.ok(Math.abs(playerDamage(20,close,160,false,()=>1)-29)<1e-8);assert.equal(playerDamage(20,close,161,false,()=>1),20);
  const melee=applyAll('melee').run.stats;assert.equal(playerDamage(20,melee,30,true,()=>1),32);assert.equal(playerDamage(20,melee,30,false,()=>1),20);
  const crit=applyAll('critical').run.stats;assert.equal(playerDamage(20,crit,500,false,()=>.199),40);assert.equal(playerDamage(20,crit,500,false,()=>.201),20);

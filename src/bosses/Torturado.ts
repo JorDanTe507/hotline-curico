@@ -5,6 +5,8 @@ interface State {ammo:number;reloadAt:number;fireAt:number;prepareAt:number;aim:
 export function torturadoStats(round:number){const level=Math.max(0,Math.floor(round/5)-1);return {hp:Math.round(C.health*(1+level*C.healthScaling)),speed:C.speed*(1+level*C.speedScaling),damage:C.damage*(1+level*C.damageScaling)}}
 export class Torturado {
  private states=new WeakMap<Foe,State>();
+ freezeEnemy(e:Foe,dt:number){const m=this.states.get(e);if(m)for(const k of ['reloadAt','fireAt','prepareAt','nextSpecial','nextCharge','chargeUntil','meleeAt','poseUntil'] as const)if(m[k])m[k]+=dt}
+
  constructor(private scene:Game){}
  private state(e:Foe){let m=this.states.get(e);if(!m){const g=this.scene.survival.mind(e).weapon!;m={get ammo(){return g.ammo},set ammo(n:number){g.ammo=n},reloadAt:0,fireAt:this.scene.clock+1200,prepareAt:0,aim:{x:0,y:0},special:false,nextSpecial:this.scene.clock+3000,nextCharge:this.scene.clock+C.chargeCooldown,chargeUntil:0,meleeAt:0,poseUntil:0};this.states.set(e,m)}return m}
  update(e:Foe){const s=this.scene,p=s.player,body=p.body!.center,m=this.state(e),cfg=torturadoStats(s.run.round),dist=Math.hypot(p.x-e.sprite.x,p.y-e.sprite.y),los=s.lineClear(e.sprite.x,e.sprite.y,p.x,p.y),sprite=e.sprite;sprite.setVelocity(0);e.label.setPosition(sprite.x,sprite.y-72).setText(m.reloadAt?'EL TORTURADO · RECARGANDO':m.prepareAt&&m.special?'¡DESCARGA! · ESQUIVA':'EL TORTURADO');

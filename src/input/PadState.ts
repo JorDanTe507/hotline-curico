@@ -1,6 +1,6 @@
 export interface PadPreferences {deadzone:number;assist:boolean;strength:number;mapping:Record<string,number>;axes:number[]|null}
 export const PAD_DEFAULTS:PadPreferences={deadzone:.18,assist:false,strength:.2,mapping:{},axes:null};
-export const STANDARD_BUTTONS={interact:0,execute:1,reload:2,ultimate:3,throw:4,switch:5,dash:6,fire:7,heal:8,pause:9,adrenaline:11,up:12,down:13,left:14,right:15} as const;
+export const STANDARD_BUTTONS={interact:0,execute:1,reload:2,ultimate:3,throw:4,switch:5,dash:6,fire:7,heal:8,pause:9,adrenaline:11,throwable:10,up:12,down:13,left:14,right:15} as const;
 export type PadAction=keyof typeof STANDARD_BUTTONS;
 export function stick(x:number,y:number,deadzone=.18){const length=Math.hypot(x,y);if(!Number.isFinite(length)||length<=deadzone)return {x:0,y:0};const magnitude=Math.min(1,(length-deadzone)/(1-deadzone));return {x:x/length*magnitude,y:y/length*magnitude}}
 export function readPreferences(raw:unknown):PadPreferences {const p=raw as Partial<PadPreferences>|null;return {deadzone:typeof p?.deadzone==='number'&&Number.isFinite(p.deadzone)?Math.min(.4,Math.max(.05,p.deadzone)):.18,assist:p?.assist===true,strength:typeof p?.strength==='number'&&Number.isFinite(p.strength)?Math.min(.5,Math.max(0,p.strength)):.2,axes:Array.isArray(p?.axes)&&p.axes.length===4&&p.axes.every(i=>Number.isInteger(i)&&i>=0&&i<32)?[...p.axes]:null,mapping:Object.fromEntries(Object.entries(p?.mapping??{}).filter(([key,value])=>key in STANDARD_BUTTONS&&Number.isInteger(value)&&value>=0&&value<32))}}

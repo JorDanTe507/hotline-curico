@@ -1,0 +1,1146 @@
+{
+  "perk-light-step": {
+    "file": "perk-light-step.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      237,
+      124,
+      381,
+      228
+    ],
+    "size": 64
+  },
+  "perk-steady": {
+    "file": "perk-steady.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      423,
+      124,
+      567,
+      228
+    ],
+    "size": 64
+  },
+  "perk-pockets": {
+    "file": "perk-pockets.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      609,
+      124,
+      753,
+      228
+    ],
+    "size": 64
+  },
+  "perk-last-breath": {
+    "file": "perk-last-breath.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      795,
+      124,
+      939,
+      228
+    ],
+    "size": 64
+  },
+  "perk-aggressive-reload": {
+    "file": "perk-aggressive-reload.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      235,
+      295,
+      379,
+      393
+    ],
+    "size": 64
+  },
+  "perk-urban-runner": {
+    "file": "perk-urban-runner.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      421,
+      295,
+      565,
+      393
+    ],
+    "size": 64
+  },
+  "perk-scrapper": {
+    "file": "perk-scrapper.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      607,
+      295,
+      751,
+      393
+    ],
+    "size": 64
+  },
+  "perk-trained-arm": {
+    "file": "perk-trained-arm.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      793,
+      295,
+      937,
+      393
+    ],
+    "size": 64
+  },
+  "perk-second-shield": {
+    "file": "perk-second-shield.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      979,
+      295,
+      1123,
+      393
+    ],
+    "size": 64
+  },
+  "perk-powder": {
+    "file": "perk-powder.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      235,
+      464,
+      379,
+      563
+    ],
+    "size": 64
+  },
+  "perk-persistent-fire": {
+    "file": "perk-persistent-fire.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      421,
+      464,
+      565,
+      563
+    ],
+    "size": 64
+  },
+  "perk-silent-hunter": {
+    "file": "perk-silent-hunter.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      607,
+      464,
+      751,
+      563
+    ],
+    "size": 64
+  },
+  "perk-reactive-armor": {
+    "file": "perk-reactive-armor.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      793,
+      464,
+      937,
+      563
+    ],
+    "size": 64
+  },
+  "perk-kill-chain": {
+    "file": "perk-kill-chain.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      979,
+      464,
+      1123,
+      563
+    ],
+    "size": 64
+  },
+  "perk-secondary-blast": {
+    "file": "perk-secondary-blast.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      218,
+      638,
+      326,
+      726
+    ],
+    "size": 64
+  },
+  "perk-chain-fire": {
+    "file": "perk-chain-fire.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      337,
+      638,
+      445,
+      726
+    ],
+    "size": 64
+  },
+  "perk-combat-adrenaline": {
+    "file": "perk-combat-adrenaline.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      456,
+      638,
+      564,
+      726
+    ],
+    "size": 64
+  },
+  "perk-survival-instinct": {
+    "file": "perk-survival-instinct.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      575,
+      638,
+      683,
+      726
+    ],
+    "size": 64
+  },
+  "perk-tactical-overload": {
+    "file": "perk-tactical-overload.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      694,
+      638,
+      802,
+      726
+    ],
+    "size": 64
+  },
+  "perk-bloodlust": {
+    "file": "perk-bloodlust.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      813,
+      638,
+      921,
+      726
+    ],
+    "size": 64
+  },
+  "perk-fortress": {
+    "file": "perk-fortress.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      932,
+      638,
+      1040,
+      726
+    ],
+    "size": 64
+  },
+  "perk-piercing": {
+    "file": "perk-piercing.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1051,
+      638,
+      1159,
+      726
+    ],
+    "size": 64
+  },
+  "perk-killer-instinct": {
+    "file": "perk-killer-instinct.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1170,
+      638,
+      1278,
+      726
+    ],
+    "size": 64
+  },
+  "perk-hell-ammo": {
+    "file": "perk-hell-ammo.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1289,
+      638,
+      1397,
+      726
+    ],
+    "size": 64
+  },
+  "perk-overdose": {
+    "file": "perk-overdose.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1408,
+      638,
+      1516,
+      726
+    ],
+    "size": 64
+  },
+  "perk-one-against-all": {
+    "file": "perk-one-against-all.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      230,
+      807,
+      361,
+      922
+    ],
+    "size": 64
+  },
+  "perk-inferno": {
+    "file": "perk-inferno.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      371,
+      807,
+      502,
+      922
+    ],
+    "size": 64
+  },
+  "perk-storm": {
+    "file": "perk-storm.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      512,
+      807,
+      643,
+      922
+    ],
+    "size": 64
+  },
+  "perk-last-bullet": {
+    "file": "perk-last-bullet.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      654,
+      807,
+      785,
+      922
+    ],
+    "size": 64
+  },
+  "perk-killing-machine": {
+    "file": "perk-killing-machine.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      793,
+      807,
+      923,
+      922
+    ],
+    "size": 64
+  },
+  "perk-accidental-immortal": {
+    "file": "perk-accidental-immortal.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      930,
+      807,
+      1066,
+      922
+    ],
+    "size": 64
+  },
+  "perk-last-cigarette": {
+    "file": "perk-last-cigarette.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1077,
+      807,
+      1212,
+      922
+    ],
+    "size": 64
+  },
+  "perk-raid-boss": {
+    "file": "perk-raid-boss.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1226,
+      807,
+      1363,
+      922
+    ],
+    "size": 64
+  },
+  "perk-unmapped-special": {
+    "file": "perk-unmapped-special.png",
+    "source": "Hoja de mejoras roguelite en pixel art.png",
+    "crop": [
+      1375,
+      807,
+      1521,
+      922
+    ],
+    "size": 64
+  },
+  "radio-idle-0": {
+    "file": "radio-idle-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      27,
+      126,
+      142,
+      279
+    ],
+    "size": 96
+  },
+  "radio-idle-1": {
+    "file": "radio-idle-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      155,
+      126,
+      270,
+      279
+    ],
+    "size": 96
+  },
+  "radio-idle-2": {
+    "file": "radio-idle-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      276,
+      126,
+      391,
+      279
+    ],
+    "size": 96
+  },
+  "radio-idle-3": {
+    "file": "radio-idle-3.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      397,
+      126,
+      512,
+      279
+    ],
+    "size": 96
+  },
+  "radio-walk-0": {
+    "file": "radio-walk-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      548,
+      126,
+      663,
+      279
+    ],
+    "size": 96
+  },
+  "radio-walk-1": {
+    "file": "radio-walk-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      679,
+      126,
+      794,
+      279
+    ],
+    "size": 96
+  },
+  "radio-walk-2": {
+    "file": "radio-walk-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      811,
+      126,
+      926,
+      279
+    ],
+    "size": 96
+  },
+  "radio-walk-3": {
+    "file": "radio-walk-3.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      946,
+      126,
+      1061,
+      279
+    ],
+    "size": 96
+  },
+  "radio-detect-0": {
+    "file": "radio-detect-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      1129,
+      123,
+      1244,
+      280
+    ],
+    "size": 96
+  },
+  "radio-detect-1": {
+    "file": "radio-detect-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      1258,
+      123,
+      1373,
+      280
+    ],
+    "size": 96
+  },
+  "radio-detect-2": {
+    "file": "radio-detect-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      1390,
+      123,
+      1505,
+      280
+    ],
+    "size": 96
+  },
+  "radio-call-0": {
+    "file": "radio-call-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      37,
+      374,
+      152,
+      521
+    ],
+    "size": 96
+  },
+  "radio-call-1": {
+    "file": "radio-call-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      167,
+      374,
+      282,
+      521
+    ],
+    "size": 96
+  },
+  "radio-call-2": {
+    "file": "radio-call-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      296,
+      374,
+      411,
+      521
+    ],
+    "size": 96
+  },
+  "radio-call-3": {
+    "file": "radio-call-3.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      426,
+      374,
+      541,
+      521
+    ],
+    "size": 96
+  },
+  "radio-flee-0": {
+    "file": "radio-flee-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      603,
+      374,
+      718,
+      521
+    ],
+    "size": 96
+  },
+  "radio-flee-1": {
+    "file": "radio-flee-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      735,
+      374,
+      850,
+      521
+    ],
+    "size": 96
+  },
+  "radio-flee-2": {
+    "file": "radio-flee-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      864,
+      374,
+      979,
+      521
+    ],
+    "size": 96
+  },
+  "radio-flee-3": {
+    "file": "radio-flee-3.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      994,
+      374,
+      1109,
+      521
+    ],
+    "size": 96
+  },
+  "radio-hurt-0": {
+    "file": "radio-hurt-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      1140,
+      374,
+      1255,
+      521
+    ],
+    "size": 96
+  },
+  "radio-hurt-1": {
+    "file": "radio-hurt-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      1268,
+      374,
+      1383,
+      521
+    ],
+    "size": 96
+  },
+  "radio-hurt-2": {
+    "file": "radio-hurt-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      1398,
+      374,
+      1513,
+      521
+    ],
+    "size": 96
+  },
+  "radio-dead-0": {
+    "file": "radio-dead-0.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      35,
+      619,
+      150,
+      759
+    ],
+    "size": 96
+  },
+  "radio-dead-1": {
+    "file": "radio-dead-1.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      168,
+      619,
+      283,
+      759
+    ],
+    "size": 96
+  },
+  "radio-dead-2": {
+    "file": "radio-dead-2.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      300,
+      619,
+      415,
+      759
+    ],
+    "size": 96
+  },
+  "radio-dead-3": {
+    "file": "radio-dead-3.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      436,
+      619,
+      606,
+      759
+    ],
+    "size": 96
+  },
+  "radio-item": {
+    "file": "radio-item.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      43,
+      901,
+      102,
+      1004
+    ],
+    "size": 32
+  },
+  "radio-ready": {
+    "file": "radio-ready.png",
+    "source": "Hoja de sprites del radioperador pixel art.png",
+    "crop": [
+      475,
+      900,
+      562,
+      1003
+    ],
+    "size": 32
+  },
+  "supply-open-0": {
+    "file": "supply-open-0.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      39,
+      400,
+      174,
+      522
+    ],
+    "size": 64
+  },
+  "supply-open-1": {
+    "file": "supply-open-1.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      191,
+      400,
+      326,
+      522
+    ],
+    "size": 64
+  },
+  "supply-open-2": {
+    "file": "supply-open-2.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      340,
+      400,
+      475,
+      522
+    ],
+    "size": 64
+  },
+  "supply-open-3": {
+    "file": "supply-open-3.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      489,
+      400,
+      624,
+      522
+    ],
+    "size": 64
+  },
+  "supply-open-4": {
+    "file": "supply-open-4.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      636,
+      400,
+      771,
+      522
+    ],
+    "size": 64
+  },
+  "supply-open-5": {
+    "file": "supply-open-5.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      785,
+      400,
+      920,
+      522
+    ],
+    "size": 64
+  },
+  "supply-marker": {
+    "file": "supply-marker.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      31,
+      129,
+      176,
+      264
+    ],
+    "size": 32
+  },
+  "supply-icon": {
+    "file": "supply-icon.png",
+    "source": "Spritesheet pixel art de suministros del radioperador.png",
+    "crop": [
+      223,
+      850,
+      332,
+      936
+    ],
+    "size": 32
+  },
+  "frame-0": {
+    "file": "frame-0.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      42,
+      107,
+      208,
+      245
+    ],
+    "size": 64
+  },
+  "frame-1": {
+    "file": "frame-1.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      228,
+      107,
+      396,
+      245
+    ],
+    "size": 64
+  },
+  "frame-2": {
+    "file": "frame-2.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      411,
+      107,
+      581,
+      245
+    ],
+    "size": 64
+  },
+  "frame-3": {
+    "file": "frame-3.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      596,
+      107,
+      765,
+      245
+    ],
+    "size": 64
+  },
+  "frame-4": {
+    "file": "frame-4.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      777,
+      107,
+      945,
+      245
+    ],
+    "size": 64
+  },
+  "ach-knife-boss": {
+    "file": "ach-knife-boss.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      31,
+      352,
+      215,
+      476
+    ],
+    "size": 64
+  },
+  "ach-throwable-boss": {
+    "file": "ach-throwable-boss.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      246,
+      352,
+      430,
+      476
+    ],
+    "size": 64
+  },
+  "ach-copec": {
+    "file": "ach-copec.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      461,
+      352,
+      645,
+      476
+    ],
+    "size": 64
+  },
+  "ach-coop": {
+    "file": "ach-coop.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      676,
+      352,
+      860,
+      476
+    ],
+    "size": 64
+  },
+  "ach-interrupt": {
+    "file": "ach-interrupt.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      891,
+      352,
+      1075,
+      476
+    ],
+    "size": 64
+  },
+  "ach-radio-kill": {
+    "file": "ach-radio-kill.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      1106,
+      352,
+      1290,
+      476
+    ],
+    "size": 64
+  },
+  "ach-radio-use": {
+    "file": "ach-radio-use.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      1321,
+      352,
+      1505,
+      476
+    ],
+    "size": 64
+  },
+  "ach-chain": {
+    "file": "ach-chain.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      31,
+      575,
+      215,
+      699
+    ],
+    "size": 64
+  },
+  "ach-fire": {
+    "file": "ach-fire.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      246,
+      575,
+      430,
+      699
+    ],
+    "size": 64
+  },
+  "ach-flash": {
+    "file": "ach-flash.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      461,
+      575,
+      645,
+      699
+    ],
+    "size": 64
+  },
+  "ach-electric": {
+    "file": "ach-electric.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      676,
+      575,
+      860,
+      699
+    ],
+    "size": 64
+  },
+  "ach-all-bosses": {
+    "file": "ach-all-bosses.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      891,
+      575,
+      1075,
+      699
+    ],
+    "size": 64
+  },
+  "ach-survivor": {
+    "file": "ach-survivor.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      1106,
+      575,
+      1290,
+      699
+    ],
+    "size": 64
+  },
+  "ach-daily": {
+    "file": "ach-daily.png",
+    "source": "Paquete de Logros Pixel Art Curicó.png",
+    "crop": [
+      1321,
+      575,
+      1505,
+      699
+    ],
+    "size": 64
+  },
+  "daily-calendar": {
+    "file": "daily-calendar.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      42,
+      111,
+      132,
+      203
+    ],
+    "size": 32
+  },
+  "daily-available": {
+    "file": "daily-available.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      158,
+      111,
+      240,
+      203
+    ],
+    "size": 32
+  },
+  "daily-progress": {
+    "file": "daily-progress.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      270,
+      111,
+      355,
+      203
+    ],
+    "size": 32
+  },
+  "daily-complete": {
+    "file": "daily-complete.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      383,
+      111,
+      471,
+      203
+    ],
+    "size": 32
+  },
+  "daily-reward": {
+    "file": "daily-reward.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      497,
+      111,
+      585,
+      203
+    ],
+    "size": 32
+  },
+  "daily-coin": {
+    "file": "daily-coin.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      736,
+      109,
+      826,
+      203
+    ],
+    "size": 32
+  },
+  "daily-medal": {
+    "file": "daily-medal.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      853,
+      105,
+      939,
+      206
+    ],
+    "size": 32
+  },
+  "daily-kill": {
+    "file": "daily-kill.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      37,
+      515,
+      121,
+      580
+    ],
+    "size": 32
+  },
+  "daily-boss": {
+    "file": "daily-boss.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      135,
+      515,
+      219,
+      580
+    ],
+    "size": 32
+  },
+  "daily-survive": {
+    "file": "daily-survive.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      233,
+      515,
+      317,
+      580
+    ],
+    "size": 32
+  },
+  "daily-throwable": {
+    "file": "daily-throwable.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      331,
+      515,
+      415,
+      580
+    ],
+    "size": 32
+  },
+  "daily-weapon": {
+    "file": "daily-weapon.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      429,
+      515,
+      513,
+      580
+    ],
+    "size": 32
+  },
+  "daily-coop": {
+    "file": "daily-coop.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      527,
+      515,
+      611,
+      580
+    ],
+    "size": 32
+  },
+  "daily-hc": {
+    "file": "daily-hc.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      625,
+      515,
+      709,
+      580
+    ],
+    "size": 32
+  },
+  "daily-special": {
+    "file": "daily-special.png",
+    "source": "Paquete de desafíos diarios pixel art.png",
+    "crop": [
+      723,
+      515,
+      807,
+      580
+    ],
+    "size": 32
+  }
+}

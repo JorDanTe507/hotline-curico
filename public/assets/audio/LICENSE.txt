@@ -1,3 +1,5 @@
 Original procedurally synthesized sound effects created for Hotline Curico. CC0 1.0 Universal: free to use, modify and distribute, including commercially. No third-party recordings. Source: tools/generate_audio.py.
 
 Rain ambience (rain-ambient.wav): original procedural synthesis for Hotline Curico, CC0 1.0 Universal. No samples or third-party recordings. Source: tools/generate_rain.py. Free to use, modify and distribute, including commercially; no attribution required.
+
+Chaos 1.8 effects: original procedural synthesis, CC0 1.0 Universal. No third-party samples. Reproducible source: tools/generate_chaos_audio.py (12 effects, including fire-loop).

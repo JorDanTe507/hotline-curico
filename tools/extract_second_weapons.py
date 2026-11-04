@@ -29,3 +29,7 @@ for f in range(2):
 grenade=Image.new('RGBA',(16,16));d=ImageDraw.Draw(grenade);d.rounded_rectangle((3,3,12,13),radius=3,fill='#55715d',outline='#e7ba67',width=1);d.rectangle((6,0,9,3),fill='#e5ddd1');grenade.save(out/'grenade.png')
 (out/'crops.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8');preview.save(root/'arsenal-assets.png')
 print('8 new weapons, individual 32x32 equipped/pickup/HUD/use frames; flame/grenade FX')
+
+# Reapply the targeted 1.8.1 alpha repair after rebuilding these four presentation crops.
+import runpy
+runpy.run_path(str(root/"tools/repair_weapon_alpha181.py"),run_name="__main__")

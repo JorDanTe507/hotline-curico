@@ -10,14 +10,16 @@ export class WeatherCycle {
 }
 export interface SectorEvent {kind:CityEvent;started:number;until:number;resolved:boolean}
 export class EventDirector {
+ private globalOutage?:SectorEvent;
  readonly sectors=new Map<string,SectorEvent>();nextAt=30000;combatReadyAt=0;last?:CityEvent;lastRound=0;extraThisRound=0;history:{sector:string;kind:CityEvent;at:number}[]=[];
  constructor(private random=Math.random){}
  tick(c:DirectorContext):CityEvent|undefined{for(const e of this.sectors.values())if(!e.resolved&&c.now>=e.until)e.resolved=true;if(c.round!==this.lastRound){this.lastRound=c.round;this.extraThisRound=0}if(!c.combat||c.round<CITY.eventMinRound||c.now<this.nextAt)return;const prior=this.sectors.get(c.sector);if(prior&&(!prior.resolved||c.now<prior.started+CITY.sectorCooldown))return;const safe=c.healthRatio>CITY.criticalRatio&&c.alive<12&&c.quality>0&&!c.boss&&c.round>=CITY.combatMinRound&&c.now>=this.combatReadyAt&&this.extraThisRound<CITY.maxExtraPerRound;
  const pool:CityEvent[]=['blackout','flicker','weather-pulse'];if(safe&&this.random()<.3)pool.push('ambush','reinforcements');const options=pool.filter(k=>k!==this.last),kind=options[Math.floor(this.random()*options.length)];return this.start(kind,c)?kind:undefined}
- start(kind:CityEvent,c:DirectorContext,forced=false){if(c.round!==this.lastRound){this.lastRound=c.round;this.extraThisRound=0}const fight=kind==='ambush'||kind==='reinforcements',prior=this.sectors.get(c.sector);if(!c.combat||(prior&&!prior.resolved)||fight&&(c.boss||c.healthRatio<=CITY.criticalRatio||c.alive>=CITY.eventEnemyCap||this.extraThisRound>=CITY.maxExtraPerRound||(!forced&&c.now<this.combatReadyAt)))return false;const duration=kind==='blackout'?CITY.blackoutMin+this.random()*(CITY.blackoutMax-CITY.blackoutMin):fight?12000:7000;this.sectors.set(c.sector,{kind,started:c.now,until:c.now+duration,resolved:false});this.last=kind;this.nextAt=c.now+CITY.cooldown;if(fight)this.combatReadyAt=c.now+CITY.combatCooldown;this.history.push({sector:c.sector,kind,at:c.now});if(this.history.length>64)this.history.shift();return true}
- blackout(sector:string,now:number){const e=this.sectors.get(sector);return !!e&&!e.resolved&&e.kind==='blackout'&&now<e.until}
- restore(sector:string){const e=this.sectors.get(sector);if(e)e.resolved=true}
- resolve(sector:string){this.restore(sector)}
+ start(kind:CityEvent,c:DirectorContext,forced=false){if(c.round!==this.lastRound){this.lastRound=c.round;this.extraThisRound=0}const fight=kind==='ambush'||kind==='reinforcements',prior=this.sectors.get(c.sector);if(!c.combat||(prior&&!prior.resolved)||(kind==='blackout'&&this.blackout(c.sector,c.now))||fight&&(c.boss||c.healthRatio<=CITY.criticalRatio||c.alive>=CITY.eventEnemyCap||this.extraThisRound>=CITY.maxExtraPerRound||(!forced&&c.now<this.combatReadyAt)))return false;const duration=kind==='blackout'?CITY.blackoutMin+this.random()*(CITY.blackoutMax-CITY.blackoutMin):fight?12000:7000;const event={kind,started:c.now,until:c.now+duration,resolved:false};this.sectors.set(c.sector,event);if(kind==='blackout')this.globalOutage=event;this.last=kind;this.nextAt=c.now+CITY.cooldown;if(fight)this.combatReadyAt=c.now+CITY.combatCooldown;this.history.push({sector:c.sector,kind,at:c.now});if(this.history.length>64)this.history.shift();return true}
+ blackout(_sector:string,now:number){const e=this.globalOutage;return !!e&&!e.resolved&&now<e.until}
+ restore(sector:string){if(this.globalOutage)this.globalOutage.resolved=true;this.resolve(sector)}
+ resolve(sector:string){const e=this.sectors.get(sector);if(e)e.resolved=true}
+ clear(){this.globalOutage=undefined;this.sectors.clear()}
 }
 /** Stable windows and hysteresis; elapsed values supplied only during active gameplay. */
 export class EffectQuality {

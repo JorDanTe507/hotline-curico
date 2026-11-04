@@ -12,7 +12,7 @@ import {Dash} from '../src/systems/Dash';
 import {readFileSync} from 'node:fs';
 
 test('configuración de dos protagonistas, bases independientes y recursos propios sin fumar',()=>{
- assert.deepEqual(CHARACTERS.map(c=>c.id),['cervela','nicolas']);assert.equal(characterById(undefined).id,'cervela');
+ assert.deepEqual(CHARACTERS.map(c=>c.id),['cervela','nicolas','jordan']);assert.equal(characterById(undefined).id,'cervela');
  const c=characterById('nicolas');assert.equal(c.stats().maxHealth,100);assert.equal(c.stats().maxArmor,50);assert.notEqual(c.stats(),c.stats());
  assert.ok(!/cigar|fumar|humo/i.test([c.intro,c.ability.line,c.bossReply,c.bossTaunt,...c.lowHealthLines].join(' ')));
  for(const pose of Object.keys(c.normal) as (keyof typeof c.normal)[])for(const state of [c.normal,c.wounded])for(const key of state[pose]){const png=readFileSync(`public/assets/characters/nicolas/${key.slice(8)}.png`);assert.equal(png.readUInt32BE(16),68);assert.equal(png.readUInt32BE(20),128)}

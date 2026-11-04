@@ -8,7 +8,7 @@ import {WEAPON_SEARCH_INTERVAL} from '../config/instinct';
 import Phaser from 'phaser';
 import type {Game,Foe,Drop} from '../scenes/Game';
 import type {Gun} from '../weapons/arsenal';
-import {WEAPONS,reload,gun,isMelee} from '../weapons/arsenal';
+import {WEAPONS,reload,gun,isMelee,singleTank} from '../weapons/arsenal';
 import {blocked} from '../maps/apartments';
 import {ENEMIES,enemyAnimation} from '../enemies/config';
 import {AudioSystem} from './AudioSystem';
@@ -17,38 +17,44 @@ export type EnemyAction='esperar'|'perseguir'|'buscar arma'|'recoger arma'|'atac
 interface Mind {pickupOpportunities:WeaponPickupOpportunities;owner:string;spinAt?:number;state:EnemyAction;stunUntil:number;nextSearch:number;weapon?:Gun;reloadAt:number;target?:Drop;visual?:Phaser.GameObjects.Image}
 interface Thrown {sprite:Phaser.Physics.Arcade.Sprite;weapon:Gun;left:number;last:{x:number;y:number};collider?:Phaser.Physics.Arcade.Collider}
 export class SurvivalSystem {
- private minds=new WeakMap<Foe,Mind>();private ownerSequence=0;
+ private enemyState?:SurvivalSystem;private minds=new WeakMap<Foe,Mind>();private ownerSequence=0;
  private claims=new Map<Drop,Foe>();
- private enemyExecution?:{enemy:Foe;until:number};
+ private enemyExecution?:{enemy:Foe;until:number;playerId?:number};
  private playerExecution?:{enemy:Foe;until:number};
  private nextEnemyExecution=0;
  private thrown:Thrown[]=[];
+ freezeEnemy(e:Foe,dt:number){const m=this.mind(e);for(const k of ['stunUntil','nextSearch','reloadAt','spinAt'] as const)if(m[k])m[k]!+=dt;if(this.enemyExecution?.enemy===e)this.enemyExecution.until+=dt}
+
  constructor(private game:Game){}
  get executing(){return !!this.playerExecution}
- mind(e:Foe):Mind {let m=this.minds.get(e);if(!m){m={pickupOpportunities:new WeaponPickupOpportunities(),owner:'enemy-'+(++this.ownerSequence),state:'esperar',stunUntil:0,reloadAt:0,nextSearch:0};this.minds.set(e,m)}return m}
+ shareEnemyState(other:SurvivalSystem){this.enemyState=other;this.claims=other.claims}
+ cancelPlayerExecution(){this.playerExecution=undefined}
+ executingEnemy(e:Foe){return this.playerExecution?.enemy===e}
+ mind(e:Foe):Mind {if(this.enemyState)return this.enemyState.mind(e);let m=this.minds.get(e);if(!m){m={pickupOpportunities:new WeaponPickupOpportunities(),owner:'enemy-'+(++this.ownerSequence),state:'esperar',stunUntil:0,reloadAt:0,nextSearch:0};this.minds.set(e,m)}return m}
+ stunned(e:Foe){return e.boss<0&&this.mind(e).stunUntil>this.game.clock}
  speed(e:Foe){return C.enemyMovementSpeed(ENEMIES[e.tier].speed,e.boss>=0)}
  private distance(e:Foe){return Phaser.Math.Distance.Between(e.sprite.x,e.sprite.y,this.game.player.x,this.game.player.y)}
  private clear(e:Foe){const s=this.game;return s.lineClear(e.sprite.x,e.sprite.y,s.player.x,s.player.y)}
  private release(e:Foe){const m=this.mind(e);if(m.target){if(this.claims.get(m.target)===e)this.claims.delete(m.target);m.target=undefined}}
  private cancelEnemyExecution(){if(this.enemyExecution){const e=this.enemyExecution.enemy;if(e.sprite.active){e.sprite.clearTint();e.sprite.setTint(e.tier===0?0xffffff:ENEMIES[e.tier].color);e.sprite.setScale(e.boss<0?42/96:62/96,e.boss<0?58/112:88/112)}this.mind(e).state='perseguir';this.enemyExecution=undefined}}
  markAttack(e:Foe){if(e.boss<0)this.mind(e).state='atacar'}
- equipInitial(e:Foe){const initial=e.boss>=0?BOSS_DEFINITIONS[e.boss].weapon:ENEMIES[e.tier].weapon;if(initial===undefined)return;const g=gun(initial);if(e.boss===0){g.ammo=4;g.reserve=60}else if(e.boss>0){g.ammo=BOSS_DEFINITIONS[e.boss].mag}this.equip(e,g)}
+ equipInitial(e:Foe){const initial=e.boss>=0?BOSS_DEFINITIONS[e.boss].weapon:ENEMIES[e.tier].weapon;if(initial===undefined)return;const g=gun(initial);if(e.boss===0){g.ammo=4;g.reserve=60}else if(e.boss>0&&!singleTank(initial)){g.ammo=BOSS_DEFINITIONS[e.boss].mag}this.equip(e,g)}
  equip(e:Foe,g:Gun){const m=this.mind(e);if(!this.game.weaponInstances.register(g,'enemy',m.owner))return false;const old=m.weapon;m.weapon=undefined;if(old&&old!==g)this.game.addDrop(e.sprite.x,e.sprite.y,'gun',old.id,old);m.visual?.destroy();m.visual=undefined;m.weapon=g;m.reloadAt=0;m.spinAt=undefined;return true}
  died(e:Foe,drop=false){this.onHit(e);this.release(e);const m=this.mind(e),g=m.weapon;m.weapon=undefined;m.visual?.destroy();m.visual=undefined;m.state='muerto';if(g){if(drop&&dropsEquippedWeapon(e.tier,e.boss))this.game.addDrop(e.sprite.body!.center.x,e.sprite.body!.center.y,'gun',g.id,g);else this.game.weaponInstances.retire(g,'enemy')}}
  onHit(e:Foe){if(this.enemyExecution?.enemy===e)this.cancelEnemyExecution()}
  stun(e:Foe,extra=0){if(e.boss>=0)return;this.onHit(e);this.release(e);const m=this.mind(e);m.spinAt=undefined;m.stunUntil=this.game.clock+C.STUN_DURATION+extra;m.state='aturdido';e.sprite.setVelocity(0)}
- tryExecute(){const s=this.game;if(this.executing||s.ended||s.paused||s.roulette.active||s.levelUp.active||s.dash.active(s.clock)||s.reloadAt)return false;const enemy=s.foes.filter(e=>e.boss<0&&e.hp>0&&e.sprite.active&&this.mind(e).stunUntil>s.clock&&this.distance(e)<=C.PLAYER_EXECUTION_RANGE&&this.clear(e)).sort((a,b)=>this.distance(a)-this.distance(b))[0];if(!enemy)return false;
-  this.onHit(enemy);this.release(enemy);s.rounds.requiem.offensive('execute');this.playerExecution={enemy,until:s.clock+C.PLAYER_EXECUTION_DURATION};enemy.sprite.setVelocity(0);s.player.setVelocity(0);s.appearance.hold('melee');AudioSystem.play(s,'execute',.7);return true;
+ tryExecute(){const s=this.game;if(s.temporal?.owner===s)return s.temporal.execute(s);if(this.executing||s.ended||s.paused||s.roulette.active||s.levelUp.active||s.dash.active(s.clock)||s.reloadAt)return false;const enemy=s.foes.filter(e=>e.boss<0&&e.hp>0&&e.sprite.active&&this.mind(e).stunUntil>s.clock&&this.distance(e)<=C.PLAYER_EXECUTION_RANGE&&this.clear(e)).sort((a,b)=>this.distance(a)-this.distance(b))[0];if(!enemy||s.coop?.executingEnemy(enemy))return false;
+  this.onHit(enemy);this.release(enemy);s.rounds.requiem.offensive('execute');s.rogue.executed();this.playerExecution={enemy,until:s.clock+C.PLAYER_EXECUTION_DURATION};enemy.sprite.setVelocity(0);s.player.setVelocity(0);s.appearance.hold('melee');AudioSystem.play(s,'execute',.7);return true;
  }
  punch(angle:number){const s=this.game;if(s.ended||s.paused||s.roulette.active||s.levelUp.active||this.executing||s.dash.active(s.clock))return false;const targets=s.foes.filter(e=>e.hp>0&&e.sprite.active&&(e.boss>=0?bossSurfaceDistance(e.boss,e.sprite,s.player.x,s.player.y):this.distance(e))<=58&&this.clear(e)&&Math.cos(Math.atan2(e.sprite.y-s.player.y,e.sprite.x-s.player.x)-angle)>.35).sort((a,b)=>this.distance(a)-this.distance(b));s.rounds.requiem.offensive('melee');s.appearance.hold('melee');if(!targets.length){const connected=s.fortune.melee(s.player.x,s.player.y,angle,58,playerDamage(20,s.run.stats,40,true));if(connected)AudioSystem.play(s,'punch',.7);return connected}const e=targets[0];s.hit(e,playerDamage(20,s.run.stats,this.distance(e),true));AudioSystem.play(s,'punch',.7);return true}
  throwWeapon(angle:number){const s=this.game;if(s.ended||s.paused||s.roulette.active||s.levelUp.active||this.executing||s.dash.active(s.clock)||!s.guns.length)return false;
-  const weapon=s.guns[s.active];if(!s.weaponInstances.fly(weapon))return false;s.rounds.requiem.offensive('throw',weapon.id);s.guns.splice(s.active,1);s.equipped.setVisible(false);s.ultimate.releaseGun(weapon);s.active=Math.min(s.active,Math.max(0,s.guns.length-1));s.reloadAt=0;
+  const weapon=s.guns[s.active];if(!s.weaponInstances.fly(weapon))return false;s.rounds.requiem.offensive('throw',weapon.id);s.guns.splice(s.active,1);s.equipped.setVisible(false);s.ultimate.releaseGun(weapon);s.active=Math.min(s.active,Math.max(0,s.guns.length-1));s.reloadAt=0;s.sound.stopByKey('sfx-reload');
   const sprite=s.physics.add.sprite(s.player.x,s.player.y,`weapon-${weapon.id}`).setDepth(14);const width=weapon.id<2?26:44;sprite.setDisplaySize(width,width*sprite.height/sprite.width).setRotation(angle);sprite.body!.setSize(sprite.width,sprite.height);sprite.setVelocity(Math.cos(angle)*C.THROW_SPEED,Math.sin(angle)*C.THROW_SPEED);
   const shot:Thrown={sprite,weapon,left:C.THROW_RANGE,last:{x:s.player.x,y:s.player.y}};this.thrown.push(shot);shot.collider=s.physics.add.collider(sprite,s.walls,()=>this.land(shot));AudioSystem.play(s,'throw',.7);return true;
  }
  private land(t:Thrown){if(!t.sprite.active)return;const s=this.game;let {x,y}=t.last;if(blocked(s.grid,Math.floor(x/48),Math.floor(y/48))){const points:{x:number;y:number}[]=[];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const tx=Math.floor(x/48)+dx,ty=Math.floor(y/48)+dy;if(!blocked(s.grid,tx,ty))points.push({x:tx*48+24,y:ty*48+24})}points.sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y));if(points.length){x=points[0].x;y=points[0].y}}t.collider?.destroy();t.sprite.destroy();s.addDrop(x,y,'gun',t.weapon.id,t.weapon)}
  update(dt:number){const s=this.game;
-  if(this.enemyExecution){const {enemy,until}=this.enemyExecution;if(!enemy.sprite.active||enemy.hp<=0||this.mind(enemy).stunUntil>s.clock||s.dash.active(s.clock)||this.executing||this.distance(enemy)>C.ENEMY_EXECUTION_RANGE||!this.clear(enemy))this.cancelEnemyExecution();else if(s.clock>=until){this.cancelEnemyExecution();s.damage(1000,true)}}
+  if(this.enemyExecution&&!s.temporal?.active){const {enemy,until,playerId}=this.enemyExecution,target=s.coop?.actor(playerId??1)??s,near=Math.hypot(enemy.sprite.x-target.player.x,enemy.sprite.y-target.player.y);if(!enemy.sprite.active||enemy.hp<=0||target.run.health<=0||this.mind(enemy).stunUntil>s.clock||target.dash.active(s.clock)||target.survival.executing||near>C.ENEMY_EXECUTION_RANGE||!s.lineClear(enemy.sprite.x,enemy.sprite.y,target.player.x,target.player.y))this.cancelEnemyExecution();else if(s.clock>=until){this.cancelEnemyExecution();target.damage(1000,true)}}
   if(this.playerExecution){const {enemy,until}=this.playerExecution;s.appearance.show(Math.floor(s.clock/90)%2?'melee':'hurt');if(!enemy.sprite.active||enemy.hp<=0){this.playerExecution=undefined}else if(s.clock>=until){this.playerExecution=undefined;s.hit(enemy,(enemy.hp+1)*(1+s.run.stats.meleeDamage),{...s.ultimate.shot(s.clock),method:'execute'});achievements().event({type:'execute'})}}
   for(const t of this.thrown){if(!t.sprite.active)continue;const {x,y}=t.sprite;if(!blocked(s.grid,Math.floor(x/48),Math.floor(y/48)))t.last={x,y};t.left-=Math.hypot(t.sprite.body!.velocity.x,t.sprite.body!.velocity.y)*dt/1000;t.sprite.rotation+=dt*.015;
    const e=s.foes.find(e=>e.sprite.active&&e.hp>0&&(e.boss>=0?bossHitAt(e.boss,e.sprite,x,y):Phaser.Math.Distance.Between(x,y,e.sprite.x,e.sprite.y)<24)&&s.lineClear(t.last.x,t.last.y,e.sprite.x,e.sprite.y));if(e){s.rounds.requiem.offensive('throw',t.weapon.id);const level=s.run.upgrades.brutalThrow??0;this.stun(e,250*level);if(level)s.hit(e,10*level,{...s.ultimate.shot(s.clock),method:'throw',weaponId:t.weapon.id});this.land(t)}else if(t.left<=0)this.land(t);
@@ -61,12 +67,12 @@ export class SurvivalSystem {
   if(m.stunUntil>s.clock){m.state='aturdido';e.label.setText('★ ATURDIDO ★');e.sprite.setAlpha(.65+.3*Math.sin(s.clock/90));return true}
   e.sprite.setAlpha(1);
   if(this.enemyExecution?.enemy===e){m.state='preparar ejecución';e.label.setText('¡EJECUCIÓN! · ALÉJATE');e.sprite.setTint(Math.floor(s.clock/80)%2?0xff174e:0xffffff);e.sprite.play(enemyAnimation(e.tier,'attack'),true);return true}
-  e.label.setText(e.tier===0?(m.weapon?'Matón · '+WEAPONS[m.weapon.id].name:ENEMIES[0].name):ENEMIES[e.tier].name);
+  e.label.setText('');
   const sight=s.perception.update(e),dist=this.distance(e),los=this.clear(e);
   if(sight?.visible&&dist<=C.ENEMY_EXECUTION_RANGE&&los&&!s.dash.active(s.clock)&&!this.executing&&!this.enemyExecution&&s.clock>=this.nextEnemyExecution&&s.clock>=e.next){
    // A failed roll also consumes the global attempt window: no frame-by-frame probability inflation.
    this.nextEnemyExecution=s.clock+C.ENEMY_EXECUTION_COOLDOWN;
-   if(Math.random()<C.ENEMY_EXECUTION_CHANCE){this.release(e);this.enemyExecution={enemy:e,until:s.clock+C.ENEMY_EXECUTION_PREPARE};m.state='preparar ejecución';e.sprite.play(enemyAnimation(e.tier,'attack'),true);e.label.setText('¡EJECUCIÓN! · ALÉJATE');return true}
+   if(Math.random()<C.ENEMY_EXECUTION_CHANCE){this.release(e);this.enemyExecution={enemy:e,playerId:s.coop?.targetId??s.playerId,until:s.clock+C.ENEMY_EXECUTION_PREPARE};m.state='preparar ejecución';e.sprite.play(enemyAnimation(e.tier,'attack'),true);e.label.setText('¡EJECUCIÓN! · ALÉJATE');return true}
   }
   if(e.tier===0&&!m.weapon&&e.sprite.anims.isPlaying&&e.sprite.anims.currentAnim?.key==='maton-attack'&&e.next>s.clock){m.state='atacar';return true}
   // Only unarmed matones acquire ground weapons; close combat takes priority.

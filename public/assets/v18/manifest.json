@@ -1,0 +1,312 @@
+{
+  "icon-0": {
+    "file": "icon-0.png",
+    "w": 175,
+    "h": 165
+  },
+  "pickup-0": {
+    "file": "pickup-0.png",
+    "w": 145,
+    "h": 99
+  },
+  "flight-0": {
+    "file": "flight-0.png",
+    "w": 110,
+    "h": 92
+  },
+  "icon-1": {
+    "file": "icon-1.png",
+    "w": 175,
+    "h": 165
+  },
+  "pickup-1": {
+    "file": "pickup-1.png",
+    "w": 145,
+    "h": 99
+  },
+  "flight-1": {
+    "file": "flight-1.png",
+    "w": 110,
+    "h": 92
+  },
+  "icon-2": {
+    "file": "icon-2.png",
+    "w": 175,
+    "h": 165
+  },
+  "pickup-2": {
+    "file": "pickup-2.png",
+    "w": 145,
+    "h": 99
+  },
+  "flight-2": {
+    "file": "flight-2.png",
+    "w": 110,
+    "h": 92
+  },
+  "icon-3": {
+    "file": "icon-3.png",
+    "w": 175,
+    "h": 165
+  },
+  "pickup-3": {
+    "file": "pickup-3.png",
+    "w": 145,
+    "h": 99
+  },
+  "flight-3": {
+    "file": "flight-3.png",
+    "w": 110,
+    "h": 92
+  },
+  "icon-4": {
+    "file": "icon-4.png",
+    "w": 175,
+    "h": 165
+  },
+  "pickup-4": {
+    "file": "pickup-4.png",
+    "w": 145,
+    "h": 99
+  },
+  "flight-4": {
+    "file": "flight-4.png",
+    "w": 110,
+    "h": 92
+  },
+  "blast-0": {
+    "file": "blast-0.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-1": {
+    "file": "blast-1.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-2": {
+    "file": "blast-2.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-3": {
+    "file": "blast-3.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-4": {
+    "file": "blast-4.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-5": {
+    "file": "blast-5.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-6": {
+    "file": "blast-6.png",
+    "w": 110,
+    "h": 112
+  },
+  "blast-7": {
+    "file": "blast-7.png",
+    "w": 110,
+    "h": 112
+  },
+  "fire-0": {
+    "file": "fire-0.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-1": {
+    "file": "fire-1.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-2": {
+    "file": "fire-2.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-3": {
+    "file": "fire-3.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-4": {
+    "file": "fire-4.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-5": {
+    "file": "fire-5.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-6": {
+    "file": "fire-6.png",
+    "w": 110,
+    "h": 111
+  },
+  "fire-7": {
+    "file": "fire-7.png",
+    "w": 110,
+    "h": 111
+  },
+  "flash-0": {
+    "file": "flash-0.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-1": {
+    "file": "flash-1.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-2": {
+    "file": "flash-2.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-3": {
+    "file": "flash-3.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-4": {
+    "file": "flash-4.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-5": {
+    "file": "flash-5.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-6": {
+    "file": "flash-6.png",
+    "w": 110,
+    "h": 87
+  },
+  "flash-7": {
+    "file": "flash-7.png",
+    "w": 110,
+    "h": 87
+  },
+  "electric-0": {
+    "file": "electric-0.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-1": {
+    "file": "electric-1.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-2": {
+    "file": "electric-2.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-3": {
+    "file": "electric-3.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-4": {
+    "file": "electric-4.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-5": {
+    "file": "electric-5.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-6": {
+    "file": "electric-6.png",
+    "w": 110,
+    "h": 86
+  },
+  "electric-7": {
+    "file": "electric-7.png",
+    "w": 110,
+    "h": 86
+  },
+  "barrel-0": {
+    "file": "barrel-0.png",
+    "w": 142,
+    "h": 167
+  },
+  "barrel-1": {
+    "file": "barrel-1.png",
+    "w": 142,
+    "h": 167
+  },
+  "barrel-2": {
+    "file": "barrel-2.png",
+    "w": 142,
+    "h": 167
+  },
+  "barrel-3": {
+    "file": "barrel-3.png",
+    "w": 142,
+    "h": 167
+  },
+  "barrel-4": {
+    "file": "barrel-4.png",
+    "w": 142,
+    "h": 167
+  },
+  "barrel-blast-0": {
+    "file": "barrel-blast-0.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-1": {
+    "file": "barrel-blast-1.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-2": {
+    "file": "barrel-blast-2.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-3": {
+    "file": "barrel-blast-3.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-4": {
+    "file": "barrel-blast-4.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-5": {
+    "file": "barrel-blast-5.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-6": {
+    "file": "barrel-blast-6.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-blast-7": {
+    "file": "barrel-blast-7.png",
+    "w": 170,
+    "h": 183
+  },
+  "barrel-debris": {
+    "file": "barrel-debris.png",
+    "w": 169,
+    "h": 142
+  },
+  "knife-ground": {
+    "file": "knife-ground.png",
+    "w": 87,
+    "h": 96
+  }
+}

@@ -2,6 +2,8 @@ import type Phaser from 'phaser';import type {Game,Foe} from '../scenes/Game';im
 interface State {phase:'ready'|'windup'|'charge'|'recover';until:number;x:number;y:number;next:number}
 export class EnemyBehaviors {
  private states=new WeakMap<Foe,State>();private graphics:Phaser.GameObjects.Graphics;
+ freezeEnemy(e:Foe,dt:number){const m=this.states.get(e);if(m){if(m.until)m.until+=dt;if(m.next)m.next+=dt}}
+
  constructor(private s:Game){this.graphics=s.add.graphics().setDepth(9)}
  begin(){this.graphics.clear()}
  update(e:Foe){const s=this.s,cfg=ENEMIES[e.tier],mind=s.survival.mind(e),p=s.player,d=Math.hypot(p.x-e.sprite.x,p.y-e.sprite.y),visible=s.lineClear(e.sprite.x,e.sprite.y,p.x,p.y);if(mind.stunUntil>s.clock||s.survival.executing)return false;let state=this.states.get(e);if(!state){state={phase:'ready',until:0,x:1,y:0,next:0};this.states.set(e,state)}

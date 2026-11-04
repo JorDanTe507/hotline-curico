@@ -1,6 +1,6 @@
 {
   "name": "hotline-curico",
-  "version": "1.7.3",
+  "version": "2.0.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,6 +8,10 @@
     "build": "tsc --noEmit && vite build",
     "test": "tsx --test tests/*.test.ts",
     "preview": "vite preview --host 127.0.0.1",
+    "test:browser:polish181": "node check-polish181.cjs",
+    "test:browser:chaos18": "node check-chaos18.cjs",
+    "test:browser:chaos18:mobile": "node check-chaos18-mobile.cjs",
+    "test:browser:chaos18:production": "node check-chaos18-production.cjs",
     "test:browser:city17": "node check-city17.cjs",
     "test:browser:city17:mobile": "node check-city17-mobile.cjs",
     "test:browser": "node check.cjs",
@@ -41,7 +45,19 @@
     "dev:mobile": "vite --host 0.0.0.0 --port 5176",
     "test:browser:mobile": "node check-mobile151.cjs",
     "test:browser:mobile:menus": "node check-mobile151-menus.cjs",
-    "test:browser:mobile:platform": "node check-mobile151-platform.cjs"
+    "test:browser:mobile:platform": "node check-mobile151-platform.cjs",
+    "test:browser:coop19": "node check-coop19.cjs",
+    "test:browser:radio19": "node check-radio19.cjs",
+    "test:browser:menus19": "node check-menus19.cjs",
+    "test:browser:world19": "node check-world19.cjs",
+    "test:browser:production19": "node check-production19.cjs",
+    "test:browser:coop191": "node check-coop191.cjs",
+    "test:browser:production191": "node check-production191.cjs",
+    "test:browser:jordan20": "node check-jordan20.cjs",
+    "test:browser:jordan20:flows": "node check-jordan20-flows.cjs",
+    "test:browser:jordan20:combat": "node check-jordan20-combat.cjs",
+    "test:browser:jordan20:mobile": "node check-jordan20-mobile.cjs",
+    "test:browser:jordan20:production": "node check-jordan20-production.cjs"
   },
   "dependencies": {
     "phaser": "^3.90.0"

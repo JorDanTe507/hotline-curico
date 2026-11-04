@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 export const SHOTS=['pistol','revolver','smg','shotgun','assault','sniper','rpg','minigun','uzi','magnum','sawedoff','m79','flame','bat','crowbar','axe'] as const;
-export const EFFECTS=[...SHOTS,'explosion','reload','pickup','hurt','kill','voice','dash','throw','execute','critical','ultimate','motor','reward','tryhard','achievement','punch'] as const;
+export const EFFECTS=[...SHOTS,'explosion','reload','pickup','hurt','kill','voice','dash','throw','execute','critical','ultimate','motor','reward','tryhard','achievement','punch','grenade-throw','frag','shrapnel','bottle','fire-loop','flashbang','electric','knife-throw','knife-hit','knife-pickup','barrel','throwable-pickup'] as const;
 export type Effect=typeof EFFECTS[number];
 // One Phaser sound manager shared across scenes; individual sounds self-remove on completion.
 export class AudioSystem {

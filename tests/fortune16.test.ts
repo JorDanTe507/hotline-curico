@@ -48,5 +48,5 @@ test('colisiones dinámicas revisan la caché de navegación y se eliminan al de
 });
 test('logro Requiem conserva ID/icono/marco y desbloqueo con título y descripción nuevos',()=>{
  const def=ACHIEVEMENTS.find(a=>a.id==='requiem-round')!;assert.equal(def.name,'Salud para los vivos, Requiem para los muertos');assert.equal(def.description,'Completa una ronda de combate utilizando exclusivamente la Requiem.');assert.equal(def.rarity,'legendary');assert.equal(def.icon,12);
- const saved=JSON.stringify({version:1,unlocked:{'requiem-round':'2026-10-31T12:00:00Z'},progress:{},kills:507,rerolls:{}}),a=new AchievementService({getItem:()=>saved,setItem:()=>assert.fail('no reset')},()=>false);assert.equal(a.data.unlocked[def.id],'2026-10-31T12:00:00Z');assert.equal(a.data.kills,507);assert.equal(ACHIEVEMENTS.length,41);
+ const saved=JSON.stringify({version:1,unlocked:{'requiem-round':'2026-10-31T12:00:00Z'},progress:{},kills:507,rerolls:{}}),a=new AchievementService({getItem:()=>saved,setItem:()=>assert.fail('no reset')},()=>false);assert.equal(a.data.unlocked[def.id],'2026-10-31T12:00:00Z');assert.equal(a.data.kills,507);assert.equal(ACHIEVEMENTS.length,64);
 });
