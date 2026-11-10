@@ -1,3 +1,6 @@
+import {drawRoomTiles} from '../bossRush/RoomArt';
+import {decorateStation,stationSurface} from '../uroboros/Station';
+import {UROBOROS_ATLAS} from '../uroboros/assets';
 import {electricallyPowered} from '../atmosphere/AtmosphereStyle';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
@@ -25,6 +28,27 @@ export class MapVisuals {
   const tiles=this.map.addTilesetImage('map-tiles','map-tiles',32,32,0,0)!;
   this.floor=this.map.createBlankLayer('Piso',tiles)!.setScale(TILE/32).setDepth(0);
   this.structure=this.map.createBlankLayer('Estructura',tiles)!.setScale(TILE/32).setDepth(3);
+  if(s.rush?.map.layout){
+   s.rush.decorate();
+   this.visuals=s.children.list.filter(o=>!previous.has(o));
+   return;
+  }
+  if(s.worldModel.fixedGrid){
+   const tileset=s.textures.get(UROBOROS_ATLAS);
+   if(s.rush)drawRoomTiles(s,'station',s.grid,stationSurface);
+   else for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    const material=(x*23+y*17)%13===0?'crack':x>13&&x<27&&y>7&&y<18?'checkered':'floor';
+    s.add.image(x*TILE+24,y*TILE+24,tileset.key,material).setDisplaySize(TILE,TILE).setTint(0xc7bbd0).setDepth(0);
+    if(s.grid[y][x]===1){
+     const boundary=x===0||y===0||x===COLS-1||y===ROWS-1;
+     s.add.image(x*TILE+24,y*TILE+24,tileset.key,boundary?'brick':'wall').setDisplaySize(TILE,TILE).setTint(0xc7bbd0).setDepth(3);
+    }
+   }
+   decorateStation(s);
+   s.rush?.decorate();
+   this.visuals=s.children.list.filter(o=>!previous.has(o));
+   return;
+  }
   const trim=s.add.graphics().setDepth(3.1);
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
    const room=Math.min(2,Math.floor(y/9))*4+Math.min(3,Math.floor(x/10));

@@ -6,7 +6,8 @@ export const BOSS_SHAPES=[
  {width:288,height:128,anchorX:144,feet:116,bodyX:121,bodyY:80,bodyW:46,bodyH:36,hitW:60,hitTop:20},
  {width:288,height:128,anchorX:144,feet:116,bodyX:121,bodyY:80,bodyW:46,bodyH:36,hitW:56,hitTop:24},
  {width:288,height:128,anchorX:144,feet:116,bodyX:121,bodyY:80,bodyW:46,bodyH:36,hitW:54,hitTop:22},
- {width:288,height:128,anchorX:144,feet:116,bodyX:121,bodyY:80,bodyW:46,bodyH:36,hitW:54,hitTop:22}
+ {width:288,height:128,anchorX:144,feet:116,bodyX:121,bodyY:80,bodyW:46,bodyH:36,hitW:54,hitTop:22},
+ {width:112,height:112,anchorX:56,feet:100,bodyX:36,bodyY:70,bodyW:40,bodyH:30,hitW:55,hitTop:27}
 ] as const;
 export interface BossSprite {x:number;y:number;originX:number;originY:number;scaleX:number;scaleY:number;flipX?:boolean}
 export function bossOriginY(index:number){const b=BOSS_SHAPES[index];return (b.feet-(b.feet-b.height/2)*BOSS_OLD_SCALE/BOSS_VISUAL_SCALE)/b.height}

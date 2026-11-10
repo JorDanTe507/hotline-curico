@@ -3,9 +3,10 @@ import type {Run} from './run';
 import {ARMOR_CAPACITY,NORMAL_ARMOR_DROP_CHANCE,BOSS_ARMOR_DROP_CHANCE} from '../config/armor';
 import {ULTIMATE_DAMAGE_REDUCTION} from '../config/instinct';
 /** Mitigation precedes absorption: armor has no timer or automatic regeneration. */
-export function receiveDamage(run:Run,raw:number,ultimateActive:boolean){
+export function receiveDamage(run:Run,raw:number,ultimateActive:boolean,healthOnly=false){
  const baseMultiplier=ultimateActive?1-(run.stats.caladaReduction??ULTIMATE_DAMAGE_REDUCTION):1;
  let incoming=Math.max(0,Number.isFinite(raw)?raw:0)*baseMultiplier;
+ if(healthOnly){run.health=Math.max(0,run.health-incoming);return {amount:incoming,absorbed:0,healthDamage:incoming}}
  const temporaryAbsorbed=Math.min(incoming,run.temporaryArmor??0);run.temporaryArmor=Math.max(0,(run.temporaryArmor??0)-temporaryAbsorbed);incoming-=temporaryAbsorbed;
  const armorMultiplier=Math.max(1-Math.max(0,run.stats.armorReduction),(1-MAX_DAMAGE_REDUCTION)/baseMultiplier);
  const protectedDamage=Math.min(incoming,Math.max(0,run.armor)/armorMultiplier);

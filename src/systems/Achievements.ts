@@ -1,6 +1,7 @@
+import {RUSH_ACHIEVEMENTS,rushIcon} from '../bossRush/achievementCatalog';
 import {developerSession} from './DeveloperSession';
 export type AchievementRarity='common'|'uncommon'|'rare'|'epic'|'legendary';
-export interface AchievementDefinition {id:string;name:string;description:string;rarity:AchievementRarity;icon:number;target:number;secret:boolean;available:boolean;condition:string;counted?:boolean}
+export interface AchievementDefinition {id:string;name:string;description:string;rarity:AchievementRarity;icon:number;target:number;secret:boolean;available:boolean;condition:string;counted?:boolean;category?:'rush';iconKey?:string;medal?:string}
 const entries:[string,string,string,AchievementRarity,number,number?,boolean?,boolean?][]=[
  ['cervela','Un último cigarrito','Juega una partida con Cervela.','common',1],['nicolas','Tengo que hacer los jefes','Juega una partida con Nicolás.','common',2],['round','Bienvenido a Curicó','Completa una ronda.','common',9],['kill','El primer cadáver','Elimina un enemigo.','common',0],['pickup','Esto es mío','Recoge un arma.','common',4],['switch','Cambio de planes','Cambia de arma.','common',4],['execute','No era tan difícil','Realiza una ejecución.','common',5],['medkit','Un pequeño respiro','Utiliza un botiquín.','common',3],['level','Aprendiendo a sobrevivir','Sube de nivel.','common',9],['reroll','No me convencen','Cambia las cartas de mejora.','common',8],
  ['throw','¡Quítate de encima!','Elimina a un enemigo lanzándole un arma.','uncommon',5],['shotguns','A quemarropa','Elimina diez enemigos con escopetas en una partida.','uncommon',4,10],['clean-round','Sin despeinarme','Completa una ronda sin recibir daño.','uncommon',6],['purchase','Comprador compulsivo','Compra una mejora permanente.','uncommon',10],['calada','Última Calada','Activa la definitiva de Cervela.','uncommon',1],['tryhard','Modo Tryhard','Activa la definitiva de Nicolás.','uncommon',2],['aceite','Una ayudita, tío','Cúrate con Tío Aceite.','uncommon',3],['hundred','No es personal','Elimina cien enemigos acumulados.','uncommon',0,100],
@@ -32,14 +33,15 @@ entries.find(e=>e[0]==='arsenal')![1]='Arsenal variado';
 for(const id of ['five-bosses','commander','demolisher'])entries.find(e=>e[0]===id)![7]=true;
 
 export const ACHIEVEMENTS:AchievementDefinition[]=entries.map(([id,name,description,rarity,icon,target=1,secret=false,available=true])=>({id,name,description,rarity,icon,target,secret,available,condition:description,counted:id!=='coop'&&id!=='jordan-known'}));
+ACHIEVEMENTS.push(...RUSH_ACHIEVEMENTS.map(([id,name,description,medal,target],icon):AchievementDefinition=>({id,name,description,medal,target,icon,iconKey:rushIcon(icon),category:'rush',rarity:medal==='Bronce'?'uncommon':medal==='Plata'?'rare':medal==='Oro'?'epic':'legendary',secret:false,available:true,condition:description})));
 ACHIEVEMENTS.find(a=>a.id==='requiem-round')!.condition='Completa una ronda de combate entera empezando con Requiem equipada y atacando exclusivamente con ella.';
 ACHIEVEMENTS.find(a=>a.id==='all')!.target=ACHIEVEMENTS.filter(a=>a.available&&a.counted!==false&&a.id!=='all').length;
 export const ACHIEVEMENT_KEY='hotline-achievements-v1';
-export type AchievementEvent={type:string;token?:object;hit?:boolean;character?:string;value?:number;weapon?:number;method?:string;roundType?:string;health?:number;ultimate?:boolean;maxed?:boolean;boss?:boolean;bossIndex?:number;round?:number};
-interface Save {version:1;unlocked:Record<string,string>;progress:Record<string,number>;kills:number;rerolls:Record<string,number>}
+export type AchievementEvent={type:string;token?:object;hit?:boolean;character?:string;value?:number;weapon?:number;method?:string;roundType?:string;health?:number;ultimate?:boolean;maxed?:boolean;boss?:boolean;bossIndex?:number;round?:number;rush?:{bosses:number[];damage:number;rifleHit:boolean;cureUsed:boolean;campaign:boolean;falls:number;cleared:number;clean:number}};
+interface Save {version:1;unlocked:Record<string,string>;progress:Record<string,number>;kills:number;rerolls:Record<string,number>;rushCharacters:string[]}
 interface StorageLike {getItem(key:string):string|null;setItem(key:string,value:string):void}
 const integer=(v:unknown)=>typeof v==='number'&&Number.isFinite(v)?Math.max(0,Math.min(Number.MAX_SAFE_INTEGER,Math.floor(v))):0;
-export function migrateAchievements(raw:unknown):Save {const data=raw as Partial<Save>|null,result:Save={version:1,unlocked:{},progress:{},kills:integer(data?.kills),rerolls:{cervela:integer(data?.rerolls?.cervela),nicolas:integer(data?.rerolls?.nicolas),jordan:integer(data?.rerolls?.jordan)}};for(const a of ACHIEVEMENTS){const date=data?.unlocked?.[a.id];if(typeof date==='string'&&Number.isFinite(Date.parse(date)))result.unlocked[a.id]=date;result.progress[a.id]=Math.min(a.target,integer(data?.progress?.[a.id]))}return result}
+export function migrateAchievements(raw:unknown):Save {const data=raw as Partial<Save>|null,result:Save={version:1,unlocked:{},progress:{},kills:integer(data?.kills),rushCharacters:Array.isArray(data?.rushCharacters)?[...new Set(data.rushCharacters.filter(id=>['cervela','nicolas','jordan'].includes(id)))]:[],rerolls:{cervela:integer(data?.rerolls?.cervela),nicolas:integer(data?.rerolls?.nicolas),jordan:integer(data?.rerolls?.jordan)}};for(const a of ACHIEVEMENTS){const date=data?.unlocked?.[a.id];if(typeof date==='string'&&Number.isFinite(Date.parse(date)))result.unlocked[a.id]=date;result.progress[a.id]=Math.min(a.target,integer(data?.progress?.[a.id]))}result.progress.all=ACHIEVEMENTS.filter(a=>a.available&&a.counted!==false&&a.id!=='all'&&result.unlocked[a.id]).length;return result}
 /** Event-driven service, independent of Phaser and the currency snapshot. */
 export class AchievementService {
  private bossTypes=new Set<number>();private ultimates=new Map<string,number>();data:Save;persisted=true;readonly notifications:AchievementDefinition[]=[];private run?:{character:string;shotguns:number;dash:number;weapons:Set<number>;shots:{token:object;hit:boolean;resolved:boolean;kills:number}[];accuracy:number;noArmor:number;armor:boolean;roundDamage:boolean;roundUltimate:boolean;bossDamage:boolean;bossMed:boolean;bossMelee:boolean;ultimateKills:number;ultimateActive:boolean};
@@ -48,6 +50,23 @@ export class AchievementService {
  private progress(id:string,n:number){const a=ACHIEVEMENTS.find(a=>a.id===id)!;this.data.progress[id]=Math.max(this.data.progress[id]??0,Math.min(a.target,n));if(n>=a.target)this.unlock(id)}
  event(e:AchievementEvent){if(this.disabled())return false;const before=JSON.stringify(this.data),r=this.run;let changed=true;
   switch(e.type){
+   case 'rushBlood':this.unlock('br_first_blood');break;
+   case 'rushVictory':{
+    const v=e.rush;if(!v)return false;
+    this.unlock('br_first_blood');
+    if(!v.damage)this.unlock('br_no_damage');
+    if(v.bosses.length===2&&!v.falls)this.unlock('br_double_clear');
+    if(v.bosses.includes(3)&&!v.rifleHit)this.unlock('br_sniper_dodge');
+    if(v.bosses.includes(5)&&!v.cureUsed)this.unlock('br_wesker_no_cure');
+    if(v.campaign){
+      this.unlock('br_campaign_clear');if(!v.falls)this.unlock('br_campaign_no_falls');
+      if(e.character&&['cervela','nicolas','jordan'].includes(e.character)&&!this.data.rushCharacters.includes(e.character))this.data.rushCharacters.push(e.character);
+      this.progress('br_all_characters',this.data.rushCharacters.length);
+    }
+    if(v.cleared){for(const n of [5,10,25,50,100])this.progress('br_endless_'+n,v.cleared);this.progress('br_three_clean',v.clean);}
+    this.progress('br_master',RUSH_ACHIEVEMENTS.filter(([id])=>id!=='br_master'&&this.data.unlocked[id]).length);
+    break;
+   }
    case 'start':this.bossTypes.clear();this.ultimates.clear();this.run={character:e.character??'cervela',shotguns:0,dash:0,weapons:new Set(),shots:[],accuracy:0,noArmor:0,armor:false,roundDamage:false,roundUltimate:false,bossDamage:false,bossMed:false,bossMelee:true,ultimateKills:0,ultimateActive:false};if(e.character!=='jordan')this.unlock(e.character==='nicolas'?'nicolas':'cervela');break;
    case 'roundStart':if(r){r.roundDamage=false;r.roundUltimate=false;r.armor=false;r.bossDamage=false;r.bossMed=false;r.bossMelee=true;this.progress('round15',e.value??0);this.progress('round25',e.value??0)}break;
    case 'damage':if(r){r.roundDamage=true;r.bossDamage=true}changed=false;break;

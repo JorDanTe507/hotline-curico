@@ -25,8 +25,10 @@ export class Navigation {
  // Soft local separation. There are no solid actor-vs-actor colliders to deadlock doorways.
  let sx=0,sy=0;const cx=Math.floor(p.x/48),cy=Math.floor(p.y/48);for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++)for(const other of this.buckets.get(`${cx+ox},${cy+oy}`)??[]){if(other===e)continue;const q=other.sprite.body!.center,dist=Math.hypot(p.x-q.x,p.y-q.y);if(dist<24){if(dist>.1){sx+=(p.x-q.x)/dist*(24-dist)/24;sy+=(p.y-q.y)/dist*(24-dist)/24}else{const a=(this.ids.get(e)!+1)*2.4;sx+=Math.cos(a);sy+=Math.sin(a)}}}
  const separation=Math.min(1,.35/(Math.hypot(sx,sy)||1));const proposedX=vx+sx*separation,proposedY=vy+sy*separation,n=Math.hypot(proposedX,proposedY)||1,radius=Math.max(body.halfWidth,body.halfHeight)+1;
- if(this.open(p.x+proposedX/n*18,p.y+proposedY/n*18,radius)){vx=proposedX/n;vy=proposedY/n}
- else if(!this.open(p.x+vx*18,p.y+vy*18,radius)){if(Math.abs(dx)>2&&this.open(p.x+Math.sign(dx)*14,p.y,radius)){vx=Math.sign(dx);vy=0}else if(Math.abs(dy)>2&&this.open(p.x,p.y+Math.sign(dy)*14,radius)){vx=0;vy=Math.sign(dy)}else{e.sprite.setVelocity(0);r.next=0;r.points=[];return}}
+ // A probe past the waypoint can see the wall after a turn and block an otherwise clear route.
+ const lookAhead=Math.min(d,18);
+ if(this.open(p.x+proposedX/n*lookAhead,p.y+proposedY/n*lookAhead,radius)){vx=proposedX/n;vy=proposedY/n}
+ else if(!this.open(p.x+vx*lookAhead,p.y+vy*lookAhead,radius)){if(Math.abs(dx)>2&&this.open(p.x+Math.sign(dx)*Math.min(Math.abs(dx),14),p.y,radius)){vx=Math.sign(dx);vy=0}else if(Math.abs(dy)>2&&this.open(p.x,p.y+Math.sign(dy)*Math.min(Math.abs(dy),14),radius)){vx=0;vy=Math.sign(dy)}else{e.sprite.setVelocity(0);r.next=0;r.points=[];return}}
  const velocity=Math.min(speed,d*40);e.sprite.setVelocity(vx*velocity,vy*velocity)
  }
 }

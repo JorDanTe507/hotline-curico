@@ -14,6 +14,6 @@ export const BOSS_DEFINITIONS=[
 export const BOSS_TUNING={burstShots:8,burstInterval:90,chargeDuration:1500,chargeMultiplier:4.5,carniceroEngage:550,spinDuration:1000,spinInterval:350,spinDamage:.65,slamRadius:110,spinRadius:140,contactDamage:28,contactCooldown:1100} as const;
 /** HP from the supplied sheet; missing movement/attack timings are provisional configuration. */
 export function expansionBossStats(index:number,round:number){const c=BOSS_DEFINITIONS[index],cycle=Math.max(0,Math.floor((round-1)/25));return {hp:Math.round(c.hp*(1+cycle*.25)),speed:c.speed*(1+cycle*.04),damage:c.damage*(1+cycle*.12)}}
-export const bossName=(index:number)=>BOSS_DEFINITIONS[index]?.name??'EL TORTURADO';
+export const bossName=(index:number)=>index===5?'EL DIRECTOR · WESKER':BOSS_DEFINITIONS[index]?.name??'EL TORTURADO';
 export const bossAnimation=(index:number,state:string)=>index===0?`torturado-${state}`:`boss-${index}-${state}`;
 export const bossTexture=(index:number,state='idle')=>index===0?`torturado-${state}-0`:`boss-${index}-${state}-0`;

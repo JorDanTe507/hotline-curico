@@ -1,3 +1,4 @@
+import {hudPreferences} from './HudPreferences';
 import {Judgment} from '../v20/Judgment';
 import {inputHub} from '../input/InputHub';
 import {maxHealth} from '../systems/HealthCapacity';
@@ -14,8 +15,11 @@ export class UltimateView {
   this.aura=scene.add.graphics().setDepth(8);this.healing=scene.add.text(0,0,`+${ULTIMATE_HEAL_PER_SECOND} VIDA/S`,{fontFamily:'monospace',fontSize:10,color:'#80ffb0'}).setOrigin(.5).setDepth(14).setVisible(false);
   this.second=scene.add.image(0,0,'weapon-0').setOrigin(.15,.5).setDepth(13).setVisible(false);
  }
- update(angle:number){const s=this.scene,name=s.character.ability.name,color=s.character.ability.color,active=s.ultimate.active(s.clock),ready=s.ultimate.ready;
-  this.status.setText(s.ultimate.pending?name+' · ACTIVANDO':active?`${name} · ${Math.ceil((s.ultimate.until-s.clock)/1000)}s${s.ultimate instanceof Judgment?' · '+s.ultimate.actions+'/10 · CADENA '+Math.max(0,(s.ultimate.chainUntil-s.clock)/1000).toFixed(1)+'s':''}`:ready?`ULTI LISTA — PRESIONA ${inputHub(s.game).last==='gamepad'?'△':'X'}`:`${name} ${s.ultimate.charge}/${s.ultimate.requiredHits}`);
+ refreshStatus(){const s=this.scene,name=s.character.ability.name,active=s.ultimate.active(s.clock),ready=s.ultimate.ready;
+  this.status.setText(s.ultimate.pending?name+' · ACTIVANDO':active?`${name} · ${Math.ceil((s.ultimate.until-s.clock)/1000)}s${s.ultimate instanceof Judgment?' · '+s.ultimate.actions+'/10 · CADENA '+Math.max(0,(s.ultimate.chainUntil-s.clock)/1000).toFixed(1)+'s':''}`:ready?('ULTI LISTA'+(hudPreferences.helpers?` — PRESIONA ${inputHub(s.game).last==='gamepad'?'△':'X'}`:'')):`${name} ${s.ultimate.charge}/${s.ultimate.requiredHits}`);
+ }
+ update(angle:number){const s=this.scene,color=s.character.ability.color,active=s.ultimate.active(s.clock),ready=s.ultimate.ready;
+  this.refreshStatus();
   const show=!s.registry.get('mobileUI')&&!s.coop;this.status.setVisible(show);this.bar.setVisible(show);this.background.setVisible(show);
   this.bar.width=280*(active?(s.ultimate.until-s.clock)/s.ultimate.activeDuration:s.ultimate.charge/s.ultimate.requiredHits);this.bar.setFillStyle(active?0xff398f:ready?0x63e7ee:0xd74f9b);
   this.aura.clear();this.healing.setVisible(active&&s.ultimate.healRate>0);if(active){this.aura.lineStyle(2,color,.55).strokeEllipse(s.player.x,s.player.y+9,52+Math.sin(s.clock/100)*4,65).fillStyle(color,.08).fillEllipse(s.player.x,s.player.y+9,54,67);this.healing.setPosition(s.player.x,s.player.y-45).setText(s.run.health<maxHealth(s.run)?`+${s.ultimate.healRate} VIDA/S`:'VIDA COMPLETA');s.player.setTint(s.character.id==='jordan'?0x99efff:s.ultimate.healRate>0?0xffc5e4:0xff8da9)}else s.player.clearTint();

@@ -18,10 +18,16 @@ export class FortuneObjects {
  cancelConfirmation(){this.pending=undefined}
  constructor(private s:Game){this.graphics=s.add.graphics().setDepth(16)}
  load(chunk:Chunk){if(this.stopped)return;for(const item of this.ledger.load(this.s.worldModel,chunk))this.show(item)}
+ placeUroborosCrate(id:string,x:number,y:number,hp:number){
+  const item:FortuneObject={id,kind:'crate',chunk:'station',x,y,hp,progress:0,opened:false,rewarded:false,uroboros:true};
+  this.ledger.objects.set(id,item);
+  this.show(item);
+ }
  private show(item:FortuneObject){if(this.views.has(item.id)||(item.kind==='crate'&&item.opened))return;const s=this.s;
   if(!item.opened&&(Math.hypot(item.x-s.player.x,item.y-s.player.y)<100||s.foes.some(e=>Math.hypot(item.x-e.sprite.x,item.y-e.sprite.y)<100)))return;
-  const texture=`fortune-${item.kind}${item.opened?'-open':item.kind==='crate'&&item.hp<FORTUNE.crateHP?'-hurt':''}`,image=s.physics.add.staticImage(item.x,item.y,texture).setDepth(actorDepth(item.y+24));
-  image.setScale(item.kind==='mystery'?1.05:.9).setData('fortune',item.id);image.body!.checkCollision.none=item.kind!=='crate';
+  const texture=`fortune-${item.kind}${item.opened?'-open':item.kind==='crate'&&item.hp<FORTUNE.crateHP?'-hurt':''}`,image=s.physics.add.staticImage(item.x,item.y,item.uroboros?'uroboros':texture,item.uroboros?'crate':undefined).setDepth(actorDepth(item.y+24));
+  if(item.uroboros)image.setDisplaySize(46,42).refreshBody();else image.setScale(item.kind==='mystery'?1.05:.9);
+  image.setData('fortune',item.id);image.body!.checkCollision.none=item.kind!=='crate';
   if(item.kind==='crate'){image.body!.setSize(34,34);s.walls.add(image);s.worldModel.setDynamicSolid(Math.floor(item.x/48),Math.floor(item.y/48),true)}
   const price=item.kind==='mystery'?s.add.text(item.x,item.y+42,`${FORTUNE.mysteryCost} HC`,{fontFamily:'monospace',fontSize:14,color:'#ffe26d',stroke:'#100819',strokeThickness:4,align:'center'}).setOrigin(.5).setDepth(18):undefined;this.views.set(item.id,{item,image,price});
  }
@@ -30,8 +36,14 @@ export class FortuneObjects {
  unload(chunk:string){for(const [id,v] of this.views)if(v.item.chunk===chunk)this.hide(id)}
  atObstacle(object:unknown){const id=(object as Phaser.GameObjects.GameObject)?.getData?.('fortune') as string|undefined;return id?this.views.get(id)?.item:undefined}
  atPoint(x:number,y:number){return [...this.views.values()].find(v=>v.item.kind==='crate'&&!v.item.opened&&Math.floor(v.item.x/48)===Math.floor(x/48)&&Math.floor(v.item.y/48)===Math.floor(y/48))?.item}
- damage(item:FortuneObject,amount:number,_credit?:ShotCredit){if(!this.ledger.damage(item,amount)){const view=this.views.get(item.id);if(view&&item.hp<FORTUNE.crateHP)view.image.setTexture('fortune-crate-hurt');return false}
-  const s=this.s;this.hide(item.id);const debris=s.add.image(item.x,item.y,'fortune-crate-dead').setDepth(2);s.tweens.add({targets:debris,alpha:0,duration:550,onComplete:()=>debris.destroy()});
+ damage(item:FortuneObject,amount:number,_credit?:ShotCredit){if(!this.ledger.damage(item,amount)){const view=this.views.get(item.id);if(view&&!item.uroboros&&item.hp<FORTUNE.crateHP)view.image.setTexture('fortune-crate-hurt');return false}
+  const s=this.s;this.hide(item.id);
+  if(item.uroboros){
+   s.add.image(item.x,item.y,'uroboros','crate-open').setDisplaySize(46,44).setDepth(2);
+   if(this.ledger.claim(item))s.uroboros?.dropCure(item.x,item.y);
+   return true;
+  }
+  const debris=s.add.image(item.x,item.y,'fortune-crate-dead').setDepth(2);s.tweens.add({targets:debris,alpha:0,duration:550,onComplete:()=>debris.destroy()});
   if(this.ledger.claim(item)){const owner=s.coop?.actor(_credit?.playerId??1)??s,kind=crateReward(Math.random,owner.rogue?.has('scrapper'));if(kind==='hc')s.economy.supply(FORTUNE.crateHC);else if(kind!=='none')s.addDrop(item.x,item.y,kind,0);if(Math.random()<CHAOS.crateChance)s.addDrop(item.x+25,item.y,'throwable',Math.floor(Math.random()*5))}return true;
  }
  melee(x:number,y:number,angle:number,range:number,damage:number){const view=[...this.views.values()].filter(v=>v.item.kind==='crate'&&!v.item.opened&&Math.hypot(v.item.x-x,v.item.y-y)<=range&&Math.cos(Math.atan2(v.item.y-y,v.item.x-x)-angle)>.35&&this.s.lineClear(x,y,v.item.x+(x-v.item.x)*.6,v.item.y+(y-v.item.y)*.6)).sort((a,b)=>Math.hypot(a.item.x-x,a.item.y-y)-Math.hypot(b.item.x-x,b.item.y-y))[0];if(!view)return false;this.s.mapVisuals.impactAt(view.item.x,view.item.y);return this.damage(view.item,damage*CRATE_MELEE_DAMAGE_MULTIPLIER)}

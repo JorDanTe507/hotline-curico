@@ -6,6 +6,8 @@ export class MusicManager {
  private static instances=new WeakMap<Phaser.Game,MusicManager>();
  private current?:Phaser.Sound.BaseSound;
  private requested?:string;
+ private transition?:string;
+ private fadeIn=0;
  private fadeRemaining=0;
  private fadeDuration=250;
  private index=-1;
@@ -21,13 +23,14 @@ export class MusicManager {
   game.events.once(Phaser.Core.Events.DESTROY,()=>{this.stop();game.sound.off(Phaser.Sound.Events.UNLOCKED,this.unlock,this);game.events.off(Phaser.Core.Events.STEP,this.update,this)});
  }
  setVolume(value:number){this.volume=Phaser.Math.Clamp(value,0,1);this.applyVolume();try{localStorage.setItem('hotline-music',String(this.volume))}catch{/* In-memory volume is still usable. */}}
- private applyVolume(){if(this.current)(this.current as Phaser.Sound.WebAudioSound).setVolume(this.volume*(this.fadeRemaining?this.fadeRemaining/this.fadeDuration:1))}
+ private applyVolume(){if(this.current)(this.current as Phaser.Sound.WebAudioSound).setVolume(this.volume*(this.fadeRemaining?this.fadeRemaining/this.fadeDuration:this.fadeIn?1-this.fadeIn/this.fadeDuration:1))}
  private unlock(){if(this.requested)this.play(this.requested)}
  private play(key:string){if(this.requested===key&&this.current&&!this.fadeRemaining)return;this.stop();this.requested=key;if(this.game.sound.locked)return;this.current=this.game.sound.add(key,{loop:true,volume:this.volume});this.current.play()}
+ rush(track:string,fade=0){const key='music-rush-'+track;if(!this.game.cache.audio.exists(key)||this.requested===key)return;if(fade&&this.current){this.requested=key;this.transition=key;this.fadeDuration=fade;this.fadeRemaining=fade;return}this.play(key)}
  menu(){this.play('music-neon-noir')}
  newSession(){this.stop();this.index=-1}
  combat(retry:boolean){this.index=retry?(this.index+1)%MUSIC_TRACKS.length:0;this.play(`music-${MUSIC_TRACKS[this.index]}`)}
- death(duration=250){this.fadeDuration=duration;this.requested=undefined;if(this.current)this.fadeRemaining=this.fadeDuration}
- stop(){this.requested=undefined;this.fadeRemaining=0;if(this.current){this.current.stop();this.current.destroy();this.current=undefined}}
- private update(_time:number,delta:number){if(!this.fadeRemaining)return;this.fadeRemaining=Math.max(0,this.fadeRemaining-delta);if(!this.fadeRemaining)this.stop();else this.applyVolume()}
+ death(duration=250){this.transition=undefined;this.fadeIn=0;this.fadeDuration=duration;this.requested=undefined;if(this.current)this.fadeRemaining=this.fadeDuration}
+ stop(){this.requested=undefined;this.transition=undefined;this.fadeIn=0;this.fadeRemaining=0;if(this.current){this.current.stop();this.current.destroy();this.current=undefined}}
+ private update(_time:number,delta:number){if(this.fadeIn){this.fadeIn=Math.max(0,this.fadeIn-delta);this.applyVolume();return}if(!this.fadeRemaining)return;this.fadeRemaining=Math.max(0,this.fadeRemaining-delta);if(this.fadeRemaining){this.applyVolume();return}const next=this.transition;this.stop();if(next){this.play(next);this.fadeIn=this.fadeDuration;this.applyVolume()}}
 }

@@ -27,3 +27,14 @@
 body.radar-mobile-visible .mobile-hud{right:calc(152px + var(--safe-r))}
 
 body.radar-mobile-visible .mobile-hud .weapons{min-width:0;overflow-wrap:anywhere}body.radar-mobile-visible .mobile-hud .weapons span{white-space:normal}
+.mobile-controls .uroboros-cure{position:absolute;right:calc(7px + var(--safe-r));top:calc(108px + var(--safe-t));width:46px;min-height:32px;padding:2px;font-size:10px;color:#f7bbff;border-color:#bc54d1}
+.mobile-menu.boss-rush-menu{background:linear-gradient(90deg,#090612ed 10%,#090612a8 70%,#09061244)}.boss-rush-menu .scroll{display:flex;flex-direction:column;gap:7px;max-width:min(540px,100%)}
+.mobile-menu.safe-talk-menu{inset:auto max(12px,5vw) max(10px,env(safe-area-inset-bottom)) max(12px,5vw);padding:8px 12px;gap:6px;border:1px solid #ea3985;background:#140a21f5}.safe-talk-menu h1{font-size:17px;color:#ff75b5}.safe-talk-menu .scroll{display:flex;align-items:center;gap:12px;padding:0;min-height:44px}.safe-talk-menu img{width:42px;height:48px;object-fit:contain}.safe-talk-menu nav{justify-content:flex-end}
+
+.rush-rank-list{display:grid;gap:8px}
+.rush-rank-list article{padding:8px 10px;background:#1b1226;border:1px solid #654064;border-radius:6px}
+.rush-rank-list article.first{border-color:#f8ca68;background:#382038}
+.rush-rank-list article img{float:right;width:36px;height:36px;object-fit:contain;image-rendering:pixelated}
+.rush-rank-fields,.rush-rank-actions{display:flex;flex-wrap:wrap;gap:6px 12px}
+.rush-rank-fields{font-size:.75rem;color:#acdce4;margin-top:6px}
+.mobile-menu [data-action^="rush-card-"]{white-space:pre-line}

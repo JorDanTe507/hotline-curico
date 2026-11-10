@@ -6,6 +6,9 @@ import {dashCooldown} from '../systems/PlayerModifiers';
 import {AudioSystem} from '../systems/AudioSystem';
 const COLORS={common:0x5de9e9,uncommon:0x53ed85,legendary:0xffd25b,rare:0x779fff,epic:0xff46a0};
 const NAMES={common:'COMÚN',uncommon:'POCO COMÚN',legendary:'LEGENDARIA',rare:'RARA',epic:'ÉPICA'};
+export function upgradeFrame(scene:Phaser.Scene,x:number,y:number,w:number,h:number,color:number){
+ return scene.add.rectangle(x,y,w,h,0x17152a,.98).setStrokeStyle(2,color);
+}
 export class LevelUpView {
  active=false;options:Upgrade[]=[];generation=0;rerolls=0;maxRerolls=1;private panel?:Phaser.GameObjects.Container;private locked=false;
  private keys:Phaser.Input.Keyboard.Key[];
@@ -19,7 +22,7 @@ export class LevelUpView {
   const text=(x:number,y:number,value:string,size:number,color='#f5edf8')=>s.add.text(x,y,value,{fontFamily:'monospace',fontSize:size,color,stroke:'#090712',strokeThickness:2}).setOrigin(.5);
   parts.push(text(640,111,s.coop?`J${s.playerId} · ${s.character.name} · SUBISTE DE NIVEL`:'¡SUBISTE DE NIVEL!',s.coop?27:40,'#ff4eaa'),text(640,162,`NIVEL ${s.run.level} · ${s.run.pendingLevels} ELECCIÓN${s.run.pendingLevels===1?'':'ES'} PENDIENTE${s.run.pendingLevels===1?'':'S'}`,17,'#81eaf0'));
   this.options.forEach((item,i)=>{const x=300+i*340,color=COLORS[item.rarity],current=item.currentLevel(this.context());
-   const card=s.add.rectangle(x,365,300,340,0x17152a,.98).setStrokeStyle(2,color).setInteractive({useHandCursor:true});card.on('pointerover',()=>card.setFillStyle(0x29213d)).on('pointerout',()=>card.setFillStyle(0x17152a)).on('pointerdown',()=>{if(!padOnly)this.choose(i,generation)});
+   const card=upgradeFrame(s,x,365,300,340,color).setInteractive({useHandCursor:true});card.on('pointerover',()=>card.setFillStyle(0x29213d)).on('pointerout',()=>card.setFillStyle(0x17152a)).on('pointerdown',()=>{if(!padOnly)this.choose(i,generation)});
    const icon=s.add.image(x,263,(['charge','duration'].includes(item.id)?s.character.specialPortrait:({walk1:s.character.normal.walk[0],back:s.character.normal.back[0],shoot:s.character.normal.pistol[0],hurt:s.character.normal.hurt[0]} as Record<string,string>)[item.icon]??item.icon)),scale=Math.min(54/icon.width,54/icon.height);icon.setScale(scale);
    const title=text(x,319,item.name,19).setWordWrapWidth(260).setAlign('center');
    const desc=text(x,402,item.description,16,'#c5c6dd').setWordWrapWidth(254).setAlign('center');

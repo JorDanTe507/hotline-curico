@@ -11,14 +11,14 @@ export class WorldModel {
  readonly dynamicSolids=new Set<string>();collisionRevision=0;
  setDynamicSolid(x:number,y:number,solid:boolean){const key=`${x},${y}`,before=this.dynamicSolids.has(key);if(solid)this.dynamicSolids.add(key);else this.dynamicSolids.delete(key);if(before!==solid)this.collisionRevision++}
  readonly grid:number[][];readonly apartment=createMap();readonly cache=new Map<string,Chunk>();generated=0;
- constructor(readonly seed:number){
+ constructor(readonly seed:number, readonly fixedGrid?:number[][]){
   for(const x of [14,15,16,17]){this.apartment[0][x]=0;this.apartment[27][x]=0}for(const y of [13,14,15,16,17]){this.apartment[y][0]=0;this.apartment[y][39]=0}
   const rows=new Map<number,number[]>();const row=(y:number)=>{let r=rows.get(y);if(!r){r=new Proxy(Array(COLS).fill(0),{get:(a,k)=>typeof k==='string'&&/^-?\d+$/.test(k)?this.cell(Number(k),y):Reflect.get(a,k)});if(rows.size>128)rows.delete(rows.keys().next().value!);rows.set(y,r)}return r};
   this.grid=new Proxy(Array.from({length:ROWS},(_,y)=>row(y)),{get:(a,k)=>typeof k==='string'&&/^-?\d+$/.test(k)?row(Number(k)):Reflect.get(a,k)});
  }
  inApartment(x:number,y:number){return x>=0&&y>=0&&x<COLS&&y<ROWS}
  biome(cx:number,cy:number):Biome{const distance=Math.max(Math.abs(cx),Math.abs(cy));if(distance<=1)return 'residential';if(cx>=4&&Math.abs(cy)<=2)return 'industrial';if(distance>=4&&hash(this.seed,Math.floor(cx/3),Math.floor(cy/3))%3!==0)return 'industrial';return (['commercial','plaza','residential'] as Biome[])[hash(this.seed,Math.floor(cx/3),Math.floor(cy/3))%3]}
- cell(x:number,y:number){if(this.dynamicSolids.has(`${x},${y}`))return 1;if(this.inApartment(x,y))return this.apartment[y][x];const cx=Math.floor(x/32),cy=Math.floor(y/32);return this.chunk(cx,cy).cells[y-cy*32][x-cx*32]}
+ cell(x:number,y:number){if(this.dynamicSolids.has(`${x},${y}`))return 1;if(this.fixedGrid)return this.fixedGrid[y]?.[x]??1;if(this.inApartment(x,y))return this.apartment[y][x];const cx=Math.floor(x/32),cy=Math.floor(y/32);return this.chunk(cx,cy).cells[y-cy*32][x-cx*32]}
  chunk(cx:number,cy:number){const key=`${cx},${cy}`,cached=this.cache.get(key);if(cached){this.cache.delete(key);this.cache.set(key,cached);return cached}const chunk=this.generate(cx,cy);this.generated++;if(this.cache.size>=64)this.cache.delete(this.cache.keys().next().value!);this.cache.set(key,chunk);return chunk}
  private generate(cx:number,cy:number):Chunk{
   const biome=this.biome(cx,cy),cells=Array.from({length:32},()=>Array(32).fill(0)),props:WorldProp[]=[],buildings:Building[]=[],zones:UrbanZone[]=[],baseX=cx*32,baseY=cy*32;
