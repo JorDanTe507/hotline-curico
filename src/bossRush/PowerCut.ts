@@ -5,9 +5,10 @@ import {roomProp,RUSH_ROOM_ART} from './RoomArt';
 import {ATMOSPHERE} from '../atmosphere/AtmosphereStyle';
 
 export const GENERATORS = [[5,6],[24,7],[14,13]] as const;
-export const CUT={first:14500,duration:11500,retry:900,success:[.48,.56,.64]} as const;
+export const CUT={first:14500,retry:900,success:[.48,.56,.64]} as const;
 
 export class PowerCut {
+  restoredEver=false;
   private shade:Phaser.GameObjects.Rectangle;
   private machines:Phaser.GameObjects.Image[];
   private emitters:{image:Phaser.GameObjects.Image;frame:string}[];
@@ -44,16 +45,15 @@ export class PowerCut {
     if(index<0)return false;
     if(this.s.clock>=this.retry){
       this.retry=this.s.clock+CUT.retry;
-      if(random()<CUT.success[index])this.restore();
+      if(random()<CUT.success[index]){this.restoredEver=true;this.restore();}
       else this.announce('EL GENERADOR NO ARRANCÓ');
     }
     return true;
   }
   update(active:boolean){
     if(!active){if(this.until)this.restore();return;}
-    if(this.until&&this.s.clock>=this.until){this.restore();return;}
     if(!this.until&&this.s.clock>=this.next){
-      this.until=this.s.clock+CUT.duration;
+      this.until=Infinity;
       this.shade.setFillStyle(0x080719,ATMOSPHERE.blackoutShade);
       this.machines.forEach(m=>m.setFrame('3-generator-off'));
       this.emitters.forEach(({image,frame})=>image.setFrame(frame+'-dark'));

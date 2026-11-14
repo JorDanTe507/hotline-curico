@@ -59,9 +59,9 @@ export class FortuneObjects {
   if(this.pending.actor.playerId!==owner.playerId)return true;
   if(s.clock>this.pending.until||!this.near(item,owner)){this.cancelConfirmation();return true}
   this.cancelConfirmation();
-  const wallet=permanentProgress();if(!wallet.spend(FORTUNE.mysteryCost)){this.message=`CAJA MISTERIOSA · NECESITAS ${FORTUNE.mysteryCost} HC`;this.until=s.clock+1800;return true}
+  const wallet=permanentProgress();if(!wallet.spend(FORTUNE.mysteryCost,owner.character.id)){this.message=`CAJA MISTERIOSA · NECESITAS ${FORTUNE.mysteryCost} HC`;this.until=s.clock+1800;return true}
   this.busy=true;item.opened=true;view.image.setTexture('fortune-mystery-open');
-  if(!s.roulette.start(()=>{this.busy=false;if(this.ledger.claim(item))owner.awardWeapon(s.roulette.winner);s.rounds.state.restUntil=Math.max(s.rounds.state.restUntil,s.clock+5000)},mysteryWeights())){wallet.award(FORTUNE.mysteryCost);this.busy=false;item.opened=false;view.image.setTexture('fortune-mystery')}
+  if(!s.roulette.start(()=>{this.busy=false;if(this.ledger.claim(item))owner.awardWeapon(s.roulette.winner);s.rounds.state.restUntil=Math.max(s.rounds.state.restUntil,s.clock+5000)},mysteryWeights())){wallet.award(FORTUNE.mysteryCost,owner.character.id);this.busy=false;item.opened=false;view.image.setTexture('fortune-mystery')}
   return true;
  }
  update(delta:number){const s=this.s;if(this.stopped||s.paused||s.ended||s.roulette.active||s.levelUp.active||s.coop?.actor(2).levelUp.active||s.presentation.active||s.bossDialogue.active)return;this.graphics.clear();const view=this.nearest();

@@ -21,8 +21,9 @@ export class SafeConversation {
       this.portrait = s.add.image(283, 587, characterById(lines[0][0]).portrait);
       this.name = s.add.text(354, 518, '', {fontFamily:'monospace', fontSize:21,color:'#ff75b5'});
       this.body = s.add.text(354, 553, '', {fontFamily:'monospace', fontSize:21,color:'#f8e9f4',wordWrap:{width:684}});
-      const help = s.add.text(354, 640, 'E / × CONTINUAR  ·  ESC / ○ CERRAR', {fontFamily:'monospace',fontSize:14,color:'#7ae8ed'});
-      this.panel = s.add.container(0,0,[bg,this.portrait,this.name,this.body,help]).setScrollFactor(0).setDepth(140);
+      const help = s.add.text(354, 640, 'E / × CONTINUAR', {fontFamily:'monospace',fontSize:14,color:'#7ae8ed'}).setInteractive({useHandCursor:true}).on('pointerdown',()=>this.advance());
+      const close=s.add.text(860,640,'ESC / ○ CERRAR',{fontFamily:'monospace',fontSize:14,color:'#7ae8ed'}).setInteractive({useHandCursor:true}).on('pointerdown',()=>this.close());
+      this.panel = s.add.container(0,0,[bg,this.portrait,this.name,this.body,help,close]).setScrollFactor(0).setDepth(140);
     }
     this.render();
   }

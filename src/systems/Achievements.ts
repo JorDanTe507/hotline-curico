@@ -29,11 +29,13 @@ entries.push(
  ['daily','Al día','Completa un desafío diario.','common',33]
 );
 entries.push(['jordan-time','El tiempo es oro','Activa Juicio Final.','common',34],['jordan-known','Un viejo conocido','Completa una partida cooperativa local con Jordan y Cervela tras superar al menos la primera ronda.','common',23,1,true],['jordan-five','Uno menos...','Ejecuta cinco enemigos durante un Juicio Final.','uncommon',36,5],['jordan-heal','Segunda oportunidad','Recupera el 50% de tu vida máxima en un Juicio Final.','rare',37],['jordan-ten','A contrarreloj','Ejecuta diez enemigos durante un Juicio Final.','rare',38,10],['jordan-boss','Ni lo vio venir','Derrota a un jefe con el golpe temporal.','epic',39],['jordan-clean','Cuando el tiempo se detuvo','Diez ejecuciones en un Juicio Final sin recibir daño en esa ronda.','legendary',40,10],['jordan-rush','Doce segundos de eternidad','Dos jefes distintos durante un Juicio Final en Boss Rush. No disponible aún.','legendary',41,2,true,false]);
+entries.push(['wesker-requiem','Réquiem para Wesker','Hasta los monstruos tienen su última bala.','legendary',12,1,true],['verdugo-dark','A oscuras con la muerte','No necesitas verlo para acabar con él.','legendary',38]);
 entries.find(e=>e[0]==='arsenal')![1]='Arsenal variado';
 for(const id of ['five-bosses','commander','demolisher'])entries.find(e=>e[0]===id)![7]=true;
 
 export const ACHIEVEMENTS:AchievementDefinition[]=entries.map(([id,name,description,rarity,icon,target=1,secret=false,available=true])=>({id,name,description,rarity,icon,target,secret,available,condition:description,counted:id!=='coop'&&id!=='jordan-known'}));
 ACHIEVEMENTS.push(...RUSH_ACHIEVEMENTS.map(([id,name,description,medal,target],icon):AchievementDefinition=>({id,name,description,medal,target,icon,iconKey:rushIcon(icon),category:'rush',rarity:medal==='Bronce'?'uncommon':medal==='Plata'?'rare':medal==='Oro'?'epic':'legendary',secret:false,available:true,condition:description})));
+for(const id of ['wesker-requiem','verdugo-dark'])ACHIEVEMENTS.find(a=>a.id===id)!.category='rush';
 ACHIEVEMENTS.find(a=>a.id==='requiem-round')!.condition='Completa una ronda de combate entera empezando con Requiem equipada y atacando exclusivamente con ella.';
 ACHIEVEMENTS.find(a=>a.id==='all')!.target=ACHIEVEMENTS.filter(a=>a.available&&a.counted!==false&&a.id!=='all').length;
 export const ACHIEVEMENT_KEY='hotline-achievements-v1';
@@ -50,6 +52,7 @@ export class AchievementService {
  private progress(id:string,n:number){const a=ACHIEVEMENTS.find(a=>a.id===id)!;this.data.progress[id]=Math.max(this.data.progress[id]??0,Math.min(a.target,n));if(n>=a.target)this.unlock(id)}
  event(e:AchievementEvent){if(this.disabled())return false;const before=JSON.stringify(this.data),r=this.run;let changed=true;
   switch(e.type){
+   case 'weskerRequiem':this.unlock('wesker-requiem');break;case 'verdugoDark':this.unlock('verdugo-dark');break;
    case 'rushBlood':this.unlock('br_first_blood');break;
    case 'rushVictory':{
     const v=e.rush;if(!v)return false;

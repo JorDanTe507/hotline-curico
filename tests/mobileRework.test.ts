@@ -1,0 +1,29 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {selectAutoTarget,mobileAutoTarget} from '../src/mobile/AutoFire';
+import {MobileSettings,MOBILE_PREFERENCES_KEY,readMobilePreferences} from '../src/mobile/MobilePreferences';
+import {TouchState} from '../src/mobile/TouchState';
+import {gun,WEAPONS,isMelee} from '../src/weapons/arsenal';
+const origin={x:0,y:0},prefs={priority:'nearest',distance:'weapon'} as const;
+const target=(x:number,threat=1)=>({x,y:0,threat,alive:true,active:true});
+test('automático: prioriza cercanía y filtra muertos, retirados, alcance y paredes',()=>{
+ const near=target(50),danger=target(100,99),blocked=target(10),dead={...target(1),alive:false},inactive={...target(2),active:false};
+ assert.equal(selectAutoTarget(origin,[dead,inactive,blocked,danger,near,target(651)],650,prefs,t=>t!==blocked),near);
+ assert.equal(selectAutoTarget(origin,[target(651)],650,prefs,()=>true),undefined);
+ assert.equal(selectAutoTarget(origin,[near],650,prefs,()=>false),undefined);
+ assert.equal(selectAutoTarget(origin,[near],NaN,prefs,()=>true),undefined);
+});
+test('automático: peligro usa datos existentes, respeta distancia cercana y LOS',()=>{
+ const near=target(50),danger=target(200,99),far=target(500,500);
+ assert.equal(selectAutoTarget(origin,[near,danger,far],800,{priority:'dangerous',distance:'near'},()=>true),danger);
+ assert.equal(selectAutoTarget(origin,[far],800,{priority:'nearest',distance:'near'},()=>true),undefined);
+ assert.equal(selectAutoTarget(origin,[near,danger],800,{priority:'dangerous',distance:'weapon'},t=>t!==danger),near);
+});
+function fixture(){const touch=new TouchState();touch.available=true;touch.settings.set({autoShoot:true});const foe={hp:100,boss:-1,tier:1,sprite:{...target(100),active:true,visible:true}};
+ const s:any={registry:{get:()=>true},coop:undefined,paused:false,ended:false,run:{health:100},bossDialogue:{active:false},presentation:{active:false},levelUp:{active:false},roulette:{active:false},survival:{executing:false},dash:{active:()=>false},character:{id:'cervela'},ultimate:{active:()=>false,infiniteAmmo:false},clock:1,active:0,guns:[gun(0)],foes:[foe],player:origin,lineClear:()=>true};return {s,touch,foe};}
+test('automático móvil: sin munición no solicita fuego ni recarga; definitiva infinita usa reglas existentes',()=>{const {s,touch,foe}=fixture();assert.equal(mobileAutoTarget(s,touch,'touch'),foe);s.guns[0].ammo=0;assert.equal(mobileAutoTarget(s,touch,'touch'),undefined);assert.equal(s.guns[0].reserve,80);s.ultimate={active:()=>true,infiniteAmmo:true};assert.equal(mobileAutoTarget(s,touch,'touch'),foe);s.reloadAt=10;assert.equal(mobileAutoTarget(s,touch,'touch'),undefined)});
+test('automático móvil: manual prevalece, escritorio y mando no lo activan',()=>{const {s,touch}=fixture();for(const device of ['keyboard','gamepad'])assert.equal(mobileAutoTarget(s,touch,device),undefined);touch.target(0,1);assert.equal(mobileAutoTarget(s,touch,'touch'),undefined);touch.target(0,0);assert.ok(mobileAutoTarget(s,touch,'touch'));touch.available=false;assert.equal(mobileAutoTarget(s,touch,'touch'),undefined);touch.available=true;s.registry.get=()=>false;assert.equal(mobileAutoTarget(s,touch,'touch'),undefined)});
+test('automático móvil: pausa, menús, diálogos, reanimación y dash conservan bloqueos',()=>{for(const patch of [{paused:true},{ended:true},{coop:{}},{run:{health:0}},{bossDialogue:{active:true}},{presentation:{active:true}},{levelUp:{active:true}},{roulette:{active:true}},{survival:{executing:true}},{rush:{peaceful:true}},{rush:{phase:'intro'}},{rush:{cardPanel:{}}},{uroboros:{transforming:true}}]){const {s,touch}=fixture();Object.assign(s,patch);assert.equal(mobileAutoTarget(s,touch,'touch'),undefined)}const {s,touch}=fixture();s.dash.active=()=>true;assert.equal(mobileAutoTarget(s,touch,'touch'),undefined);s.character.id='nicolas';s.ultimate.active=()=>true;assert.ok(mobileAutoTarget(s,touch,'touch'))});
+test('automático: alcance original de cada arma, incluidas variantes y explosivos, sin mutar el arma',()=>{for(let id=0;id<WEAPONS.length;id++){const {s,touch}=fixture();s.guns=[gun(id)];s.foes[0].sprite.x=WEAPONS[id].range+1;const before=JSON.stringify(s.guns);assert.equal(mobileAutoTarget(s,touch,'touch'),undefined);s.foes[0].sprite.x=WEAPONS[id].range-1;assert.equal(!!mobileAutoTarget(s,touch,'touch'),!isMelee(id));assert.equal(JSON.stringify(s.guns),before)}});
+test('preferencias móviles: defaults, límites, persistencia y reset en clave separada del progreso',()=>{const data=new Map([['hotline-permanent-v1','progreso intacto']]);const storage={getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value)}};const settings=new MobileSettings(storage);assert.equal(settings.value.autoShoot,true);settings.set({autoShoot:false,size:1.15,opacity:.4,layout:'wide',priority:'dangerous',distance:'near'});assert.deepEqual(new MobileSettings(storage).value,settings.value);assert.equal(data.get('hotline-permanent-v1'),'progreso intacto');assert.ok(data.has(MOBILE_PREFERENCES_KEY));settings.reset();assert.equal(settings.value.autoShoot,true);assert.equal(settings.value.size,1);assert.equal(readMobilePreferences({size:100,opacity:-1}).size,1.2);assert.equal(readMobilePreferences({size:100,opacity:-1}).opacity,.3)});
+test('varios dedos conservan movimiento, apuntado, disparo y flancos independientes',()=>{const t=new TouchState();t.available=true;t.autoFire=false;t.movement(1,0);t.target(0,-1);t.press('fire');t.press('dash');assert.equal(t.move.x,1);assert.equal(t.aim.y,-1);assert.equal(t.take('dash'),true);assert.equal(t.take('dash'),false);t.release('dash');assert.equal(t.down('fire'),true);t.target(0,0);assert.equal(t.move.x,1);assert.equal(t.down('fire'),true);t.clear();assert.equal(t.down('fire'),false);assert.deepEqual(t.move,origin)});

@@ -7,7 +7,7 @@ import {BOSS_DEFINITIONS,expansionBossStats} from '../src/bosses/expansion';impo
 import {PermanentProgress} from '../src/systems/PermanentProgress';import {AchievementService,ACHIEVEMENTS} from '../src/systems/Achievements';
 const box=(kind:FortuneObject['kind']):FortuneObject=>({id:kind,chunk:'0,0',kind,x:300,y:300,hp:FORTUNE.crateHP,progress:0,opened:false,rewarded:false});
 test('jefes 5/10/15/20/25, vidas de referencia, ciclo y Torturado conservados',()=>{
- assert.deepEqual([5,10,15,20,25].map(bossIndex),[0,1,2,3,4]);assert.deepEqual(BOSS_DEFINITIONS.map(b=>b.hp),[450,650,850,1000,1300]);assert.equal(bossIndex(30),0);
+ assert.deepEqual([5,10,15,20,25].map(bossIndex),[0,1,2,3,4]);assert.deepEqual(BOSS_DEFINITIONS.map(b=>b.hp),[450,650,850,1000,1300]);assert.equal(bossIndex(30),5);
  assert.equal(expansionBossStats(1,10).hp,650);assert.equal(expansionBossStats(1,35).hp,813);assert.equal(BOSS_DEFINITIONS[0].damage,20);
 });
 test('comunes filtran en búsqueda/recogida por categoría explícita, conservan 10% y especiales',()=>{
@@ -29,7 +29,7 @@ test('categorías de caja fuerte renormalizadas sin inventar míticas, todas las
  assert.ok(!WEAPONS.some(w=>w.rarity==='mythic'));const counts={rare:0,epic:0,legendary:0};for(let i=0;i<9900;i++){let call=0;const id=safeWeapon(()=>call++===0?(i+.5)/9900:.5),rarity=WEAPONS[id].rarity as keyof typeof counts;assert.ok(rarity in counts);counts[rarity]++}assert.deepEqual(counts,{rare:5500,epic:3500,legendary:900});
 });
 test('cobro HC atómico, fondos insuficientes y guardado existente',()=>{
- let saved='';const storage={getItem:()=>saved,setItem:(_k:string,v:string)=>saved=v},p=new PermanentProgress(storage);p.award(2000);assert.ok(p.spend(1500));assert.equal(p.data.currency,500);assert.equal(p.spend(1500),false);assert.equal(p.spend(-100),false);assert.equal(new PermanentProgress(storage).data.currency,500);
+ let saved='';const storage={getItem:()=>saved,setItem:(_k:string,v:string)=>saved=v},p=new PermanentProgress(storage);p.award(2000);assert.ok(p.spend(1500));assert.equal(p.balance(),500);assert.equal(p.spend(1500),false);assert.equal(p.spend(-100),false);assert.equal(new PermanentProgress(storage).balance(),500);
 });
 test('generación determinista, segura y acotada; interiores y exteriores; descarga no regenera premios',()=>{
  const w=new WorldModel(507),l=new FortuneLedger();let safes=0,indoor=0,outdoor=0;
@@ -48,5 +48,5 @@ test('colisiones dinámicas revisan la caché de navegación y se eliminan al de
 });
 test('logro Requiem conserva ID/icono/marco y desbloqueo con título y descripción nuevos',()=>{
  const def=ACHIEVEMENTS.find(a=>a.id==='requiem-round')!;assert.equal(def.name,'Salud para los vivos, Requiem para los muertos');assert.equal(def.description,'Completa una ronda de combate utilizando exclusivamente la Requiem.');assert.equal(def.rarity,'legendary');assert.equal(def.icon,12);
- const saved=JSON.stringify({version:1,unlocked:{'requiem-round':'2026-10-31T12:00:00Z'},progress:{},kills:507,rerolls:{}}),a=new AchievementService({getItem:()=>saved,setItem:()=>assert.fail('no reset')},()=>false);assert.equal(a.data.unlocked[def.id],'2026-10-31T12:00:00Z');assert.equal(a.data.kills,507);assert.equal(ACHIEVEMENTS.length,79);
+ const saved=JSON.stringify({version:1,unlocked:{'requiem-round':'2026-10-31T12:00:00Z'},progress:{},kills:507,rerolls:{}}),a=new AchievementService({getItem:()=>saved,setItem:()=>assert.fail('no reset')},()=>false);assert.equal(a.data.unlocked[def.id],'2026-10-31T12:00:00Z');assert.equal(a.data.kills,507);assert.equal(ACHIEVEMENTS.length,81);
 });

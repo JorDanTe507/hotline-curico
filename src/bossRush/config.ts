@@ -12,6 +12,6 @@ export const RUSH_TRACKS = [
 ] as const;
 export const RUSH_BALANCE = {
   talkRange: 74, restMs: 60_000, recovery: .25, reward: 180,
-  ammoPrice: 35, medkitPrice: 80, armorPrice: 100, weaponPrice: 140,
+  ammoPrice: 35, medkitPrice: 80, armorPrice: 100, weaponPrice: 140,rouletteGrowth:.25,
   damagePenalty: 50, fallPenalty: 1000,
 } as const;

@@ -10,7 +10,7 @@ export class Ultimate {
  protected get maximumHealth(){return this.stats().maxHealth}
  get requiredHits(){return Math.max(20,this.stats().ultimateHits)}
  get duration(){return this.stats().ultimateDuration}
- get healRate(){return this.stats().ultimateHeal}
+ get healRate(){return this.stats().ultimateHeal*.6}
  get infiniteAmmo(){return true}
  get dualFire(){return true}
  get damageReduction(){return true}
@@ -32,6 +32,7 @@ export class Ultimate {
  addAmmo(gun:Gun,amount:number){const gained=addGunAmmo(gun,amount);const saved=this.saved.get(gun);if(saved)saved.gained+=gained}
  private restore(guns:Gun[]){for(const g of guns){const old=this.saved.get(g);if(old){if(singleTank(g.id)){g.ammo=old.ammo;g.reserve=old.reserve;addGunAmmo(g,old.gained)}else{g.ammo=old.ammo;g.reserve=old.reserve+old.gained}}}this.saved.clear()}
  stop(){this.until=0;this.charge=0;this.pending=false;this.saved.clear()}
+ cancel(guns:Gun[]=[]){if(!this.until)return false;this.restore(guns);this.stop();return true}
  tick(now:number,health:number,guns:Gun[]=[]){if(health<=0){this.stop();return 0}if(!this.until)return health;const end=Math.min(now,this.until);health=Math.min(this.maximumHealth,health+Math.max(0,end-this.lastTick)*this.healRate/1000);this.lastTick=end;if(now>=this.until){this.restore(guns);this.until=0;this.charge=0}return health}
  double(weapons:{id:number}[],now:number){return this.active(now)&&weapons.length===2}
 }

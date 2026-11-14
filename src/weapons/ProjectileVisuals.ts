@@ -1,0 +1,4 @@
+import type Phaser from 'phaser';
+export const PROJECTILE_VISUALS:Record<number,{name:string;width:number}>={0:{name:'pistol',width:24},1:{name:'revolver',width:28},2:{name:'smg',width:23},3:{name:'shotgun',width:11},4:{name:'assault',width:32},5:{name:'sniper',width:58},7:{name:'minigun',width:34},8:{name:'smg',width:20},10:{name:'shotgun',width:12}};
+export function loadProjectileVisuals(s:Phaser.Scene){for(const name of new Set([...Object.values(PROJECTILE_VISUALS).map(v=>v.name),'knife']))s.load.image('projectile-'+name,'assets/v210/projectiles/'+name+'.png')}
+export function styleProjectile(sprite:Phaser.Physics.Arcade.Sprite,id:number,angle:number){const v=PROJECTILE_VISUALS[id];if(!v)return;sprite.setTexture('projectile-'+v.name).clearTint().setDisplaySize(v.width,v.width*sprite.height/sprite.width).setRotation(angle);sprite.body!.setSize(7/sprite.scaleX,3/sprite.scaleY,true)}

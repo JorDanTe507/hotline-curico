@@ -47,8 +47,8 @@ test('modificadores todas las armas incluida minigun, cargadores y límites téc
 test('dash reduce como máximo 40% y reescala enfriamiento pendiente',()=>{
  const {run}=applyAll('dash'),d=new Dash();d.start(0,1,0);d.setCooldown(dashCooldown(run.stats),600);assert.equal(d.readyAt,960);assert.equal(d.start(959,1,0),false);assert.ok(d.start(960,1,0));assert.equal(d.readyAt,1680);assert.equal(dashCooldown(run.stats),720);
 });
-test('ulti mínimos y mejoras activas: 20 impactos, 32 HP/s, 16s y vida 200',()=>{
- const {run}=setup();run.stats=applyAll('charge').run.stats;const u=new Ultimate(()=>run.stats);assert.equal(u.requiredHits,20);u.charge=20;run.stats.ultimateHeal=32;run.stats.ultimateDuration=16000;run.stats.maxHealth=200;assert.ok(u.activate(0));assert.equal(u.until,16000);assert.equal(u.tick(1000,120),152);assert.equal(u.tick(2000,190),200);u.extend(1000,2000);assert.equal(u.until,17000);assert.equal(u.activeDuration,17000);
+test('ulti mínimos y mejoras activas: 20 impactos, 19,2 HP/s, 16s y vida 200',()=>{
+ const {run}=setup();run.stats=applyAll('charge').run.stats;const u=new Ultimate(()=>run.stats);assert.equal(u.requiredHits,20);u.charge=20;run.stats.ultimateHeal=32;run.stats.ultimateDuration=16000;run.stats.maxHealth=200;assert.ok(u.activate(0));assert.equal(u.until,16000);assert.equal(u.tick(1000,120),139.2);assert.equal(u.tick(2000,190),200);u.extend(1000,2000);assert.equal(u.until,17000);assert.equal(u.activeDuration,17000);
 });
 test('placas solo protegen daño cubierto, combinan con ulti y nunca dan invulnerabilidad',()=>{
  const {run}=applyAll('plates');run.stats.maxArmor=150;run.armor=150;const a=receiveDamage(run,100,true);assert.ok(Math.abs(a.absorbed-40.8)<1e-8);assert.equal(run.health,100);

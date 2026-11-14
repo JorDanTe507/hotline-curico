@@ -9,6 +9,9 @@ import {playerInput} from '../input/InputHub';
 import {UROBOROS_ATLAS as ATLAS} from './assets';
 import {CRATES, DIRECTOR_START} from './Station';
 import {INTRO_LINES, TRANSFORM_LINE, TRANSFORM_REPLIES, UROBOROS as C, WESKER} from './config';
+import {achievements} from '../systems/Achievements';
+import type {ShotCredit} from '../systems/Ultimate';
+import {REQUIEM_ID} from '../weapons/RequiemPenetration';
 
 type Attack = keyof typeof C.attacks;
 type Point = {x:number; y:number};
@@ -46,6 +49,7 @@ export class UroborosEncounter {
   private lethalPending = false;
   private stopped = false;
   private lastHit = 0;
+  private lastCredit?:ShotCredit;
   private bolts: Bolt[] = [];
   private effects: Phaser.GameObjects.Image[] = [];
   private graphics: Phaser.GameObjects.Graphics;
@@ -55,7 +59,7 @@ export class UroborosEncounter {
   private icon: Phaser.GameObjects.Image;
   private meter: Phaser.GameObjects.Graphics;
 
-  constructor(private s: Game, kit: UroborosKit) {
+  constructor(private s: Game, kit: UroborosKit,readonly traditional=false) {
     this.initial=kit;
     this.graphics=s.add.graphics().setDepth(17);
     this.infectionAura=s.add.graphics().setDepth(17);
@@ -75,18 +79,18 @@ export class UroborosEncounter {
       a.chaos.inventory.counts.splice(0,saved.counts.length,...saved.counts);
       a.chaos.inventory.selected=saved.selected;
     }
-    const {x,y}=DIRECTOR_START;
+    const [x,y]=traditional?s.validPoint(550,true):[DIRECTOR_START.x,DIRECTOR_START.y];
     const sprite=s.physics.add.sprite(x,y,ATLAS,'human-idle-down-0').setDepth(10);
     this.applyScale(sprite);
-    const hp=Math.round(C.health*(s.coop?C.coopHealth:1)*(s.rush?.tuning(WESKER).hp??1));
+    const hp=Math.round(C.health*(s.coop?C.coopHealth:1)*(s.rush?.tuning(WESKER).hp??(traditional?1+Math.max(0,Math.floor(s.run.round/30)-1)*.25:1)));
     this.foe={sprite,boss:WESKER,tier:0,hp,max:hp,canPickupWeapons:false,next:0,pathAt:0,target:null,awake:true,
       label:s.add.text(x,y-55,'EL DIRECTOR',{fontFamily:'monospace',fontSize:13,color:'#fbc9ff',stroke:'#11091b',strokeThickness:3}).setOrigin(.5)};
     this.foe.collider=s.physics.add.collider(sprite,s.walls,()=>{
       if(this.mode==='dash'||this.mode==='evade')this.recover();
     });
     s.foes.push(this.foe);
-    CRATES.forEach((p,i)=>s.fortune.placeUroborosCrate('uroboros-'+i,p.x,p.y,C.crateHP));
-    s.rounds.state.stop();
+    if(!traditional){CRATES.forEach((p,i)=>s.fortune.placeUroborosCrate('uroboros-'+i,p.x,p.y,C.crateHP));s.rounds.state.stop();}
+    else for(let i=0;i<3;i++){const p=s.lootPoint(s.player.x+(i-1)*90,s.player.y+90);s.addDrop(p.x,p.y,'med',0)}
     this.animate('idle',0,1);
   }
 
@@ -97,9 +101,9 @@ export class UroborosEncounter {
   }
   evadeBullet(origin?: Point) {
     const settings = C.bulletEvade;
-    if (!this.s.rush?.combat || !origin || this.stopped || this.s.temporal.active ||
+    if ((!this.s.rush?.combat&&!this.traditional) || !origin || this.stopped || this.s.temporal.active ||this.s.survival.stunned(this.foe)||this.s.chaos.interrupted(this.foe)||
         !['pursue','recover','evade'].includes(this.mode) || this.time < this.vulnerableUntil ||
-        Math.random() >= settings.chance) return false;
+        Math.random() >= (this.stage===1?.35:settings.chance)) return false;
     const e = this.foe.sprite;
     if (this.mode !== 'evade') {
       const angle = Math.atan2(e.y-origin.y,e.x-origin.x) + Math.PI/2;
@@ -119,6 +123,7 @@ export class UroborosEncounter {
     return true;
   }
   get finished() { return this.mode==='won'; }
+  private traditionalScale(stat:'damage'|'speed'){return 1+(this.traditional?Math.max(0,Math.floor(this.s.run.round/30)-1):0)*(stat==='damage'?.12:.04);}
   get transforming() { return this.mode==='transform'; }
 
   private applyScale(sprite: Phaser.Physics.Arcade.Sprite) {
@@ -160,8 +165,9 @@ export class UroborosEncounter {
     this.s.bossDialogue.start(done,lines);
   }
 
-  hit(n:number) {
+  hit(n:number,credit?:ShotCredit) {
     if (this.stopped || this.finished || this.mode==='intro' || this.mode==='transform' || n<=0) return;
+    this.lastCredit=credit;
     const e=this.foe;
     const remaining=e.hp-n;
     if (remaining<=0 && this.stage===1) {
@@ -170,7 +176,7 @@ export class UroborosEncounter {
     } else {
       e.hp=Math.max(0,remaining);
     }
-    if (e.hp<=0) { this.win();return; }
+    if (e.hp<=0) { if(this.stage===2&&this.s.rush&&!this.s.rush.practice&&credit?.fromPlayer!==false&&credit?.weaponId===REQUIEM_ID)achievements().event({type:'weskerRequiem'});this.win();return; }
     if(this.mode==='pursue'||this.mode==='recover'){
       this.lastHit=this.time+165;
       this.animate('hurt');
@@ -178,6 +184,7 @@ export class UroborosEncounter {
   }
 
   private transform() {
+    if(this.traditional)for(const a of this.actors())this.clearInfection(a);
     this.clearEffects();
     this.mode='transform';
     this.s.rush?.music('wesker-mutated',360);
@@ -219,7 +226,7 @@ export class UroborosEncounter {
   private hurt(a:Game,damage:number,infects:boolean) {
     if (a.dash.active(this.s.clock))return;
     const hp=a.run.health, armor=a.run.armor+(a.run.temporaryArmor??0);
-    a.damage(damage*(this.s.rush?.tuning(WESKER).damage??1),true);
+    a.damage(damage*(this.s.rush?.tuning(WESKER).damage??this.traditionalScale('damage')),true);
     if(infects&&a.run.health>0&&(a.run.health<hp||a.run.armor+(a.run.temporaryArmor??0)<armor))this.infect(a);
   }
 
@@ -237,15 +244,7 @@ export class UroborosEncounter {
     this.refreshHud();
   }
 
-  useCure(a:Game) {
-    const state=this.state(a.playerId);
-    if(!state.level||!state.cures||!this.living().some(actor=>actor.playerId===a.playerId)||this.s.paused||this.transforming||this.s.bossDialogue.active||this.finished)return false;
-    state.cures--;
-    this.s.rush?.markCure();
-    this.clearInfection(a);
-    this.effect('purge',a.player,90,480);
-    return true;
-  }
+  useCure(a:Game) { return this.pickup(a); }
 
   dropCure(x:number,y:number) {
     if(this.finished)return;
@@ -256,10 +255,10 @@ export class UroborosEncounter {
   pickup(a:Game) {
     if(this.stopped||!this.living().some(actor=>actor.playerId===a.playerId))return false;
     const vial=this.cures.find(item=>this.contains(item,78,a));
-    if(!vial)return false;
+    if(!vial||!this.state(a.playerId).level||this.s.paused||this.transforming||this.s.bossDialogue.active||this.finished)return false;
     this.cures.splice(this.cures.indexOf(vial),1);
     vial.destroy();
-    this.state(a.playerId).cures++;
+    this.s.rush?.markCure();this.clearInfection(a);this.effect('purge',a.player,90,480);
     this.refreshHud();
     return true;
   }
@@ -433,7 +432,7 @@ export class UroborosEncounter {
         }
       }
     }
-    s.navigation.move(e,target.player.x,target.player.y,C.speed[this.stage-1]*(s.rush?.tuning(WESKER).speed??1));
+    s.navigation.move(e,target.player.x,target.player.y,C.speed[this.stage-1]*(s.rush?.tuning(WESKER).speed??this.traditionalScale('speed')));
     if(this.time>=this.lastHit)this.animate('walk',dx,dy);
   }
 
@@ -445,7 +444,7 @@ export class UroborosEncounter {
     this.status.setText(actors.map(a=>{
       const state=this.state(a.playerId), input=playerInput(a).last;
       const shortcut=hudPreferences.helpers?` [${input==='gamepad'?'↑':input==='touch'?'CURA':'U'}]`:'';
-      return `${this.s.coop?'J'+a.playerId+' · ':''}INFECCIÓN ${state.level}/3 · CURAS ${state.cures}${shortcut}`;
+      return `${this.s.coop?'J'+a.playerId+' · ':''}INFECCIÓN ${state.level}/3 · ANTÍDOTO: INTERACTUAR EN EL SUELO`;
     }).join('     '));
     this.meter.clear();
     for(const [i,a] of actors.entries()){
@@ -581,6 +580,7 @@ export class UroborosEncounter {
     e.label.destroy();
     s.temporal.end(false);
     if(s.rush){s.rush.defeated();return;}
+    if(this.traditional){const actor=s.coop?.actor(this.lastCredit?.playerId??1)??s;actor.run.kills++;actor.run.bosses++;actor.progression.defeated(e);actor.economy.defeated(e);actor.goals.killed(e,this.lastCredit);s.rounds.killed(e);achievements().event({type:'kill',boss:true,bossIndex:5,character:actor.character.id,weapon:this.lastCredit?.weaponId,method:this.lastCredit?.method});s.uroboros=undefined;return;}
     for(const shot of s.shots) {
       if(shot.collider?.active)shot.collider.destroy();
       if(shot.sprite.active)shot.sprite.destroy();

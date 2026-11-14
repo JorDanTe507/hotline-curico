@@ -6,13 +6,15 @@ import {ROULETTE_SPIN_MS,ROULETTE_TOTAL_MS} from '../config/roulette';
 import {AudioSystem} from '../systems/AudioSystem';
 /** Runs on real frame delta while the simulation, scene timers and tweens are frozen. */
 export class WeaponRoulette {
+ choosing=false;private lastClick=-1;private offer?:{balance:()=>number;price:()=>number;reroll:()=>void};
  active=false;winner=-1;elapsed=0;private view?:Phaser.GameObjects.Container;
  private strip?:Phaser.GameObjects.Container;private mask?:Phaser.Display.Masks.GeometryMask;
  private maskShape?:Phaser.GameObjects.Graphics;private title?:Phaser.GameObjects.Text;
  private glows:Phaser.GameObjects.Rectangle[]=[];private result?:Phaser.GameObjects.Text;private done?:()=>void;private revealed=false;
  private readonly spacing=146;private readonly winningIndex=24;
  constructor(private s:Game,private random=Math.random){}
- start(done:()=>void,weights:WeightedWeapon[]=availableWeights()){if(this.active||this.s.ended||this.s.levelUp.active)return false;
+ start(done:()=>void,weights:WeightedWeapon[]=availableWeights(),offer?:{balance:()=>number;price:()=>number;reroll:()=>void}){if(this.active||this.s.ended||this.s.levelUp.active)return false;
+  this.offer=offer;this.choosing=false;this.lastClick=-1;
   this.glows=[];this.winner=chooseWeapon(this.random,weights);this.elapsed=0;this.revealed=false;this.done=done;this.active=true;
   const s=this.s;s.critical.suspend();s.stopMinigun();s.physics.world.pause();s.time.paused=true;s.tweens.pauseAll();
   s.player.anims.pause();for(const e of s.foes)e.sprite.anims.pause();
@@ -41,10 +43,13 @@ export class WeaponRoulette {
  update(delta:number){if(!this.active)return;this.elapsed+=Math.max(0,delta);for(const glow of this.glows)glow.setAlpha(.55+.35*Math.sin(this.elapsed/130));
   const t=Math.min(1,this.elapsed/ROULETTE_SPIN_MS),ease=1-Math.pow(1-t,4);
   this.strip!.x=640-this.winningIndex*this.spacing*ease;
+  const step=Math.floor(this.winningIndex*ease);if(t<1&&step!==this.lastClick){this.lastClick=step;AudioSystem.play(this.s,'pickup',.12)}
   if(t===1&&!this.revealed){this.revealed=true;this.title!.setText('¡ARMA OBTENIDA!');this.result!.setText(WEAPONS[this.winner].name.toUpperCase()+(isLegendary(this.winner)?' · LEGENDARIA':''));AudioSystem.play(this.s,'reward')}
-  if(this.elapsed>=ROULETTE_TOTAL_MS){const done=this.done;this.cancel();this.s.blockPointerUntilRelease=true;done?.();this.s.levelUp.openIfNeeded()}
+  if(this.elapsed>=ROULETTE_TOTAL_MS&&!this.choosing){const done=this.done;this.done=undefined;if(this.offer){done?.();this.choosing=true;this.choiceButtons();}else{this.cancel();this.s.blockPointerUntilRelease=true;done?.();this.s.levelUp.openIfNeeded()}}
  }
- cancel(){this.glows=[];this.done=undefined;const wasActive=this.active;this.active=false;this.strip?.clearMask();this.strip?.destroy(true);this.view?.destroy(true);this.mask?.destroy();this.maskShape?.destroy();this.strip=undefined;this.view=undefined;this.mask=undefined;this.maskShape=undefined;
+ private choiceButtons(){const s=this.s,offer=this.offer!;this.view!.add(s.add.text(640,500,`SALDO ${offer.balance()} HC · SIGUIENTE ${offer.price()} HC`,{fontFamily:'monospace',fontSize:19,color:'#f8df90'}).setOrigin(.5));for(const [i,label] of ['VOLVER A TIRAR','FINALIZAR'].entries()){const b=s.add.text(430+i*420,550,label,{fontFamily:'monospace',fontSize:22,color:i===0&&offer.balance()<offer.price()?'#776c7b':'#70f1ff',backgroundColor:'#22112c',padding:{x:14,y:12}}).setOrigin(.5);if(i||offer.balance()>=offer.price())b.setInteractive({useHandCursor:true}).once('pointerdown',()=>{if(!this.choosing)return;this.cancel();s.blockPointerUntilRelease=true;if(!i)offer.reroll()});this.view!.add(b)}}
+ rerollChoice(){if(!this.choosing||!this.offer||this.offer.balance()<this.offer.price())return;const offer=this.offer;this.cancel();offer.reroll()}
+ cancel(){this.choosing=false;this.offer=undefined;this.glows=[];this.done=undefined;const wasActive=this.active;this.active=false;this.strip?.clearMask();this.strip?.destroy(true);this.view?.destroy(true);this.mask?.destroy();this.maskShape?.destroy();this.strip=undefined;this.view=undefined;this.mask=undefined;this.maskShape=undefined;
   if(wasActive){const s=this.s;s.time.paused=s.paused;if(!s.paused&&!s.ended){s.physics.world.resume();s.tweens.resumeAll();s.player.anims.resume();for(const e of s.foes)e.sprite.anims.resume()}}
  }
 }

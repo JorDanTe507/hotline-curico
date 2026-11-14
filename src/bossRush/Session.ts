@@ -17,6 +17,7 @@ import {ammoGrant, reserveAmount,dashCooldown} from '../systems/PlayerModifiers'
 import {cellPoint, drawRushMap, rushMap, partnerSpawn, SAFE_POINTS, SAFE_ACTOR_POINTS} from './Arenas';
 import {STATION_EXIT} from '../uroboros/Station';
 import {PowerCut} from './PowerCut';
+import {BossCombat} from './BossCombat';
 import {roomProp} from './RoomArt';
 import {RUSH_BALANCE as B, RUSH_BOSSES} from './config';
 import {clearRush, recordRush, RUSH_CARDS, rushOffer, suspendRush, unlockRush,
@@ -46,6 +47,7 @@ export class RushSession {
   phase: 'intro' | 'fight' | 'loot' | 'rest' | 'leaving';
   door?: Phaser.GameObjects.Image;
   power?:PowerCut;
+  bossCombat?:BossCombat;
   rest?: RushRest;
   cardPanel?: Phaser.GameObjects.Container;
   companionOpen=false;
@@ -61,12 +63,13 @@ export class RushSession {
   private started = 0;
   private until = 0;
   private status?: Phaser.GameObjects.Text;
-  private rewardDrop?: Drop;
+  private rewardDrop?: Drop; roulettePrice:number=B.weaponPrice;
   get pendingWeapon() { return this.rewardDrop?.sprite.active ? this.rewardDrop : undefined; }
 
   constructor(private s: Game, readonly entry: RushEntry) {
     this.practice = entry.kind === 'practice';
     this.rest = 'rest' in entry ? entry.rest : undefined;
+    if(entry.kind==='resume'&&Number.isSafeInteger(this.rest?.roulettePrice)&&this.rest!.roulettePrice!>=B.weaponPrice)this.roulettePrice=this.rest!.roulettePrice!;
     this.boss = entry.kind === 'practice' ? entry.boss : this.rest?.next ?? 0;
     this.endless=this.rest?.endless;
     this.encounter=this.rest?.encounter??[this.boss];
@@ -95,6 +98,7 @@ export class RushSession {
 
   start() {
     const s = this.s;
+    if(!this.safe&&this.boss<5)this.bossCombat=new BossCombat(s);
     for(const [key,count,repeat] of [['smoke-flight',4,-1],['smoke-cloud',6,0]] as const){
       const name='rush-'+key;
       if(!s.anims.exists(name))s.anims.create({key:name,frames:Array.from({length:count},(_,i)=>({key:'rush-attack-polish',frame:key+'-'+i})),frameRate:10,repeat});
@@ -188,6 +192,7 @@ export class RushSession {
     if(this.killed.size<this.encounter.length)return;
     const s = this.s;
     this.phase = 'loot';
+    this.bossCombat?.stop();
     const duration=s.clock-this.started;
     if(this.endless){const run=this.endless;run.cleared++;run.kills+=this.encounter.length;run.doubles+=+(this.encounter.length===2);run.combatMs+=duration;run.clean=this.medkitUsed?0:run.clean+1;run.history=[...run.history,this.encounter].slice(-8);this.until=s.clock+45_000;}
     if(!this.practice&&!developerSession.active)achievements().event({type:'rushVictory',character:s.character.id,rush:{bosses:this.encounter,damage:this.damageTaken,rifleHit:this.rifleHit,cureUsed:this.cureUsed,campaign:!this.endless&&this.boss===5,falls:this.stats.falls,cleared:this.endless?.cleared??0,clean:this.endless?.clean??0}});
@@ -281,7 +286,7 @@ export class RushSession {
     }
   }
   private restState(): RushRest {
-    return {...this.rest!, credits: this.credits, inventory: this.capture(), stats: this.stats, dialogueHistory:this.dialogueHistory,relayHistory:this.relayHistory,
+    return {...this.rest!,roulettePrice:this.roulettePrice, credits: this.credits, inventory: this.capture(), stats: this.stats, dialogueHistory:this.dialogueHistory,relayHistory:this.relayHistory,
       remaining: Math.max(0, this.until - this.s.clock)};
   }
   private makeRest(endless=this.endless):RushRest {
@@ -315,7 +320,7 @@ export class RushSession {
       case 'ammo': return `MUNICIÓN · ${B.ammoPrice}`;
       case 'medkit': return `BOTIQUÍN · ${B.medkitPrice}`;
       case 'armor': return `ESCUDO · ${B.armorPrice}`;
-      case 'weapon': return `TIRADA · ${B.weaponPrice}`;
+      case 'weapon': return `TIRADA · ${this.roulettePrice}`;
       case 'cards': return 'CARTAS DE MEJORA';
       case 'retire': return 'TERMINAR RACHA';
       default: return 'SUSPENDER';
@@ -366,7 +371,7 @@ export class RushSession {
   }
   private purchase(station: string) {
     const s = this.s;
-    const price = station === 'ammo' ? B.ammoPrice : station === 'medkit' ? B.medkitPrice : station === 'armor' ? B.armorPrice : B.weaponPrice;
+    const price = station === 'ammo' ? B.ammoPrice : station === 'medkit' ? B.medkitPrice : station === 'armor' ? B.armorPrice : this.roulettePrice;
     if (this.credits < price) { this.notice('CRÉDITOS INSUFICIENTES'); return; }
     if (station === 'ammo') {
       const guns = s.guns.filter(g => !isMelee(g.id));
@@ -379,8 +384,8 @@ export class RushSession {
       s.run.armor = s.run.stats.maxArmor;
     } else {
       const weights=rushWeights(this.endless?'endless':this.boss<=1?'early':'late',true);
-      if (this.rewardDrop?.sprite.active) { this.notice('RECOGE O CAMBIA EL ARMA ANTES DE OTRA TIRADA'); return; }
-      if (!s.roulette.start(() => { this.rewardDrop=s.awardWeapon(s.roulette.winner); }, weights)) return;
+
+      if (!s.roulette.start(() => { if(this.rewardDrop?.sprite.active)s.removeDrop(this.rewardDrop);this.rewardDrop=s.awardWeapon(s.roulette.winner); }, weights,{balance:()=>this.balance,price:()=>this.roulettePrice,reroll:()=>this.purchase('weapon')})) return;this.roulettePrice=Math.ceil(price*(1+B.rouletteGrowth));
     }
     this.credits -= price;
   }
@@ -497,7 +502,7 @@ export class RushSession {
     }
   }
   damaged(amount:number,source?:number){if(!this.combat)return;this.damageTaken+=amount;if(this.endless)this.endless.damage+=amount;else this.stats.damage+=amount;if(source===3&&amount>0)this.rifleHit=true;}
-  died() { this.stats.falls++;if(this.endless){this.endless.falls++;this.endless.combatMs+=Math.max(0,this.s.clock-this.started);this.finishEndless('derrota');}if (!this.practice) clearRush(); }
+  died() { this.bossCombat?.stop();this.stats.falls++;if(this.endless){this.endless.falls++;this.endless.combatMs+=Math.max(0,this.s.clock-this.started);this.finishEndless('derrota');}if (!this.practice) clearRush(); }
   exit(retry: boolean) {
     if (!retry) this.s.scene.start('BossRush', {practice:this.practice});
     else this.restart(this.entry.kind === 'practice' ? this.entry : {kind:'campaign', character:this.s.character.id});

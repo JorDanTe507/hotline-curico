@@ -17,7 +17,7 @@ export const UPGRADES:Upgrade[]=[
  perk('dash','Dash mejorado','−10% de enfriamiento del dash.','back','rare',4,({run:r})=>{r.stats.dashReduction=Math.min(.58,r.stats.dashReduction+.1)}),
  perk('close','Furia de combate','+15% de daño a enemigos a 160 px o menos.','shoot','rare',3,({run:r})=>{r.stats.closeDamage+=.15}),
  perk('charge','Última Calada acelerada','−4 impactos para cargar la ulti. Mínimo: 20.','ultimate-special','rare',5,({run:r})=>{r.stats.ultimateHits=Math.max(20,r.stats.ultimateHits-4)}),
- perk('regen','Recuperación extrema','+3 HP/s de regeneración durante la ulti.','medkit','epic',4,({run:r})=>{r.stats.ultimateHeal+=3}),
+ perk('regen','Recuperación extrema','+1,8 HP/s efectivos de regeneración durante la ulti.','medkit','epic',4,({run:r})=>{r.stats.ultimateHeal+=3}),
  perk('duration','Tiempo prestado','+1 segundo de duración de Última Calada.','ultimate-special','epic',4,({run:r})=>{r.stats.ultimateDuration+=1000;r.stats.tryhardDuration=Math.min(14000,(r.stats.tryhardDuration??8000)+1000)}),
  perk('magazine','Munición adicional','+15% de capacidad de cargador; no rellena el actual.','ammo','common',4,({run:r})=>{r.stats.magazine+=.15}),
  perk('medkit','Primeros auxilios','+10 HP de curación por botiquín.','medkit','common',4,({run:r})=>{r.stats.medkitHeal+=10}),

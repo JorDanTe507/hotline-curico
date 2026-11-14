@@ -37,6 +37,7 @@ export interface RushInventory {
 }
 
 export interface RushRest {
+  roulettePrice?:number;
   endless?: EndlessRun; encounter?: number[];
   version: 1; character: CharacterId; next: number; credits: number; inventory: RushInventory;
   stats: RushStats; dialogueHistory?: SafeHistory; relayHistory?:SafeHistory; upgrades: RushCard[]; offer: RushCard[]; chose: boolean; remaining: number;

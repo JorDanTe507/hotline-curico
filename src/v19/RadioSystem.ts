@@ -3,20 +3,59 @@ import Phaser from 'phaser';import type {Game,Foe} from '../scenes/Game';import 
 export const RADIO_TIER=16;export const RADIO={minRound:3,interval:3,call:4000,reinforcements:4,drop:.75,supplyDelay:1500,openTime:2000};
 interface Mind {phase:'idle'|'calling'|'flee';until:number;called:boolean;icon:Phaser.GameObjects.Text;fleeAt:number;detectUntil:number;hurtUntil:number;patrolAt:number;patrol:{x:number;y:number};last:{x:number;y:number}}
 interface Item {progress:number;x:number;y:number;kind:'radio'|'supply';used:boolean;ready:number;opened?:number;marker?:Phaser.GameObjects.Image;image:Phaser.GameObjects.Image;label:Phaser.GameObjects.Text}
+interface BossCall {until:number;health:number;interrupt:number;complete:()=>void;icon:Phaser.GameObjects.Image}
 export class RadioSystem {
+ private bossCalls=new Map<Foe,BossCall>();
+ requestBossCall(e:Foe,complete:()=>void,interrupt=Infinity) {
+  if(this.bossCalls.has(e)||e.hp<=0)return false;
+  const icon=this.s.add.image(e.sprite.x,e.sprite.y-72,'v19-radio-item').setDisplaySize(22,30).setDepth(18);
+  this.bossCalls.set(e,{until:this.s.clock+RADIO.call,health:e.hp,interrupt,complete,icon});
+  return true;
+ }
+ cancelBossCall(e:Foe){const call=this.bossCalls.get(e);call?.icon.destroy();this.bossCalls.delete(e)}
+ calling(e:Foe){return this.bossCalls.has(e)}
+ reinforcementPoints(count:number,minDistance=300) {
+  const s=this.s,map=s.rush?.map;
+  if(!map)return [];
+  const points:{x:number;y:number}[]=[];
+  for(let y=2;y<map.height-2;y++)for(let x=2;x<map.width-2;x++){
+   const p={x:x*48+24,y:y*48+24};
+   if(Math.hypot(p.x-s.player.x,p.y-s.player.y)<minDistance||!s.walkablePoint(p.x,p.y,1)||
+     s.foes.some(f=>Math.hypot(f.sprite.x-p.x,f.sprite.y-p.y)<100)||!s.navigation.canReach(s.player.body!.center,p))continue;
+   points.push(p);
+  }
+  points.sort((a,b)=>Math.hypot(b.x-s.player.x,b.y-s.player.y)-Math.hypot(a.x-s.player.x,a.y-s.player.y));
+  const selected:typeof points=[];
+  for(const point of points)if(selected.length<count&&selected.every(p=>Math.hypot(p.x-point.x,p.y-point.y)>96))selected.push(point);
+  return selected;
+ }
+ private updateBossCall(e:Foe,delta:number) {
+  const call=this.bossCalls.get(e);
+  if(!call)return false;
+  if(e.hp<=0||!e.sprite.active||e.hp<=call.health-call.interrupt||
+    Number.isFinite(call.interrupt)&&(this.s.survival.stunned(e)||this.s.chaos.interrupted(e))){
+   this.cancelBossCall(e);return false;
+  }
+  e.sprite.setVelocity(0);
+  call.icon.setPosition(e.sprite.x+24,e.sprite.y-65);
+  e.label.setText('RADIO · '+Math.max(0,Math.ceil((call.until-this.s.clock)/1000))+' s');
+  if(this.s.survival.stunned(e)||this.s.chaos.interrupted(e)){call.until+=delta;return true}
+  if(this.s.clock>=call.until){this.cancelBossCall(e);call.complete()}
+  return true;
+ }
  private minds=new Map<Foe,Mind>();private rewarded=new WeakSet<Foe>();private items:Item[]=[];private lastRound=-1;private lastUpdate=0;private opening:Phaser.GameObjects.Graphics;
- freezeEnemy(e:Foe,dt:number){const m=this.minds.get(e);if(m)for(const k of ['until','fleeAt','detectUntil','hurtUntil','patrolAt'] as const)if(m[k])m[k]+=dt}
+ freezeEnemy(e:Foe,dt:number){const call=this.bossCalls.get(e);if(call)call.until+=dt;const m=this.minds.get(e);if(m)for(const k of ['until','fleeAt','detectUntil','hurtUntil','patrolAt'] as const)if(m[k])m[k]+=dt}
 
  constructor(private s:Game){this.opening=s.add.graphics().setDepth(17)}
  beginRound(){const s=this.s;if(this.lastRound===s.run.round)return;this.lastRound=s.run.round;if(s.run.round>=RADIO.minRound&&s.run.round%RADIO.interval===0&&s.run.round%5!==0){s.spawn(RADIO_TIER,-1);if(s.rounds.state.plan.type==='EXTERMINIO')s.rounds.state.plan.target++}}
  private actors(){return this.s.coop?.livingActors()??[this.s]}
- updateEnemy(e:Foe,delta:number){if(e.tier!==RADIO_TIER)return false;const s=this.s;let m=this.minds.get(e);if(!m){m={phase:'idle',until:0,called:false,fleeAt:0,detectUntil:0,hurtUntil:0,patrolAt:0,patrol:{x:e.sprite.x,y:e.sprite.y},last:{x:e.sprite.x,y:e.sprite.y},icon:s.add.text(e.sprite.x,e.sprite.y-45,'',{fontFamily:'monospace',fontSize:13,color:'#ffdc65',stroke:'#090613',strokeThickness:3}).setOrigin(.5).setDepth(18)};this.minds.set(e,m)}e.label.setText('');m.icon.setPosition(e.sprite.x,e.sprite.y-45);if(s.survival.stunned(e)||s.chaos.interrupted(e)){e.sprite.setVelocity(0);if(m.phase==='calling')m.until+=delta;return true}const candidates=this.actors().filter(a=>a.run.health>0),seen=candidates.filter(a=>Math.hypot(a.player.x-e.sprite.x,a.player.y-e.sprite.y)<700&&s.lineClear(e.sprite.x,e.sprite.y,a.player.x,a.player.y));const target=(seen.length?seen:candidates).sort((a,b)=>Math.hypot(a.player.x-e.sprite.x,a.player.y-e.sprite.y)-Math.hypot(b.player.x-e.sprite.x,b.player.y-e.sprite.y))[0];if(!target)return true;const distance=Math.hypot(target.player.x-e.sprite.x,target.player.y-e.sprite.y),visible=seen.length>0;if(visible)m.last={x:target.player.x,y:target.player.y};if(s.clock<m.hurtUntil){e.sprite.setVelocity(0);e.sprite.play('radio-hurt',true);if(m.phase==='calling')m.until+=delta;return true}
+ updateEnemy(e:Foe,delta:number){if(this.updateBossCall(e,delta))return true;if(e.tier!==RADIO_TIER)return false;const s=this.s;let m=this.minds.get(e);if(!m){m={phase:'idle',until:0,called:false,fleeAt:0,detectUntil:0,hurtUntil:0,patrolAt:0,patrol:{x:e.sprite.x,y:e.sprite.y},last:{x:e.sprite.x,y:e.sprite.y},icon:s.add.text(e.sprite.x,e.sprite.y-45,'',{fontFamily:'monospace',fontSize:13,color:'#ffdc65',stroke:'#090613',strokeThickness:3}).setOrigin(.5).setDepth(18)};this.minds.set(e,m)}e.label.setText('');m.icon.setPosition(e.sprite.x,e.sprite.y-45);if(s.survival.stunned(e)||s.chaos.interrupted(e)){e.sprite.setVelocity(0);if(m.phase==='calling')m.until+=delta;return true}const candidates=this.actors().filter(a=>a.run.health>0),seen=candidates.filter(a=>Math.hypot(a.player.x-e.sprite.x,a.player.y-e.sprite.y)<700&&s.lineClear(e.sprite.x,e.sprite.y,a.player.x,a.player.y));const target=(seen.length?seen:candidates).sort((a,b)=>Math.hypot(a.player.x-e.sprite.x,a.player.y-e.sprite.y)-Math.hypot(b.player.x-e.sprite.x,b.player.y-e.sprite.y))[0];if(!target)return true;const distance=Math.hypot(target.player.x-e.sprite.x,target.player.y-e.sprite.y),visible=seen.length>0;if(visible)m.last={x:target.player.x,y:target.player.y};if(s.clock<m.hurtUntil){e.sprite.setVelocity(0);e.sprite.play('radio-hurt',true);if(m.phase==='calling')m.until+=delta;return true}
  if(m.phase==='idle'){if(visible){m.phase='calling';m.until=s.clock+RADIO.call;m.detectUntil=s.clock+350;e.sprite.setVelocity(0);e.sprite.play('radio-detect')}else{if(s.clock>=m.patrolAt){m.patrolAt=s.clock+2000;const angle=Math.random()*Math.PI*2;m.patrol={x:e.sprite.x+Math.cos(angle)*120,y:e.sprite.y+Math.sin(angle)*120}}if(s.walkablePoint(m.patrol.x,m.patrol.y))s.navigation.move(e,m.patrol.x,m.patrol.y,80);else e.sprite.setVelocity(0);e.sprite.play(e.sprite.body!.velocity.length()>1?'radio-walk':'radio-idle',true)}}
  else if(m.phase==='calling'){e.sprite.setVelocity(0);if(s.clock>=m.detectUntil)e.sprite.play('radio-call',true);m.icon.setText('☎ '+Math.max(0,Math.ceil((m.until-s.clock)/1000))+'s');if(s.clock>=m.until){m.called=true;m.phase='flee';m.fleeAt=s.clock;s.rounds.radioReinforcements(RADIO.reinforcements);m.icon.setText('✓ REFUERZOS')}}
  else{e.sprite.play('radio-flee',true);const angle=Math.atan2(e.sprite.y-m.last.y,e.sprite.x-m.last.x);let moved=false;for(const turn of [0,.8,-.8,1.6,-1.6]){const x=e.sprite.x+Math.cos(angle+turn)*240,y=e.sprite.y+Math.sin(angle+turn)*240;if(s.walkablePoint(x,y)&&s.navigation.canReach(e.sprite.body!.center,{x,y})){s.navigation.move(e,x,y,150);moved=true;break}}if(!moved)e.sprite.setVelocity(0);if(s.clock-m.fleeAt>6000&&distance>750&&!s.cameras.main.worldView.contains(e.sprite.x,e.sprite.y)){this.remove(e);s.survival.died(e);e.collider?.destroy();e.sprite.destroy();e.label.destroy();s.foes=s.foes.filter(f=>f!==e);if(s.rounds.state.plan.type==='EXTERMINIO')s.rounds.state.plan.target--}}
  return true}
  hurt(e:Foe){const m=this.minds.get(e);if(m)m.hurtUntil=this.s.clock+250}
- retire(e:Foe){this.remove(e)}
+ retire(e:Foe){this.cancelBossCall(e);this.remove(e)}
  died(e:Foe,credited=true){if(e.tier!==RADIO_TIER||this.rewarded.has(e))return;this.rewarded.add(e);const m=this.minds.get(e);if(credited)events19.emit({type:'radio-kill'});if(credited&&m?.phase==='calling'&&!m.called)events19.emit({type:'radio-interrupt'});if(!m?.called&&Math.random()<RADIO.drop)this.item(e.sprite.x,e.sprite.y,'radio');this.remove(e)}
  private remove(e:Foe){this.minds.get(e)?.icon.destroy();this.minds.delete(e)}
  private item(x:number,y:number,kind:Item['kind']){const p=this.s.lootPoint(x,y),image=this.s.add.image(p.x,p.y,kind==='radio'?'v19-radio-item':'v19-supply-open-0').setDepth(10);image.setScale((kind==='radio'?25:48)/Math.max(image.width,image.height));const label=this.s.add.text(p.x,p.y+28,kind==='radio'?'[E / ×] RADIO':'SUMINISTRO EN CAMINO',{fontFamily:'monospace',fontSize:11,color:'#ffe383',stroke:'#090613',strokeThickness:3}).setOrigin(.5).setDepth(18);const row:Item={...p,kind,used:false,progress:0,ready:this.s.clock+(kind==='radio'?0:RADIO.supplyDelay),image,label};if(kind==='supply'){row.marker=this.s.add.image(p.x,p.y,'v19-supply-marker').setDisplaySize(60,36).setDepth(2);image.setAlpha(0)}this.items.push(row);return row}
@@ -25,5 +64,5 @@ export class RadioSystem {
 
  update(){const s=this.s,previous=this.lastUpdate;this.lastUpdate=s.clock;this.opening.clear();for(const r of this.items){if(r.used&&r.kind==='supply'&&r.opened!==undefined&&r.image.active)r.image.setTexture('v19-supply-open-'+Math.min(5,Math.floor((s.clock-r.opened)/110)));if(!r.used){const visible=this.actors().some(a=>Math.hypot(r.x-a.player.x,r.y-a.player.y)<1800);r.image.setVisible(visible);r.label.setVisible(visible);if(r.kind==='radio'){r.label.setText(hudPreferences.helpers?'[E / ×] RADIO':'RADIO');continue}if(s.clock>=r.ready){r.image.setAlpha(1);r.marker?.destroy();const near=this.actors().filter(a=>a.run.health>0&&Math.hypot(r.x-a.player.x,r.y-a.player.y)<85&&s.lineClear(a.player.x,a.player.y,r.x,r.y)).sort((a,b)=>Math.hypot(r.x-a.player.x,r.y-a.player.y)-Math.hypot(r.x-b.player.x,r.y-b.player.y));r.progress=near.length?Math.min(RADIO.openTime,r.progress+Math.max(0,s.clock-Math.max(previous,r.ready))):0;r.label.setText('SUMINISTRO · '+Math.floor(r.progress/RADIO.openTime*100)+'%');if(near.length){this.opening.fillStyle(0x302a1b,.9).fillRect(r.x-32,r.y+40,64,7).fillStyle(0xffd45c).fillRect(r.x-31,r.y+41,62*r.progress/RADIO.openTime,5);if(r.progress>=RADIO.openTime)this.openSupply(r,near[0])}}}}this.items=this.items.filter(r=>!r.used||r.image.active)}
 
- stop(){this.opening.clear();this.lastUpdate=this.s.clock;for(const m of this.minds.values())m.icon.destroy();for(const r of this.items){r.marker?.destroy();r.image.destroy();r.label.destroy()}this.minds.clear();this.items=[]}
+ stop(){for(const e of this.bossCalls.keys())this.cancelBossCall(e);this.opening.clear();this.lastUpdate=this.s.clock;for(const m of this.minds.values())m.icon.destroy();for(const r of this.items){r.marker?.destroy();r.image.destroy();r.label.destroy()}this.minds.clear();this.items=[]}
 }

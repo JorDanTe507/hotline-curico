@@ -27,7 +27,7 @@ test('cada baja extiende 750ms, máximo total 14s; terminar/reintentar elimina b
  const a=new Tryhard();a.charge=40;a.activate(100);a.eliminated(200);assert.equal(a.until,8850);for(let i=0;i<30;i++)a.eliminated(200);assert.equal(a.until,14100);assert.equal(a.activeDuration,14000);a.eliminated(14100);assert.equal(a.until,14100);assert.equal(a.tick(14100,0),0);assert.equal(a.until,0);a.charge=40;a.activate(20000);assert.equal(a.until,28000);a.stop();assert.equal(a.active(20001),false);
 });
 test('factoría excluye definitivas simultáneas y conserva los efectos de Cervela',()=>{
- const c=createAbility(characterById('cervela'),baseStats),n=createAbility(characterById('nicolas'),baseStats);assert.ok(c instanceof Ultimate);assert.ok(n instanceof Tryhard);assert.equal(c.healRate,20);assert.equal(c.duration,12000);assert.equal(c.infiniteAmmo,true);assert.equal(c.damageReduction,true);assert.equal(c.weaponMultiplier,1);assert.equal(n.healRate,0);
+ const c=createAbility(characterById('cervela'),baseStats),n=createAbility(characterById('nicolas'),baseStats);assert.ok(c instanceof Ultimate);assert.ok(n instanceof Tryhard);assert.equal(c.healRate,12);assert.equal(c.duration,12000);assert.equal(c.infiniteAmmo,true);assert.equal(c.damageReduction,true);assert.equal(c.weaponMultiplier,1);assert.equal(n.healRate,0);
 });
 test('Nicolás no recibe regeneración de Calada; duración Tryhard válida; carga y mejoras generales tienen efecto',()=>{
  const run=newRun(),p=new Progression(run),context:UpgradeContext={abilityModule:'tryhard',run,guns:[],addAmmo:()=>{},spawnSupply:()=>{}};

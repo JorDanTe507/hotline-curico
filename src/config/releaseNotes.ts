@@ -1,7 +1,9 @@
 export interface ReleaseNote {version:string;title:string;date?:string;categories:{title:string;entries:string[]}[]}
 export const CURRENT_VERSION='2.1.0';
 export const RELEASE_NOTES:ReleaseNote[]=[
-{version:'2.1.0',title:'BOSS RUSH · ARENAS Y RELEVOS',categories:[
+{version:'2.1.0',title:'BOSS RUSH · CONTROLES MÓVILES',date:'2026-11-14',categories:[
+ {title:'INTERFAZ MÓVIL',entries:['Controles flotantes configurables, HUD compacto y navegación horizontal adaptada a teléfonos.','Disparo automático móvil opcional: objetivos con línea de visión y alcance válido, prioridad manual y preferencias persistentes.','Menús táctiles, retratos y diálogos adaptados; modo Historia continúa como Próximamente.']},
+ {title:'MEJORAS DE BOSS RUSH 2.1.0',entries:['Segundas fases del Torturado y Carnicero; radio del Comandante con reintentos y bombardeo del Demoledor ampliado.','Wesker en ronda 30 y rotación de seis jefes; antídoto inmediato en Boss Rush y botiquín contra infección en Tradicional.','Regeneración de Cervela reducida un 40%, cancelación voluntaria de definitivas y disparo durante dash exclusivo del Tryhard activo.','HC por personaje con saldo histórico conservado hasta elegir destinatario; ruleta Boss Rush con tiradas crecientes y selección al finalizar.','Dos logros legendarios, proyectiles por arma, audio de ruleta y navegación de perks corregida.']},
  {title:'ESCENARIOS Y COMBATE',entries:[
   'Seis arenas y la sala segura renovadas con suelos, paredes y mobiliario propios.',
   'El apagón del Verdugo atenúa las luces y permite restaurar la electricidad en tres generadores.',

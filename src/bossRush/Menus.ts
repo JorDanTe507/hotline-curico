@@ -135,7 +135,7 @@ export class BossRushMenu extends Phaser.Scene {
     this.practiceFocus=id;
     this.practiceCards.forEach((image,i)=>{if(this.practiceTargets[i]){
       if(i===id)image.clearTint();else image.setTintFill(0x06050a);
-      this.practiceLabels[i].setText(i===id?(BOSS_DEFINITIONS[i]?.weaponName??'PROYECTO UROBOROS'):'REVELAR');
+      this.practiceLabels[i].setText(i===id?(i===5?'PROYECTO UROBOROS':RUSH_BOSSES[i].name.toUpperCase()+'\n'+BOSS_DEFINITIONS[i].weaponName):'REVELAR');
     }});
   }
   choosePractice(id:number){
