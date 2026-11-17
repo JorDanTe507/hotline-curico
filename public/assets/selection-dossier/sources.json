@@ -1,0 +1,137 @@
+{
+  "cervela": {
+    "still": "Cervela_ Mugshot neón de Curicó P.D.png",
+    "sequence": "Cervela_ Animación de Entrada Neón.png",
+    "panels": [
+      [
+        14,
+        90,
+        350,
+        670
+      ],
+      [
+        376,
+        90,
+        712,
+        670
+      ],
+      [
+        738,
+        90,
+        1074,
+        670
+      ],
+      [
+        1100,
+        90,
+        1436,
+        670
+      ],
+      [
+        1462,
+        90,
+        1798,
+        670
+      ],
+      [
+        1824,
+        90,
+        2160,
+        670
+      ]
+    ],
+    "stillSha256": "1f48856e4e00389187b3481a6fc54f44389974fcce1fec1266a0f86429a5d56a",
+    "sequenceSha256": "92615f8caba273d7dd64f657532452916106b92c3cdc572a21079c26f7b8812d",
+    "background": "Intentional police wall retained; frame numbers covered by UI badge."
+  },
+  "nicolas": {
+    "still": "Nicolás en el muro policial neón.png",
+    "sequence": "Nicolás_ Ficha policial en seis frames.png",
+    "panels": [
+      [
+        14,
+        90,
+        350,
+        670
+      ],
+      [
+        376,
+        90,
+        712,
+        670
+      ],
+      [
+        738,
+        90,
+        1074,
+        670
+      ],
+      [
+        1100,
+        90,
+        1436,
+        670
+      ],
+      [
+        1462,
+        90,
+        1798,
+        670
+      ],
+      [
+        1824,
+        90,
+        2160,
+        670
+      ]
+    ],
+    "stillSha256": "4ea063f52f569bcbd0405ccae54adfc0294193f56afff5a1078af3087621a2ff",
+    "sequenceSha256": "44dcc74239bd81cbbe6c94fabe0268c1f9a121c45d440375e7bdda8b1a882893",
+    "background": "Intentional police wall retained; frame numbers covered by UI badge."
+  },
+  "jordan": {
+    "still": "Retrato policial neón de Jordan.png",
+    "sequence": "Storyboard cyberpunk de Jordan en seis frames.png",
+    "panels": [
+      [
+        14,
+        90,
+        350,
+        670
+      ],
+      [
+        376,
+        90,
+        712,
+        670
+      ],
+      [
+        738,
+        90,
+        1074,
+        670
+      ],
+      [
+        1100,
+        90,
+        1436,
+        670
+      ],
+      [
+        1462,
+        90,
+        1798,
+        670
+      ],
+      [
+        1824,
+        90,
+        2160,
+        670
+      ]
+    ],
+    "stillSha256": "51336459d0094cb1c476c8b6be07a77bb0f3c73e0772b064197a85d0fa91c94d",
+    "sequenceSha256": "bab61a0c12d1d5106ce64d8e5623731433247cacdee66c5833cc5aac2d742be9",
+    "background": "Intentional police wall retained; frame numbers covered by UI badge."
+  }
+}

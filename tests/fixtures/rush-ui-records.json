@@ -1,0 +1,91 @@
+{
+  "campaign": {
+    "completed": 1,
+    "best": [
+      {
+        "character": "jordan",
+        "times": [
+          31.1,
+          5420.21000000002,
+          35.56999999999971,
+          458.34999999999997,
+          17.75,
+          59.97999999999883
+        ],
+        "damage": 147.60000000000218,
+        "falls": 0,
+        "date": "2026-11-15T23:45:19.329Z"
+      }
+    ]
+  },
+  "endless": [
+    {
+      "cleared": 7,
+      "kills": 8,
+      "doubles": 1,
+      "damage": 79,
+      "falls": 1,
+      "combatMs": 1783.3999999999987,
+      "totalMs": 1963.3499999999976,
+      "clean": 4,
+      "history": [
+        [
+          5
+        ],
+        [
+          0
+        ],
+        [
+          2
+        ],
+        [
+          2,
+          4
+        ]
+      ],
+      "relays": [
+        {
+          "from": "jordan",
+          "to": "cervela",
+          "cleared": 0
+        }
+      ],
+      "character": "jordan",
+      "reason": "derrota",
+      "date": "2026-11-15T23:45:30.785Z",
+      "bestCycle": 3
+    },
+    {
+      "cleared": 3,
+      "kills": 3,
+      "doubles": 0,
+      "damage": 0,
+      "falls": 0,
+      "combatMs": 27.779999999999568,
+      "totalMs": 253.83999999999727,
+      "clean": 3,
+      "history": [
+        [
+          5
+        ],
+        [
+          0
+        ],
+        [
+          2
+        ]
+      ],
+      "relays": [
+        {
+          "from": "jordan",
+          "to": "cervela",
+          "cleared": 0
+        }
+      ],
+      "character": "jordan",
+      "reason": "retirada",
+      "date": "2026-11-15T23:45:23.355Z",
+      "bestCycle": 1
+    }
+  ]
+}

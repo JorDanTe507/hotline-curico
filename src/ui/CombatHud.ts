@@ -1,51 +1,35 @@
-import {hudPreferences} from './HudPreferences';
-import {ammoCount} from '../weapons/arsenal';
-import {reloadStatus} from './ReloadFeedback';
-import {permanentProgress} from '../systems/PermanentProgress';
-import {inputHub} from '../input/InputHub';
-import {maxHealth,healthMultiplier} from '../systems/HealthCapacity';
-import {xpRequired} from '../config/progression';
+import {hudOcclusion} from './HudOcclusion';
+import {BossHealthView} from './BossHealthView';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
+import {gameplayHud,hudWeaponTexture} from './GameplayHudState';
+import {hudSegments} from './HudPaint';
+import {menuMotion} from './MenuSkin';
 import {bossName} from '../bosses/expansion';
-import {MEDKIT_CAPACITY} from '../config/instinct';
-import {WEAPONS,isMelee} from '../weapons/arsenal';
-import {ARMOR_CAPACITY} from '../config/armor';
-function label(s:Phaser.Scene,x:number,y:number,value:string,size=17,color='#fff1fa'){
- return s.add.text(x,y,value,{fontFamily:'monospace',fontSize:size,color,stroke:'#130a1d',strokeThickness:3,shadow:{offsetX:1,offsetY:2,color:'#05030a',blur:2,fill:true,stroke:true}}).setScrollFactor(0).setDepth(92)
-}
+function label(s:Phaser.Scene,x:number,y:number,value:string,size=14,color='#f1e3f4'){return s.add.text(x,y,value,{fontFamily:'monospace',fontSize:size,color,stroke:'#100819',strokeThickness:2}).setScrollFactor(0).setDepth(94)}
 export class CombatHud {
  name:Phaser.GameObjects.Text;weapon:Phaser.GameObjects.Text;round:Phaser.GameObjects.Text;dash:Phaser.GameObjects.Text;boss:Phaser.GameObjects.Text;
- healthBar:Phaser.GameObjects.Rectangle;armorBar:Phaser.GameObjects.Rectangle;dashBar:Phaser.GameObjects.Rectangle;bossBar:Phaser.GameObjects.Rectangle;
- xpLabel:Phaser.GameObjects.Text;xpBar:Phaser.GameObjects.Rectangle;private minigunIcon:Phaser.GameObjects.Image;private armorLabel:Phaser.GameObjects.Text;private enemies:Phaser.GameObjects.Text;
- private reloadLabel:Phaser.GameObjects.Text;private adrenaline:Phaser.GameObjects.Text;private currency:Phaser.GameObjects.Text;private mobile=false;private parts:Phaser.GameObjects.GameObject[]=[];
+ healthBar:Phaser.GameObjects.Rectangle;armorBar:Phaser.GameObjects.Rectangle;dashBar:Phaser.GameObjects.Rectangle;bossBar:Phaser.GameObjects.Rectangle;xpLabel:Phaser.GameObjects.Text;xpBar:Phaser.GameObjects.Rectangle;
+ private top!:Phaser.GameObjects.Container;private bossHealth:BossHealthView;private nextRound:Phaser.GameObjects.Text;private currencyUnit:Phaser.GameObjects.Text;private lastDash=1;private dashReadyUntil=0;private mobile=false;private parts:Phaser.GameObjects.GameObject[]=[];private armorLabel:Phaser.GameObjects.Text;private currency:Phaser.GameObjects.Text;private gain:Phaser.GameObjects.Text;private counts:Phaser.GameObjects.Text[]=[];private slots:{box:Phaser.GameObjects.Rectangle;image:Phaser.GameObjects.Image;name:Phaser.GameObjects.Text;ammo:Phaser.GameObjects.Text}[]=[];
+ private hp=1;private armor=0;private xp=0;private previousCurrency?:number;private previousLevel=1;private gainUntil=0;private previousArmor=0;private impactUntil=0;
+ get overlayOpacity(){return this.top.alpha}
  setMobile(value:boolean){if(this.mobile===value)return;this.mobile=value;for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(!value&&!this.s.ended)}
- constructor(private s:Game){this.reloadLabel=label(s,640,59,'',14,'#80f3e5').setOrigin(.5,0);const before=new Set(s.children.list);
-  s.add.image(510,86,'adrenaline').setDisplaySize(24,24).setScrollFactor(0).setDepth(92);this.adrenaline=label(s,530,78,'ADRENALINA 0/1 [H]',14,'#ffe27d');this.currency=label(s,1000,70,'HC: 0',17,'#ffdb79');this.minigunIcon=s.add.image(444,31,'minigun-hud').setDisplaySize(32,32).setScrollFactor(0).setDepth(92).setVisible(false);
-  this.xpLabel=label(s,24,190,'NIVEL 1 · XP 0/100',13,'#98e9b8');s.add.rectangle(24,213,280,5,0x22483b,.25).setOrigin(0,.5).setScrollFactor(0).setDepth(91);this.xpBar=s.add.rectangle(24,213,0,5,0x77efb0).setOrigin(0,.5).setScrollFactor(0).setDepth(92);
-  this.name=label(s,110,14,s.character.name+'  ♥ 100',19);
-  s.add.rectangle(110,48,180,11,0x9b245d,.18).setOrigin(0,.5).setStrokeStyle(1,0xff76b7,.8).setScrollFactor(0).setDepth(91);
-  this.healthBar=s.add.rectangle(110,48,180,7,0xff328d,.95).setOrigin(0,.5).setScrollFactor(0).setDepth(92);
-  s.add.rectangle(110,70,180,11,0x11456b,.18).setOrigin(0,.5).setStrokeStyle(1,0x66dfff,.8).setScrollFactor(0).setDepth(91);
-  this.armorBar=s.add.rectangle(110,70,0,7,0x23caff,.95).setOrigin(0,.5).setScrollFactor(0).setDepth(92);
-  this.armorLabel=label(s,110,84,'CHALECO 0/50',12,'#78eaff');
-  this.enemies=label(s,24,108,'ENEMIGOS: 0',16);
-  this.round=label(s,24,132,'',16);
-  this.weapon=label(s,640,14,'',17).setOrigin(.5,0).setAlign('center');
-  this.dash=label(s,1000,17,'DASH LISTO',16,'#5ae8df');
-  s.add.rectangle(1000,48,220,4,0x176361,.2).setOrigin(0,.5).setScrollFactor(0).setDepth(91);
-  this.dashBar=s.add.rectangle(1000,48,220,4,0x5ae8df).setOrigin(0,.5).setScrollFactor(0).setDepth(92);
-  this.boss=label(s,640,113,'',18,'#ff8cb7').setOrigin(.5);
-  this.bossBar=s.add.rectangle(330,139,620,8,0xff327d).setOrigin(0,.5).setScrollFactor(0).setDepth(92).setVisible(false);this.parts=s.children.list.filter(o=>!before.has(o));
+ constructor(private s:Game){const before=new Set(s.children.list),panel=(x:number,y:number,w:number,h:number,opacity=s.rush?.9:.72)=>s.add.rectangle(x,y,w,h,0x100a1c,opacity).setOrigin(0).setStrokeStyle(1,0x7f3565,.8).setScrollFactor(0).setDepth(90),bar=(x:number,y:number,w:number,color:number)=>{s.add.rectangle(x,y,w,10,0x34223b).setOrigin(0).setScrollFactor(0).setDepth(91);return s.add.rectangle(x,y,w,10,color).setOrigin(0).setScrollFactor(0).setDepth(92)};
+ panel(10,8,308,92);this.name=label(s,101,17,'',13);this.healthBar=bar(101,43,200,0xff438f);this.armorBar=bar(101,66,200,0x39cfff);label(s,84,38,'♥',20,'#ff60ad');s.add.image(90,71,'armor').setDisplaySize(16,18).setScrollFactor(0).setDepth(94);this.armorLabel=label(s,102,82,'',11,'#8dedff');
+ const lines=s.add.graphics().setScrollFactor(0).setDepth(93);hudSegments(lines,101,43,200,10);hudSegments(lines,101,66,200,10,10,0x278da8);
+ for(let i=0;i<2;i++){const x=330+i*171,box=panel(x,8,160,92,s.rush?.78:.64),image=s.add.image(x+81,50,'weapon-0').setDisplaySize(78,30).setScrollFactor(0).setDepth(93),name=label(s,x+8,16,'',11),ammo=label(s,x+10,77,'',13);this.slots.push({box,image,name,ammo})}this.weapon=this.slots[0].ammo;
+ for(const [i,key]of ['medkit','adrenaline','chaos-icon-0'].entries()){const x=676+i*73;panel(x,8,65,92,s.rush?.78:.64);s.add.image(x+32,38,key).setDisplaySize(30,30).setScrollFactor(0).setDepth(94);this.counts.push(label(s,x+8,73,'',12))}
+ panel(904,8,184,92);label(s,916,17,'ϟ DASH',15,'#a0eeee');this.dash=label(s,916,43,'',12,'#87eeeb');this.dashBar=bar(916,77,160,0x67e4e3);hudSegments(lines,916,77,160,10,8,0x4c9bba);
+ panel(1100,8,170,92);s.add.circle(1123,39,15,0x8c611e).setStrokeStyle(2,0xffdc70).setScrollFactor(0).setDepth(93);this.currencyUnit=label(s,1113,32,'HC',12,'#ffed9e');this.currency=label(s,1144,31,'',15,'#ffe094');this.gain=label(s,1113,72,'',13,'#ffdb69');
+ panel(10,104,1260,28);this.round=label(s,22,111,'',12,'#d9c4e6');this.xpLabel=label(s,950,108,'',13,'#88e4b9');this.xpBar=bar(1111,114,155,0x69e5b6);this.xpBar.height=5;this.boss=label(s,640,153,'',15,'#ff93bd').setOrigin(.5);this.bossBar=s.add.rectangle(0,0,0,0,0,0).setVisible(false);this.bossHealth=new BossHealthView(s);this.nextRound=label(s,640,591,'[E / ×] INICIAR SIGUIENTE RONDA',16,'#9ff4f0').setOrigin(.5).setPadding(16,12).setBackgroundColor('#29112af0').setInteractive({useHandCursor:true}).setDepth(98).on('pointerdown',()=>{s.blockPointerUntilRelease=true;if(s.canStartNextRound())s.pickup()});this.parts=s.children.list.filter(o=>!before.has(o));this.top=s.add.container(0,0,this.parts.filter(o=>o!==this.nextRound&&o!==this.bossHealth.root)).setScrollFactor(0).setDepth(90);this.top.sort('depth');this.parts.push(this.top);
+ const visibility=()=>{const cam=s.cameras.main,top=cam.height/2-cam.height/2*cam.zoom,bottom=cam.height/2+((s.coop?275:Math.max(s.foes.some(e=>e.boss>=0)?194:132,s.banner?.visible?s.banner.y+s.banner.height/2:0))-cam.height/2)*cam.zoom,opacity=hudOcclusion(s.coop?[s.player,s.coop.actor(2).player]:[s.player],cam,top,bottom);this.top.setAlpha(opacity);s.banner?.setAlpha(opacity);this.bossHealth.root.setAlpha(opacity);s.critical?.setHudOpacity(opacity);this.boss.setVisible(false);this.bossBar.setVisible(false);this.bossHealth.update(s.foes,!this.mobile&&!s.coop&&!s.ended&&!s.paused&&!s.bossDialogue?.active&&!s.presentation?.active&&!s.roulette?.active&&!s.levelUp?.active,s.clock);this.nextRound.setVisible(s.canStartNextRound()&&!this.mobile&&!s.coop)};
+ s.events.on(Phaser.Scenes.Events.POST_UPDATE,visibility);s.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>s.events.off(Phaser.Scenes.Events.POST_UPDATE,visibility));
  }
- update(){this.reloadLabel.setText(reloadStatus(this.s)).setVisible(!this.mobile&&!this.s.ended);this.adrenaline.setText(`ADRENALINA ${this.s.run.adrenaline??0}/1 ${inputHub(this.s.game).last==='gamepad'?'[R3]':'[H]'}`);this.currency.setText(this.s.rush?`CR: ${this.s.rush.balance}`:`HC: ${permanentProgress().balance(this.s.character.id).toLocaleString('es-CL')}`);const s=this.s,g=s.guns[s.active],w=g?WEAPONS[g.id]:undefined,health=Math.max(0,s.run.health),armor=Math.max(0,s.run.armor);
-  this.xpLabel.setVisible(!this.mobile&&!s.rush);this.xpLabel.setText(`NIVEL ${s.run.level} · XP ${s.run.xp}/${xpRequired(s.run.level)}`);this.xpBar.width=280*s.run.xp/xpRequired(s.run.level);this.minigunIcon.setVisible(g?.id===7);this.name.setText(`${s.character.name}  ♥ ${Math.ceil(health)}/${maxHealth(s.run)} HP`);this.healthBar.width=180*health/maxHealth(s.run);this.healthBar.setFillStyle(healthMultiplier(s.run)>1?0x6c99ff:health>0&&health<=maxHealth(s.run)*.25?0xff173f:0xff328d);this.armorBar.width=180*armor/s.run.stats.maxArmor;this.armorLabel.setText(`CHALECO ${Math.ceil(armor)}/${s.run.stats.maxArmor}${s.perks.temporaryArmor?` +${Math.ceil(s.perks.temporaryArmor)} TEMP`:""}`);
-  this.enemies.setText(`ENEMIGOS: ${s.foes.length}`);this.round.setText(s.rounds.label);
-  if(g)this.minigunIcon.setVisible(true).setTexture(g.id===7?'minigun-hud':g.id>=8?`weapon-${g.id}-hud`:`weapon-${g.id}`);this.weapon.setText(`${w?w.name.toUpperCase():'DESARMADO'}  ${g?(isMelee(g.id)?'CUERPO A CUERPO':s.ultimate.active(s.clock)&&s.ultimate.infiniteAmmo?'∞':(g.id===12?'FUEL ':'')+ammoCount(g)):'—'}${s.reloadAt?' · RECARGANDO':''}\nBOTIQUINES: ${s.run.medkits}/${MEDKIT_CAPACITY+(s.rush?.medkitBonus??0)} ${inputHub(s.game).last==='gamepad'?'[SHARE]   [R1]':'[F]   [Q]'} ARMA ${s.guns.length?s.active+1:0}/${s.guns.length}`);
-  if(!hudPreferences.helpers){this.weapon.setText(this.weapon.text.replace(/\s*\[[^\]]*\]/g,''));this.adrenaline.setText(this.adrenaline.text.replace(/\s*\[[^\]]*\]/g,''))}this.minigunIcon.setPosition(640-this.weapon.width/2-24,31);
-  this.dash.setText(s.clock>=s.dash.readyAt?'DASH LISTO':'DASH RECARGANDO');this.dashBar.width=220*s.dash.progress(s.clock);
-  const bosses=s.foes.filter(e=>e.boss>=0);this.boss.setText(bosses.map(b=>`${bossName(b.boss)} — ${Math.ceil(b.hp)}/${b.max} HP`).join(' · '));this.bossBar.setVisible(bosses.length>0);if(bosses.length)this.bossBar.width=620*bosses.reduce((n,b)=>n+b.hp,0)/bosses.reduce((n,b)=>n+b.max,0);if(this.mobile)for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(false);
+ update(){const s=this.s,v=gameplayHud(s),motion=menuMotion(),blend=motion?.2:1;this.hp+=(v.health/v.maxHealth-this.hp)*blend;this.armor+=(v.armor/v.maxArmor-this.armor)*blend;this.xp+=(v.xp/v.xpMax-this.xp)*blend;
+ this.nextRound.setVisible(s.canStartNextRound()&&!this.mobile&&!s.coop);this.name.setText(`${s.character.name}  ♥ ${Math.ceil(v.health)}/${Math.ceil(v.maxHealth)} HP`);this.healthBar.width=200*Math.max(0,this.hp);this.healthBar.setFillStyle(v.health<=v.maxHealth*.25?0xff294f:0xff438f).setAlpha(motion&&v.health<=v.maxHealth*.25?.8+.2*Math.sin(s.clock/160):1);this.armorBar.width=200*Math.max(0,this.armor);if(v.armor<this.previousArmor)this.impactUntil=s.clock+180;this.previousArmor=v.armor;this.armorBar.setAlpha(motion&&s.clock<this.impactUntil?.5:1);this.armorLabel.setText(`CHALECO ${Math.ceil(v.armor)}/${v.maxArmor}${s.run.temporaryArmor?' +'+Math.ceil(s.run.temporaryArmor)+' TEMP':''}`);
+ for(let i=0;i<2;i++){const slot=this.slots[i],data=v.slots[i];slot.box.setStrokeStyle(data?.active?2:1,data?.active?0xffda67:0x754365);slot.image.setVisible(!!data);slot.name.setText((i+1)+' · '+(data?data.name.toUpperCase():'VACÍO')).setWordWrapWidth(144);slot.ammo.setText(data?(data.reload.startsWith('RECARGANDO')?data.reload:data.ammo):'—');if(data){slot.image.setTexture(hudWeaponTexture(data.id)).setAlpha(data.active?1:.5);const source=slot.image.frame;slot.image.setY(54).setScale(Math.min(92/source.width,24/source.height))}}
+ this.counts[0].setText(`✚ ${v.medkits}/${v.medkitMax}`);this.counts[1].setText(`ADR ${v.adrenaline}/1`);this.counts[2].setText(['FRAG','MOLOTOV','FLASH','ELÉCTR.','CUCH.'][v.throwable.type]+'\n×'+v.throwable.count);const throwable=this.parts.find(o=>o instanceof Phaser.GameObjects.Image&&o.x===854) as Phaser.GameObjects.Image|undefined;throwable?.setTexture('chaos-icon-'+v.throwable.type);
+ if(v.dash>=1&&this.lastDash<1)this.dashReadyUntil=s.clock+220;this.lastDash=v.dash;this.dashBar.setFillStyle(motion&&s.clock<this.dashReadyUntil?0xcefff5:0x67e4e3);this.currencyUnit.setText(v.currencyName);this.dash.setText(v.dash>=1?'DASH LISTO':`RECARGA ${Math.max(0,(s.dash.readyAt-s.clock)/1000).toFixed(1)}s`);this.dashBar.width=160*v.dash;this.currency.setText(v.currency.toLocaleString('es-CL'));if(this.previousCurrency!==undefined&&v.currency>this.previousCurrency){this.gain.setText('+'+(v.currency-this.previousCurrency)+' '+v.currencyName);this.gainUntil=s.clock+900}this.previousCurrency=v.currency;this.gain.setVisible(s.clock<this.gainUntil&&!this.mobile);this.round.setText(v.round.replaceAll('\n',' · '));this.xpLabel.setText(s.rush?'BOSS RUSH':`NV ${v.level} · XP ${v.xp}/${v.xpMax}`);this.xpBar.width=s.rush?0:155*this.xp;if(v.level>this.previousLevel){this.xp=0;if(motion)this.xpLabel.setColor('#fff095')}else this.xpLabel.setColor('#88e4b9');this.previousLevel=v.level;
+ this.boss.setVisible(false);this.bossBar.setVisible(false);if(this.mobile||s.ended)for(const p of this.parts)(p as Phaser.GameObjects.Image).setVisible(false);
  }
 }
-
-

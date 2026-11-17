@@ -19,7 +19,7 @@ export class SafeConversation {
     if (!s.registry.get('mobileUI')) {
       const bg = s.add.rectangle(640, 587, 860, 172, 0x140a21, .97).setStrokeStyle(2, 0xea3985);
       this.portrait = s.add.image(283, 587, characterById(lines[0][0]).portrait);
-      this.name = s.add.text(354, 518, '', {fontFamily:'monospace', fontSize:21,color:'#ff75b5'});
+      this.name = s.add.text(354, 518, '', {fontFamily:'"Press Start 2P",monospace', fontSize:13,color:'#ff75b5'});
       this.body = s.add.text(354, 553, '', {fontFamily:'monospace', fontSize:21,color:'#f8e9f4',wordWrap:{width:684}});
       const help = s.add.text(354, 640, 'E / × CONTINUAR', {fontFamily:'monospace',fontSize:14,color:'#7ae8ed'}).setInteractive({useHandCursor:true}).on('pointerdown',()=>this.advance());
       const close=s.add.text(860,640,'ESC / ○ CERRAR',{fontFamily:'monospace',fontSize:14,color:'#7ae8ed'}).setInteractive({useHandCursor:true}).on('pointerdown',()=>this.close());

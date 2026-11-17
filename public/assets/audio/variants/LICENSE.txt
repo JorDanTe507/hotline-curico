@@ -1,0 +1,1 @@
+Original project procedurally synthesized audio, CC0 1.0 Universal. Derived by tools/prepare_weapon_variants.py from tools/generate_audio.py. No third-party recordings. https://creativecommons.org/publicdomain/zero/1.0/

@@ -20,7 +20,7 @@ test('configuración de dos protagonistas, bases independientes y recursos propi
 });
 test('Tryhard requiere 40 impactos únicos, dura 8s, usa munición real y nunca regenera',()=>{
  const a=new Tryhard(),g=gun(0),enemy={};for(let i=0;i<40;i++){const shot=a.shot(0);assert.ok(a.hit(enemy,shot,0));assert.equal(a.hit(enemy,shot,0),false)}assert.ok(a.ready);assert.ok(a.activate(100,[g]));g.ammo--;
- assert.equal(a.tick(1100,20,[g]),20);assert.equal(a.weaponMultiplier,1.35);assert.equal(a.movementMultiplier,1.25);assert.equal(a.temporaryDashCooldown,500);assert.equal(a.infiniteAmmo,false);assert.equal(a.damageReduction,false);assert.equal(a.double([g,gun(1)],1100),false);
+ assert.equal(a.tick(1100,20,[g]),20);assert.equal(a.weaponMultiplier,1.35);assert.equal(a.movementMultiplier,1.25);assert.equal(a.temporaryDashCooldown,425);assert.equal(a.infiniteAmmo,false);assert.equal(a.damageReduction,false);assert.equal(a.double([g,gun(1)],1100),false);
  assert.equal(a.tick(8100,20,[g]),20);assert.equal(g.ammo,9);assert.equal(a.active(8100),false);assert.equal(a.charge,0);
 });
 test('cada baja extiende 750ms, máximo total 14s; terminar/reintentar elimina bonificaciones',()=>{
@@ -35,6 +35,6 @@ test('Nicolás no recibe regeneración de Calada; duración Tryhard válida; car
  for(const id of ['regen']){run.pendingLevels=1;const u=UPGRADES.find(u=>u.id===id)!;assert.equal(p.apply(id,[u],context),false)}
  const charge=UPGRADES.find(u=>u.id==='charge')!;run.pendingLevels=1;assert.ok(p.apply('charge',[charge],context));const a=new Tryhard(()=>run.stats);assert.equal(a.requiredHits,36);const damage=UPGRADES.find(u=>u.id==='damage')!;run.pendingLevels=1;assert.ok(p.apply('damage',[damage],context));assert.equal(run.stats.damage,1.1);
 });
-test('dash Tryhard baja a 500ms y restaura el enfriamiento general al salir',()=>{
- const d=new Dash();d.setCooldown(500,0,true);d.start(0,1,0);assert.equal(d.readyAt,500);assert.equal(d.start(499,1,0),false);assert.equal(d.start(500,1,0),true);d.setCooldown(1200,500,true);assert.equal(d.readyAt,1700);assert.equal(d.start(1699,1,0),false);assert.equal(d.start(1700,1,0),true);
+test('dash Tryhard baja a 425ms y restaura el enfriamiento general al salir',()=>{
+ const d=new Dash();d.setCooldown(425,0,true);d.start(0,1,0);assert.equal(d.readyAt,425);assert.equal(d.start(424,1,0),false);assert.equal(d.start(425,1,0),true);d.setCooldown(1200,425,true);assert.equal(d.readyAt,1625);assert.equal(d.start(1624,1,0),false);assert.equal(d.start(1625,1,0),true);
 });

@@ -1,0 +1,614 @@
+[
+  {
+    "file": "assets/audio/variants/pistol-0.wav",
+    "source": "assets/audio/pistol.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "fdd2af0c3076603804f7d7b50dee97eefaec88cb3b055d0397bf2c557f30ac5d"
+  },
+  {
+    "file": "assets/audio/variants/pistol-1.wav",
+    "source": "assets/audio/pistol.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "9ef1616637e473b9ee8da72e40370c9df5c6c3b8a532a5cf1624585c3bae53f0"
+  },
+  {
+    "file": "assets/audio/variants/pistol-2.wav",
+    "source": "assets/audio/pistol.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "aeba03c8a4d485c06187041692baa679bdec56f2e61ca280700f98563e48c490"
+  },
+  {
+    "file": "assets/audio/variants/pistol-3.wav",
+    "source": "assets/audio/pistol.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "312d55a934f0298e6e9913d12877771987f35e06ebcbdbc8d57056cbdf1b1fda"
+  },
+  {
+    "file": "assets/audio/variants/revolver-0.wav",
+    "source": "assets/audio/revolver.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "f06d7579e35a97ca2bf16eba653a84afd7051b13aa2e9c5a4700400800e3a913"
+  },
+  {
+    "file": "assets/audio/variants/revolver-1.wav",
+    "source": "assets/audio/revolver.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "2fde5b3022c5c258f1bfad9a7f10539914c2ca0bf2f89d392f901721a316f4b6"
+  },
+  {
+    "file": "assets/audio/variants/revolver-2.wav",
+    "source": "assets/audio/revolver.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "de2acf6b63f0f3911efb8d5a4e53f279d2df9838a53a4614c03543d0c78dfabf"
+  },
+  {
+    "file": "assets/audio/variants/revolver-3.wav",
+    "source": "assets/audio/revolver.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "0e2513d3f150b838b148aa01d4afb36102230ab7963495873ad5291e54b8ea5a"
+  },
+  {
+    "file": "assets/audio/variants/smg-0.wav",
+    "source": "assets/audio/smg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "7949f40fddb55b5f11a2306238321a8082a75b8b94cfd2e44f41d13e7224e82e"
+  },
+  {
+    "file": "assets/audio/variants/smg-1.wav",
+    "source": "assets/audio/smg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "e685450e90589293eeb58a4b01929192a86ca01d4f404884c983521172188333"
+  },
+  {
+    "file": "assets/audio/variants/smg-2.wav",
+    "source": "assets/audio/smg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "2970792eea0977138e87449fa96df59e638dece2bb4dbacfb8754e0b91eab16d"
+  },
+  {
+    "file": "assets/audio/variants/smg-3.wav",
+    "source": "assets/audio/smg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "d6cfb23646664b3ce13181520f2b004bf2e93f1bf406ff940c635a460071ed96"
+  },
+  {
+    "file": "assets/audio/variants/shotgun-0.wav",
+    "source": "assets/audio/shotgun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "49adb1fb50a1bb24cb2b073e3d5473cc85ec8dcecfc98dbb4bc8fe8f99f8e8c7"
+  },
+  {
+    "file": "assets/audio/variants/shotgun-1.wav",
+    "source": "assets/audio/shotgun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "81f2b832751778e4e8219db5dfedcf78521d3c00894982050065949dadd2b5ac"
+  },
+  {
+    "file": "assets/audio/variants/shotgun-2.wav",
+    "source": "assets/audio/shotgun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "35cd9de53d29a98b01f96bf0bc5d01ae6570bd105aba16984b99c9799f81c0d6"
+  },
+  {
+    "file": "assets/audio/variants/shotgun-3.wav",
+    "source": "assets/audio/shotgun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "637e8379e0d1ef7b8842e9378edaeff56dad1da85fbc8665f13e35fc77314a17"
+  },
+  {
+    "file": "assets/audio/variants/assault-0.wav",
+    "source": "assets/audio/assault.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "8ea58d4613810ec03a1545a92aac6582f29758757e8695511e612e664bfcf31c"
+  },
+  {
+    "file": "assets/audio/variants/assault-1.wav",
+    "source": "assets/audio/assault.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "d1b66012dc18cb4a44d2f6eab68ba8eea0960b6d4b5ad334df8fd3d82192e36a"
+  },
+  {
+    "file": "assets/audio/variants/assault-2.wav",
+    "source": "assets/audio/assault.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "657a8b2ca5760a2045a7bbdec6d833acbc34011a43c05e3fa7aa7f3b0aedb6ac"
+  },
+  {
+    "file": "assets/audio/variants/assault-3.wav",
+    "source": "assets/audio/assault.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "5ebdd04dfc62737693a9774c2454615b7c623a8e654a2fea08bbddfb2aea62cd"
+  },
+  {
+    "file": "assets/audio/variants/sniper-0.wav",
+    "source": "assets/audio/sniper.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "259ff5c3072460876e7a38ae5b9ad4b030222b03affb478757c891c39274c818"
+  },
+  {
+    "file": "assets/audio/variants/sniper-1.wav",
+    "source": "assets/audio/sniper.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "8e3ac84c185c924e2d96731b7411712e7c386ae70f22546d3656011a0cfac967"
+  },
+  {
+    "file": "assets/audio/variants/sniper-2.wav",
+    "source": "assets/audio/sniper.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "522ead511c7d32329516bde99533f062bc2a99bbbd35923851ccc9c47100399c"
+  },
+  {
+    "file": "assets/audio/variants/sniper-3.wav",
+    "source": "assets/audio/sniper.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "23a4fb89ca13c6774c2ac12b3f81cf651932f07ec66a2444738df6287d47deb3"
+  },
+  {
+    "file": "assets/audio/variants/rpg-0.wav",
+    "source": "assets/audio/rpg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "1a9c0b6e7ab71595707f3485ba5caae9d6723ae84e48a925fc4ff6838013d187"
+  },
+  {
+    "file": "assets/audio/variants/rpg-1.wav",
+    "source": "assets/audio/rpg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "6d4e58e77b550d8cb74c3775f3c0a94283d8e603f883182bb513cc9792bb8407"
+  },
+  {
+    "file": "assets/audio/variants/rpg-2.wav",
+    "source": "assets/audio/rpg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "124c90380b6edca4de15f35c1ff36dbf15657264f5754fb97c499ac7637f1875"
+  },
+  {
+    "file": "assets/audio/variants/rpg-3.wav",
+    "source": "assets/audio/rpg.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "4429f1d7d60809d801866020ec81f1aa715b67581918f9a70aa2ffe93d26ab71"
+  },
+  {
+    "file": "assets/audio/variants/minigun-0.wav",
+    "source": "assets/audio/minigun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "7d32afb9d29c21ae4513b35390f570eaea90d5d8a43debfb65286ba26fa8fa81"
+  },
+  {
+    "file": "assets/audio/variants/minigun-1.wav",
+    "source": "assets/audio/minigun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "7f5b17cf93f24ddb28dc1a6b0fdc51f7447353f258587d2f6df8b833d14675ac"
+  },
+  {
+    "file": "assets/audio/variants/minigun-2.wav",
+    "source": "assets/audio/minigun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "9c985d4d2a058b2930cce1d944cffc97a270e4b284a6f9aef11fde1a0cca38ad"
+  },
+  {
+    "file": "assets/audio/variants/minigun-3.wav",
+    "source": "assets/audio/minigun.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "0665b8341d3ec2dffb9f67848caaaeb60fbf8f4fed30048bb117cfdf2f1aca54"
+  },
+  {
+    "file": "assets/audio/variants/uzi-0.wav",
+    "source": "assets/audio/uzi.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "f9a26563940c8ac7d770a5d3cada01e7f8b78775f45287aeec8aad7bb1ce42ad"
+  },
+  {
+    "file": "assets/audio/variants/uzi-1.wav",
+    "source": "assets/audio/uzi.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "9e60184673bf10b1467d640f215bf9310eff5d0e4e6931382ae8f4238a9dde86"
+  },
+  {
+    "file": "assets/audio/variants/uzi-2.wav",
+    "source": "assets/audio/uzi.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "499e167ff8792ae77f41901344ae737733f38fcce929fac71b7674eab4047d73"
+  },
+  {
+    "file": "assets/audio/variants/uzi-3.wav",
+    "source": "assets/audio/uzi.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "3fb60d192946bacf2e03765f236b5a0303c41df1d9e21930068fade0cec0a59b"
+  },
+  {
+    "file": "assets/audio/variants/magnum-0.wav",
+    "source": "assets/audio/magnum.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "91cba890c9b7e542ab3448e28828a6c46aaca814bee1b479ec460fd84619de9e"
+  },
+  {
+    "file": "assets/audio/variants/magnum-1.wav",
+    "source": "assets/audio/magnum.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "d5069776288075162ce44e2b1ea74b836fec904587ff8b76aff3fa1f3906d39f"
+  },
+  {
+    "file": "assets/audio/variants/magnum-2.wav",
+    "source": "assets/audio/magnum.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "9892013a8b7c05e8b5bb267f5e0838414a1316ab0d478c363d8ad2ffefa761e8"
+  },
+  {
+    "file": "assets/audio/variants/magnum-3.wav",
+    "source": "assets/audio/magnum.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "342023f83586ef8e36098cb353f0f185fa3099bb1dc7fc39c23804debcb09830"
+  },
+  {
+    "file": "assets/audio/variants/sawedoff-0.wav",
+    "source": "assets/audio/sawedoff.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "076c5ab96f186b3931fe3ca5ecc64c3b7f31ce225f01c09f5b2414e0e55a96ba"
+  },
+  {
+    "file": "assets/audio/variants/sawedoff-1.wav",
+    "source": "assets/audio/sawedoff.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "86be9b9ef54298f488f3eaaae90f89dad042ebe5d746cf4d0d56587f5b71d768"
+  },
+  {
+    "file": "assets/audio/variants/sawedoff-2.wav",
+    "source": "assets/audio/sawedoff.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "422e598d793fb40ce83b1b594198996efff8a30984aaeb20d9736533121fc90c"
+  },
+  {
+    "file": "assets/audio/variants/sawedoff-3.wav",
+    "source": "assets/audio/sawedoff.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "29951b0df42c5e1482899e32f42fca33389b05dfb200020213289c3cc8a6017f"
+  },
+  {
+    "file": "assets/audio/variants/m79-0.wav",
+    "source": "assets/audio/m79.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "f60df21465e492375377d9a690d7a9f349c5fad3ae47804d4ebc521a4532171f"
+  },
+  {
+    "file": "assets/audio/variants/m79-1.wav",
+    "source": "assets/audio/m79.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "7b2ac569df09fef02347db11f139baebb74d7917a0d0d40b35f5dcc56b760189"
+  },
+  {
+    "file": "assets/audio/variants/m79-2.wav",
+    "source": "assets/audio/m79.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "fad6d3e25ca77bcd7b9f2412a208ee66091ead0d8bcdab381e3a305c1d4a607b"
+  },
+  {
+    "file": "assets/audio/variants/m79-3.wav",
+    "source": "assets/audio/m79.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "aca5367010e87200ccfb88a7fe6bf1b3b9f09eb93869a7f46803a8859dd90814"
+  },
+  {
+    "file": "assets/audio/variants/flame-0.wav",
+    "source": "assets/audio/flame.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "a9695219519406f323db9ab6c48e0ee4cb649e431a3992321f394487c1e97fc4"
+  },
+  {
+    "file": "assets/audio/variants/flame-1.wav",
+    "source": "assets/audio/flame.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "8187b78cb7e4fbdefe10b4e6553672f3a9d796afa200b4201d0a48fdf8b16fc5"
+  },
+  {
+    "file": "assets/audio/variants/flame-2.wav",
+    "source": "assets/audio/flame.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "2dab21f07b018e1bcd6ca3b3c604a7e0f3e9f55993c49dcac496e0b67ea03504"
+  },
+  {
+    "file": "assets/audio/variants/flame-3.wav",
+    "source": "assets/audio/flame.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "69b05602632007b25b330f7deee4858af6af772743057ba576507286c9775151"
+  },
+  {
+    "file": "assets/audio/variants/bat-0.wav",
+    "source": "assets/audio/bat.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "c080cb6db724b5afbe5f9e9e7ee5091a4c7c90f5c5c0789b47356029654db8a8"
+  },
+  {
+    "file": "assets/audio/variants/bat-1.wav",
+    "source": "assets/audio/bat.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "58c74fd7c81c7da3ca0521531abc80795af89ad25ec7551c50f13916af411379"
+  },
+  {
+    "file": "assets/audio/variants/bat-2.wav",
+    "source": "assets/audio/bat.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "80ed50c299b7a8780635bbda032094c9605b128f91565aa56f3db806b5df3ff2"
+  },
+  {
+    "file": "assets/audio/variants/bat-3.wav",
+    "source": "assets/audio/bat.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "e238c49a226987af636ec4fe4a470bdc2b0b4739641593bc70c184d403ebb8ec"
+  },
+  {
+    "file": "assets/audio/variants/crowbar-0.wav",
+    "source": "assets/audio/crowbar.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "7e1c18087907f991bd80e41c13f676b4797b60536da34d6767820d9275f4b16c"
+  },
+  {
+    "file": "assets/audio/variants/crowbar-1.wav",
+    "source": "assets/audio/crowbar.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "76e3c1bcb154db075e57f6887618d982606e9634e8bc4209fbc1331d9cdb66da"
+  },
+  {
+    "file": "assets/audio/variants/crowbar-2.wav",
+    "source": "assets/audio/crowbar.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "c60a8ca17b5e4d87291397812806ebbde9783825f3d344fd9e853f48c587ea49"
+  },
+  {
+    "file": "assets/audio/variants/crowbar-3.wav",
+    "source": "assets/audio/crowbar.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "2369f9ba0703fd63011484446b2f721d8b4687e564f47e971f4039cc92804750"
+  },
+  {
+    "file": "assets/audio/variants/axe-0.wav",
+    "source": "assets/audio/axe.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "5f49be360e63412bd14e136c23c46d8da2ba0398be76029d422e941720c5a0ec"
+  },
+  {
+    "file": "assets/audio/variants/axe-1.wav",
+    "source": "assets/audio/axe.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "2b9800c64c8278857f5aae3c8a5275c8e23122419110adf97ee278f51cb48758"
+  },
+  {
+    "file": "assets/audio/variants/axe-2.wav",
+    "source": "assets/audio/axe.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "811f5a2cc2773e4115c68a8a32d55398d827b1c8c1a2efa65f13cfcc28d2cac9"
+  },
+  {
+    "file": "assets/audio/variants/axe-3.wav",
+    "source": "assets/audio/axe.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "40b0b760d7c5124e626e5c6f52ff0992366c6a3a7cd05db6095ade942b968b36"
+  },
+  {
+    "file": "assets/audio/variants/reload-0.wav",
+    "source": "assets/audio/reload.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "fefb0e4f0ee66acc708c750d4fa25634d5bd4a56cafdd0ae887aa92dcae5218b"
+  },
+  {
+    "file": "assets/audio/variants/reload-1.wav",
+    "source": "assets/audio/reload.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "743e81c8985d81525cc019db866516a0923f08f7867db9b0c0e08a403d4d2d67"
+  },
+  {
+    "file": "assets/audio/variants/reload-2.wav",
+    "source": "assets/audio/reload.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "205542aace0fdaf07e303e7050c8bffc604c32afbca1af57981d9b9ba59f683e"
+  },
+  {
+    "file": "assets/audio/variants/reload-3.wav",
+    "source": "assets/audio/reload.wav",
+    "author": "Hotline Curicó / síntesis original del proyecto",
+    "license": "CC0-1.0",
+    "sourceUrl": "https://github.com/JorDanTe507/hotline-curico/blob/b7a4e70/tools/generate_audio.py",
+    "modifications": "Filtrado tímbrico suave; remuestreo inferior a 1%; pico limitado a 0.67; PCM mono 22050 Hz",
+    "sha256": "f47e21f575c3561723abac6b5ba1e3a315bc50f51f6b04d900b60bd5ce2bb436"
+  }
+]

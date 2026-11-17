@@ -6,10 +6,10 @@ interface Item {progress:number;x:number;y:number;kind:'radio'|'supply';used:boo
 interface BossCall {until:number;health:number;interrupt:number;complete:()=>void;icon:Phaser.GameObjects.Image}
 export class RadioSystem {
  private bossCalls=new Map<Foe,BossCall>();
- requestBossCall(e:Foe,complete:()=>void,interrupt=Infinity) {
+ requestBossCall(e:Foe,complete:()=>void,interrupt=Infinity,duration=RADIO.call) {
   if(this.bossCalls.has(e)||e.hp<=0)return false;
   const icon=this.s.add.image(e.sprite.x,e.sprite.y-72,'v19-radio-item').setDisplaySize(22,30).setDepth(18);
-  this.bossCalls.set(e,{until:this.s.clock+RADIO.call,health:e.hp,interrupt,complete,icon});
+  this.bossCalls.set(e,{until:this.s.clock+duration,health:e.hp,interrupt,complete,icon});
   return true;
  }
  cancelBossCall(e:Foe){const call=this.bossCalls.get(e);call?.icon.destroy();this.bossCalls.delete(e)}

@@ -12,7 +12,7 @@ import {actorDepth} from '../maps/environment';
 interface View {item:FortuneObject;image:Phaser.Physics.Arcade.Image;price?:Phaser.GameObjects.Text}
 export class FortuneObjects {
  readonly ledger=new FortuneLedger();readonly views=new Map<string,View>();private graphics:Phaser.GameObjects.Graphics;private message='';private until=0;private stopped=false;
- private continuePoint?:{x:number;y:number;label:Phaser.GameObjects.Text};private restId?:string;private busy=false;
+ private restId?:string;private busy=false;
  pending?:{id:string;actor:Game;until:number};
  get confirmationText(){return this.pending?`CAJA MISTERIOSA · CONFIRMAR ${FORTUNE.mysteryCost} HC · [E / ×]`:''}
  cancelConfirmation(){this.pending=undefined}
@@ -50,8 +50,7 @@ export class FortuneObjects {
  blast(x:number,y:number,radius:number,damage:number,credit?:ShotCredit){for(const {item} of [...this.views.values()])if(item.kind==='crate'&&!item.opened&&Math.hypot(item.x-x,item.y-y)<radius)this.damage(item,damage,credit)}
  private near(item:FortuneObject,actor:Game){return actor.run.health>0&&!this.s.coop?.incapacitated(actor.playerId)&&Math.hypot(item.x-actor.player.x,item.y-actor.player.y)<FORTUNE.range&&this.s.lineClear(actor.player.x,actor.player.y,item.x,item.y)}
  private nearest(){const owner=this.s.coop?.actor(this.s.coop.interactionId||1)??this.s;return [...this.views.values()].filter(v=>v.item.kind!=='crate'&&!v.item.opened&&this.near(v.item,owner)).sort((a,b)=>Math.hypot(a.item.x-this.s.player.x,a.item.y-this.s.player.y)-Math.hypot(b.item.x-this.s.player.x,b.item.y-this.s.player.y))[0]}
- interact(){const s=this.s,view=this.nearest(),point=this.continuePoint;
-  if(point&&Math.hypot(point.x-s.player.x,point.y-s.player.y)<80&&(!view||Math.hypot(point.x-s.player.x,point.y-s.player.y)<Math.hypot(view.item.x-s.player.x,view.item.y-s.player.y))){s.rounds.continueNow();return true}
+ interact(){const s=this.s,view=this.nearest();
   if(!view)return false;const item=view.item;if(item.kind==='safe')return true;
   if(this.busy||s.rounds.state.phase!=='rest'){this.message='CAJA MISTERIOSA · DISPONIBLE EN DESCANSO';this.until=s.clock+1400;return true}
   const owner=s.coop?.actor(s.coop.interactionId||1)??s;
@@ -77,15 +76,13 @@ export class FortuneObjects {
     s.hint.setText(`CAJA FUERTE · APERTURA AUTOMÁTICA · ${Math.ceil(item.progress/FORTUNE.safeTime*100)}%`);
    }else{s.hint.setText(`CAJA MISTERIOSA · [E / ×] ${FORTUNE.mysteryCost} HC${s.rounds.state.phase==='rest'?'':' · EN DESCANSO'}`);this.graphics.lineStyle(2,0xffd34b,.55).strokeCircle(item.x,item.y,58+Math.sin(s.clock/180)*2)}
   }
-  if(this.continuePoint&&Math.hypot(this.continuePoint.x-s.player.x,this.continuePoint.y-s.player.y)<80)s.hint.setText('CONTINUAR RONDA · [E / ×]');
   if(s.clock<this.until)s.hint.setText(this.message);
   if(this.pending)s.hint.setText(this.confirmationText);
  }
- offerRest(){const s=this.s;if(this.restId){this.hide(this.restId);this.ledger.objects.delete(this.restId)}this.continuePoint?.label.destroy();
+ offerRest(){const s=this.s;if(this.restId){this.hide(this.restId);this.ledger.objects.delete(this.restId)}
   const find=(side:number)=>{for(let ring=3;ring<=10;ring++)for(let i=-ring;i<=ring;i++){const x=(Math.floor(s.player.x/48)+side*ring)*48+24,y=(Math.floor(s.player.y/48)+i)*48+24;if(!this.occupied(x,y,100)&&s.walkablePoint(x,y,1)&&s.navigation.canReach(s.player.body!.center,{x,y})&&s.lineClear(s.player.x,s.player.y,x,y)&&!s.foes.some(e=>Math.hypot(e.sprite.x-x,e.sprite.y-y)<120))return {x,y}}return s.lootPoint(s.player.x+side*150,s.player.y)};
   const p=find(1),id=`rest:${s.run.round}`,item:FortuneObject={id,chunk:`${Math.floor(p.x/1536)},${Math.floor(p.y/1536)}`,kind:'mystery',...p,hp:0,progress:0,opened:false,rewarded:false};this.restId=id;this.ledger.objects.set(id,item);this.show(item);
-  const next=find(-1);this.continuePoint={...next,label:s.add.text(next.x,next.y,'▶ SIGUIENTE RONDA\n[E / ×]',{fontFamily:'monospace',fontSize:13,color:'#79f9ff',backgroundColor:'#101124',padding:{x:6,y:6},align:'center'}).setOrigin(.5).setDepth(18)};
  }
- leaveRest(){this.cancelConfirmation();this.continuePoint?.label.destroy();this.continuePoint=undefined}
+ leaveRest(){this.cancelConfirmation();}
  stop(){if(this.stopped)return;this.stopped=true;for(const id of [...this.views.keys()])this.hide(id);this.leaveRest();this.ledger.clear();this.graphics.destroy()}
 }

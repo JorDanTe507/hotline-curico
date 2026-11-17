@@ -1,6 +1,6 @@
 import {WEAPONS} from '../weapons/arsenal';
 import {chooseWeapon, type WeightedWeapon} from '../systems/WeaponLottery';
-import {endlessScale} from './endless';
+import {endlessScale,endlessHealthScale} from './endless';
 
 // Health, damage, speed, recovery, windup and reload. These apply only to Rush.
 const tuning = [
@@ -11,10 +11,10 @@ const tuning = [
   [1.17,1.24,1.36,.68,.89,.74],
   [1.15,1.16,1.24,.80,.94,.80],
 ] as const;
-export function rushTuning(boss:number,cycle=1,double=false) {
+export function rushTuning(boss:number,cycle=1,double=false,cleared?:number) {
   const [hp,damage,speed,recovery,warning,reload]=tuning[boss];
   const [healthScale,damageScale,speedScale]=endlessScale(cycle);
-  return {hp:hp*healthScale*(double?.92:1),damage:damage*damageScale*(double?.90:1),speed:speed*speedScale,recovery,warning,reload};
+  return {hp:hp*(cleared===undefined?healthScale:endlessHealthScale(cleared))*(cleared===undefined&&double?.92:1),damage:damage*damageScale*(double?.90:1),speed:speed*speedScale,recovery,warning,reload};
 }
 
 export type LootTier='early'|'late'|'endless'|'double';

@@ -2,6 +2,9 @@ import type Phaser from 'phaser';
 import {RUSH_TRACKS} from './config';
 
 export function loadRushArt(scene: Phaser.Scene) {
+  scene.load.image('rush-crt-screen','assets/rush-terminal/screen.png');
+  scene.load.image('rush-crt','assets/rush-terminal/computer.png');
+  scene.load.image('rush-office','assets/rush-terminal/office.png');
   for(let i=0;i<15;i++)scene.load.image('rush-achievement-'+i,'assets/v210/achievements/'+i+'.png');
   scene.load.image('rush-main-art', 'assets/v210/main.png');
   scene.load.image('rush-menu-art', 'assets/v210/boss-rush.png');

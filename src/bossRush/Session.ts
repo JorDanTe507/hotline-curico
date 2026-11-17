@@ -1,3 +1,4 @@
+import {DestructibleCover} from './DestructibleCover';
 import {characterById, type CharacterId} from '../characters/catalog';
 import {chooseSafeDialogue, type SafeHistory} from './dialogues';
 import {relayLines,transferRatio} from './relay';
@@ -25,6 +26,7 @@ import {clearRush, recordRush, RUSH_CARDS, rushOffer, suspendRush, unlockRush,
 
 export type RushEntry = RushStart | {kind: 'next'; rest: RushRest};
 export class RushSession {
+  readonly covers:DestructibleCover;
   readonly boss: number;
   readonly encounter:number[];
   readonly endless?:EndlessRun;
@@ -36,7 +38,7 @@ export class RushSession {
   private killed=new Set<number>();
   private friendlyDamage=new WeakMap<Foe,number>();
   get cycle(){return this.endless?endlessCycle(this.endless.cleared-(this.phase==='loot'?1:0)):1;}
-  tuning(boss:number){return rushTuning(boss,this.cycle,this.encounter.length===2);}
+  tuning(boss:number){return rushTuning(boss,this.cycle,this.encounter.length===2,this.endless?.cleared);}
   elapsed(ms:number){if(this.endless)this.endless.totalMs+=ms;}
   markMedkit(){if(this.combat)this.medkitUsed=true;}
   markCure(){if(this.combat)this.cureUsed=true;}
@@ -67,6 +69,7 @@ export class RushSession {
   get pendingWeapon() { return this.rewardDrop?.sprite.active ? this.rewardDrop : undefined; }
 
   constructor(private s: Game, readonly entry: RushEntry) {
+    this.covers=new DestructibleCover(s);
     this.practice = entry.kind === 'practice';
     this.rest = 'rest' in entry ? entry.rest : undefined;
     if(entry.kind==='resume'&&Number.isSafeInteger(this.rest?.roulettePrice)&&this.rest!.roulettePrice!>=B.weaponPrice)this.roulettePrice=this.rest!.roulettePrice!;
@@ -240,10 +243,10 @@ export class RushSession {
     s.player.setVelocity(0);
     s.physics.world.pause();
     s.overlay.add(s.add.rectangle(640,360,1280,720,0x080510,.86));
-    const heading = s.add.text(640,232,'PRÁCTICA COMPLETADA',{fontFamily:'monospace',fontSize:40,color:'#ff448e'}).setOrigin(.5);
+    const heading = s.add.text(640,232,'PRÁCTICA COMPLETADA',{fontFamily:'"Press Start 2P",monospace',fontSize:24,color:'#ff448e'}).setOrigin(.5);
     s.overlay.add(heading);
     for (const [i,label] of ['REINICIAR ENCUENTRO','VOLVER A PRÁCTICA'].entries()) {
-      s.overlay.add(s.add.text(640,345+i*65,label,{fontFamily:'monospace',fontSize:25,color:'#f4ddef'}).setOrigin(.5)
+      s.overlay.add(s.add.text(640,345+i*65,label,{fontFamily:'"Press Start 2P",monospace',fontSize:16,color:'#f4ddef'}).setOrigin(.5)
         .setInteractive({useHandCursor:true}).on('pointerdown',()=>this.exit(i===0)));
     }
   }
@@ -334,7 +337,7 @@ export class RushSession {
     s.player.setVelocity(0);
     this.cardPanel = s.add.container(0, 0).setDepth(120).setScrollFactor(0);
     this.cardPanel.add(s.add.rectangle(640,360,1050,510,0x14091d,.97).setStrokeStyle(2,0xf53783));
-    this.cardPanel.add(s.add.text(640,152,'ELIGE UNA MEJORA',{fontFamily:'monospace',fontSize:29,color:'#ff8abf'}).setOrigin(.5));
+    this.cardPanel.add(s.add.text(640,152,'ELIGE UNA MEJORA',{fontFamily:'"Press Start 2P",monospace',fontSize:18,color:'#ff8abf'}).setOrigin(.5));
     const option = (y: number, label: string, action: () => void) => {
       const item = s.add.text(640,y,label,{fontFamily:'monospace',fontSize:22,color:'#ffddf1'})
         .setOrigin(.5).setInteractive({useHandCursor:true}).on('pointerdown',action);

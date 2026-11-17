@@ -1,5 +1,16 @@
 # Hotline Curicó — 1.7 · Curicó nunca duerme
 
+
+## Versión 2.2.0 — Combate despejado
+
+[Jugar en GitHub Pages](https://jordante507.github.io/hotline-curico/).
+
+HUD que se desvanece al cubrir al protagonista, inicio urbano en Tradicional, menús y presentaciones renovados. Boss Rush infinito incrementa los HP en cada encuentro. El Comandante destruye coberturas durante su ráfaga y el Demoledor recibe un escolta blindado durante sus llamadas, además de un bombardeo más rápido con refugio alcanzable. Se conservan las mejoras 2.1.0, el progreso y los controles móviles.
+
+Los efectos de armas usan provisionalmente variantes procedurales originales: licencia y procedencia en `public/assets/audio/variants/manifest.json` y `LICENSE.txt`.
+
+Las secciones siguientes conservan el historial del proyecto.
+
 Clima por rondas, apagones sectoriales, Director de Eventos, refuerzos integrados, cuatro zonas nuevas y recarga con progreso real. Se conservan los personajes, combate, controles táctiles/mando, guardados y menú animado.
 
 [Validación 1.7](VALIDACION-1.7.md) · [Recursos gráficos](RECURSOS-1.7.md)
@@ -62,7 +73,7 @@ Requiem legendaria sustituye al Revólver Magnum (ID 9): 90 de daño, 6/12 de mu
 
 El daño de armas de fuego de matones comunes se multiplica por 0,55 antes de chaleco/resistencias. Jefes, explosiones, melee y comportamientos especiales conservan sus reglas. Al generar cada matón básico, una sola tirada decide si pertenece al 10% que no recoge armas. Capacidad de botiquines: tres, con la curación anterior.
 
-Las versiones 1.5.2 a 1.6 son exclusivamente locales; GitHub Pages conserva la 1.5.1 hasta una autorización expresa. Informe anterior: [VALIDACION-1.5.2.md](VALIDACION-1.5.2.md).
+Durante las versiones 1.5.2 a 1.6 se trabajó exclusivamente en local. La versión publicada actual se indica al inicio de este documento. Informe anterior: [VALIDACION-1.5.2.md](VALIDACION-1.5.2.md).
 
 Juego local para PC con Phaser 3, TypeScript y Vite. La ruleta existente se conserva intacta en la carpeta superior.
 

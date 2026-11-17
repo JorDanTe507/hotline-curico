@@ -80,7 +80,8 @@ export function drawRushMap(s: Game, layout: Layout, boss: number, resting: bool
   drawRoomTiles(s,prefix,s.grid);
   for (const [x,y,w,h,frame] of layout.props) {
     const key=resting?frame==='crate'?'safe-crate':frame:prefix+'-'+frame;
-    roomProp(s,key,(x+w/2)*TILE,(y+h)*TILE,w*TILE,(h+.65)*TILE);
+    const image=roomProp(s,key,(x+w/2)*TILE,(y+h)*TILE,w*TILE,(h+.65)*TILE);
+    if(!resting&&boss===1&&['cover','parapet','crate'].includes(frame))s.rush?.covers.register(x,y,w,h,image);
   }
   const decor:readonly Prop[] = resting
     ? [[1,4,1,1,'plant'],[12,9,1,1,'wheel'],[6,7,1,1,'upgrade'],[7,0,2,1,'sign'],[12,0,2,1,'lamp']]

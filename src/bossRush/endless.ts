@@ -15,6 +15,8 @@ export function endlessScale(cycle:number) {
   const [from,...a]=anchors[i-1],[to,...b]=anchors[i],t=(cycle-from)/(to-from);
   return a.map((n,j)=>n+(b[j]-n)*t);
 }
+/** Every infinite encounter starts above campaign HP and keeps growing without the old cap. */
+export const endlessHealthScale=(cleared:number)=>1.12+Math.max(0,Math.floor(cleared))*.06;
 export const doubleChance = (cleared:number) => cleared<6?0:cleared<9?.18:cleared<12?.35:Math.min(.68,.55+Math.max(0,endlessCycle(cleared)-10)*.01);
 export function selectEncounter(run:EndlessRun, random=Math.random) {
   const pool=RUSH_BOSSES.filter(b=>b.available).map(b=>Number(b.id));

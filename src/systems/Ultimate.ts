@@ -15,6 +15,7 @@ export class Ultimate {
  get dualFire(){return true}
  get damageReduction(){return true}
  get weaponMultiplier(){return 1}
+ get reloadSpeedMultiplier(){return 1}
  get movementMultiplier(){return 1}
  get temporaryDashCooldown():number|undefined{return undefined}
  eliminated(_now:number){}

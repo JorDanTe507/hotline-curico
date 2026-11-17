@@ -1,0 +1,14 @@
+{
+  "source": [
+    1448,
+    1086
+  ],
+  "safeScreen": [
+    350,
+    145,
+    650,
+    460
+  ],
+  "transparentRegions": "exterior white and CRT white, seeded flood fill only",
+  "darkPixelsPreserved": 124373
+}

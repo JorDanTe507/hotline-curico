@@ -34,14 +34,14 @@ test('el giro limitado no salta de orientación y respeta el cruce de PI',()=>{
  assert(Math.abs(turnToward(Math.PI-.02,-Math.PI+.02,.1)-Math.PI-.02)<1e-8);
 });
 
-test('las tres oleadas reservan un disco seguro y separan cada explosión',()=>{
+test('las tres oleadas reservan un refugio seguro con explosiones densas',()=>{
  const points=Array.from({length:400},(_,i)=>({x:(i%20)*48+24,y:Math.floor(i/20)*48+24}));
  const safe={x:312,y:312};
  for(let wave=0;wave<C.bombardment.waves;wave++){
   const targets=bombardmentTargets(points,safe,wave);
   assert.equal(targets.length,C.bombardment.impacts);
   assert(targets.every(p=>Math.hypot(p.x-safe.x,p.y-safe.y)>C.bombardment.radius+C.bombardment.safeRadius));
-  assert(targets.every((p,i)=>targets.slice(i+1).every(q=>Math.hypot(p.x-q.x,p.y-q.y)>C.bombardment.radius*2.2)));
+  assert(targets.every((p,i)=>targets.slice(i+1).every(q=>Math.hypot(p.x-q.x,p.y-q.y)>C.bombardment.radius*.85)));
  }
 });
 

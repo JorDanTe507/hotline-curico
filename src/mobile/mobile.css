@@ -152,3 +152,243 @@ body.radar-mobile-visible #mobile-ui .mobile-hud{right:calc(152px + var(--safe-r
 #mobile-ui .mobile-menu .jordan-death-frame [data-action=retry],#mobile-ui .mobile-menu .jordan-death-frame [data-action=menu]{left:70%;right:auto;bottom:auto;width:26%;height:36px;z-index:2;font-size:clamp(10px,1.5vw,14px)}
 #mobile-ui .mobile-menu .jordan-death-frame [data-action=retry]{top:43%!important}
 #mobile-ui .mobile-menu .jordan-death-frame [data-action=menu]{top:calc(43% + 44px)!important}
+
+/* Police dossier: scoped to character selection; other screens keep their current layout. */
+#mobile-ui .mobile-menu.character-menu{background:#0d0815;gap:7px;padding-top:calc(8px + var(--safe-t));padding-bottom:calc(8px + var(--safe-b))}
+#mobile-ui .character-menu header h1{font-family:'Press Start 2P',monospace;font-size:clamp(11px,1.7vw,18px);line-height:1.5}
+#mobile-ui .character-menu header button{min-height:36px;padding:6px 10px;font-size:12px}
+#mobile-ui .character-menu .dossier-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:14px;min-height:0;flex:1;overflow:hidden}
+#mobile-ui .dossier-copy{display:flex;flex-direction:column;gap:9px;min-width:0;min-height:0;position:relative;z-index:2;background:#0d0815}
+#mobile-ui .dossier-slots{display:flex;flex-wrap:nowrap;gap:7px;overflow-x:auto;overflow-y:hidden;min-height:67px;padding:3px;flex:none;touch-action:pan-x;scrollbar-color:#ff3995 #231329;scrollbar-width:thin}
+#mobile-ui .dossier-slots .dossier-slot{min-width:72px;width:72px;height:60px;min-height:60px;padding:3px;display:grid;justify-items:center;align-content:center;gap:3px;background:#201326;border:1px solid #603752;flex:none}
+#mobile-ui .dossier-slot img{width:34px;height:34px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .dossier-slot small{font-size:9px;color:#d8b2c9}
+#mobile-ui .dossier-slot.selected{border:2px solid #ff4b9e;background:#4a1737;box-shadow:0 0 9px #f7297844}
+#mobile-ui .dossier-slot .dossier-silhouette{width:34px;height:34px;position:relative;display:block}
+#mobile-ui .dossier-silhouette:before,#mobile-ui .locked-silhouette:before{content:'';position:absolute;width:38%;height:38%;left:31%;top:0;background:#604558;border-radius:50%}
+#mobile-ui .dossier-silhouette:after,#mobile-ui .locked-silhouette:after{content:'';position:absolute;width:80%;height:58%;left:10%;bottom:0;background:#604558;border-radius:40% 40% 8% 8%}
+#mobile-ui .dossier-details{min-height:0;overflow:auto;touch-action:pan-y;padding:2px 5px 10px 1px;display:flex;flex-direction:column;gap:8px}
+#mobile-ui .dossier-details h2{font-family:'Press Start 2P',monospace;font-size:clamp(14px,2.5vw,21px);color:#ff50a2;line-height:1.6}
+#mobile-ui .dossier-details h3{font-family:'Press Start 2P',monospace;font-size:10px;color:#fa4b9c;line-height:1.6;margin:4px 0 0}
+#mobile-ui .dossier-details p{font-size:13px;line-height:1.45;color:#e7d9e5}
+#mobile-ui .dossier-details strong{font-size:14px;line-height:1.4;color:#fff0f5}
+#mobile-ui .dossier-details small{font-size:10px;color:#b798ad}
+#mobile-ui .dossier-details dl{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;font-size:12px;margin:0}
+#mobile-ui .dossier-details dd{margin:0;text-align:right;color:#8ce9ed}
+#mobile-ui .dossier-stage{margin:0;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#24101f;border:1px solid #bb327c;box-shadow:inset 0 0 20px #f5368712;position:relative}
+#mobile-ui .dossier-photo{height:100%;max-width:100%;position:relative;flex:none;will-change:transform}
+#mobile-ui .dossier-photo img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}
+#mobile-ui .dossier-badge{position:absolute;left:0;bottom:0;width:21%;height:14%;min-height:20px;background:#180c20;color:#e991b8;font:10px 'Press Start 2P',monospace;display:grid;place-items:center}
+#mobile-ui .dossier-stage.locked{flex-direction:column;color:#9a748e;font-family:'Press Start 2P',monospace;gap:20px;font-size:11px}
+#mobile-ui .locked-silhouette{width:110px;height:170px;position:relative;display:block;opacity:.35}
+#mobile-ui .dossier-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:none;border-top:1px solid #66304f;padding-top:6px}
+#mobile-ui .dossier-footer small{font-size:10px;color:#ac8a9f}
+#mobile-ui .character-menu .dossier-footer [data-action=confirm-character]{font-family:'Press Start 2P',monospace;font-size:10px;min-height:36px;max-width:65%;line-height:1.5}
+@media(max-width:680px){#mobile-ui .character-menu .dossier-layout{gap:9px;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}#mobile-ui .dossier-footer small{max-width:32%;font-size:9px}}
+
+/* Night-city menu and mode cards, independent of their illustration. */
+#mobile-ui .mobile-menu.main-menu{background:#090615;gap:7px}
+#mobile-ui .main-menu .main-art{width:100%;height:100%;right:0;top:0;bottom:0;object-fit:contain;object-position:left center}
+#mobile-ui .main-menu header,#mobile-ui .main-menu .scroll{width:38%;max-width:430px;margin-left:auto;background:#0b0615e8}
+#mobile-ui .main-menu header{padding:8px;border-top:1px solid #ef3988}
+#mobile-ui .main-menu header h1{font:clamp(12px,2vw,20px)/1.6 'Press Start 2P',monospace;color:#ff5ca7}
+#mobile-ui .main-menu .scroll{flex:0 1 auto;max-height:calc(100% - 60px);padding:4px 8px 8px}
+#mobile-ui .main-menu .menu-grid{grid-template-columns:1fr;gap:5px}
+#mobile-ui .main-menu .menu-grid button{font:9px/1.6 'Press Start 2P',monospace;min-height:33px;padding:6px;border-radius:2px;border-color:#933362}
+#mobile-ui .main-menu .menu-grid .primary-play{font-size:10px;min-height:38px;border:2px solid #ff4c9c;background:#4a1235}
+#mobile-ui .main-menu .scroll small{font-size:10px;display:block;margin-top:7px}
+#mobile-ui .main-menu .scroll p{font-size:12px;line-height:1.4;margin-top:8px}
+#mobile-ui .modes-menu header h1{font:clamp(12px,2vw,20px)/1.5 'Press Start 2P',monospace}
+#mobile-ui .modes-menu .scroll{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+#mobile-ui .modes-menu .mode-cards{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;min-height:0;flex:1;gap:12px;padding:3px 3px 9px;touch-action:pan-x;scroll-snap-type:x proximity}
+#mobile-ui .modes-menu .mode-card{min-width:220px;flex:1 0 220px;min-height:0;height:100%;display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:9px;padding:10px;border-radius:2px;background:#1b1024;overflow-y:auto;touch-action:pan-y;scroll-snap-align:start}
+#mobile-ui .mode-card h2{font:12px/1.6 'Press Start 2P',monospace;color:#ff68aa}
+#mobile-ui .mode-card p{font:13px/1.5 monospace;color:#eadbe6}
+#mobile-ui .mode-card small{font:10px/1.5 monospace;color:#87e2e6}
+#mobile-ui .mode-card:focus-visible,#mobile-ui .mode-card:active{border:2px solid #ff479a;background:#39152d}
+#mobile-ui .mode-card .mode-art{height:78px;flex:none;overflow:hidden;display:flex;justify-content:center;align-items:center;background:#100919}
+#mobile-ui .mode-art img{max-width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .mode-card .boss-portraits{display:grid;grid-template-columns:repeat(3,1fr);height:78px;grid-template-rows:repeat(2,39px)}
+#mobile-ui .boss-portraits img{width:100%;height:39px;object-fit:contain}
+#mobile-ui .mode-card.story-locked{border-color:#6c4c69;background:#14101a}
+#mobile-ui .story-locked .mode-art{filter:grayscale(1);opacity:.35}
+#mobile-ui .story-locked p{color:#ab95a8}
+#mobile-ui .story-locked strong{font:10px/1.6 'Press Start 2P',monospace;color:#b897ad}
+#mobile-ui .main-menu .menu-grid .is-selected,#mobile-ui .modes-menu .mode-card.is-selected{border:2px solid #ff8fc6;box-shadow:0 0 8px #ff39883b;background:#3d1431}
+#mobile-ui .modes-menu .mode-card{justify-content:flex-start}
+
+/* Boss Rush operations share the dossier palette without changing the combat HUD. */
+#mobile-ui .boss-rush-menu h1,#mobile-ui .boss-rush-menu h2,#mobile-ui .rush-overlay header h1{font-family:'Press Start 2P',monospace;font-size:clamp(12px,2vw,20px);line-height:1.6}
+#mobile-ui .boss-rush-menu{background:#100918;gap:9px}
+#mobile-ui .boss-rush-menu button{border-radius:2px;border-color:#ae3a77;min-height:38px;font-size:13px}
+#mobile-ui .mobile-menu.rush-home{background:#0c0714;justify-content:center;isolation:isolate}
+#mobile-ui .rush-home-art{position:absolute;left:0;top:0;width:56%;height:100%;object-fit:contain;image-rendering:pixelated;z-index:-1}
+#mobile-ui .rush-home header,#mobile-ui .rush-home .scroll{width:43%;margin-left:auto;background:#160b21ed;padding:6px 8px;min-height:0}
+#mobile-ui .rush-home .scroll{display:flex;flex-direction:column;gap:8px;flex:0 1 auto;max-height:calc(100% - 48px);overflow:auto}
+#mobile-ui .rush-home .scroll p{font-size:11px;color:#94dfe5;line-height:1.4}
+#mobile-ui .rush-home .scroll small{font-size:10px;color:#b79bae}
+#mobile-ui .rush-home .scroll button{font-family:'Press Start 2P',monospace;font-size:9px;line-height:1.5;min-height:37px;padding:7px;flex:none}
+#mobile-ui .boss-rush-menu .rush-rank-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+#mobile-ui .rush-rank-list article{border-radius:2px;display:flex;flex-direction:column;gap:9px;padding:13px;background:#22112c;border:1px solid #813460;min-height:130px}
+#mobile-ui .rush-rank-list article.first{border:2px solid #e6b969;background:#362034}
+#mobile-ui .rush-rank-list article>small{font:10px/1.6 'Press Start 2P',monospace;color:#e9c581}
+#mobile-ui .rush-rank-list article>strong{font-size:20px;color:#f8d9ef}
+#mobile-ui .rush-rank-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;font-size:13px;line-height:1.5;color:#a6e5e5}
+#mobile-ui .rush-rank-list article img{width:48px;height:48px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .rush-rank-list .rush-empty{grid-column:1/-1;justify-content:center;min-height:150px;background:linear-gradient(120deg,#28102d,#130c1d)}
+#mobile-ui .rush-empty h2{color:#ed8dbf;font-size:14px}
+#mobile-ui .rush-overlay{border-top:2px solid #e54692}
+#mobile-ui .rush-overlay .cards button{border-radius:2px}
+#mobile-ui .boss-rush-menu button.is-selected{border:2px solid #80ecea;box-shadow:0 0 9px #ef388e44;background:#4a1638}
+
+/* Shared archive language; scoped to secondary menus. */
+#mobile-ui .archive-menu{background:radial-gradient(ellipse at 4% 4%,#51153688,transparent 65%),linear-gradient(120deg,#10091cf5,#080610f5);border-top:2px solid #df3986;gap:9px}
+#mobile-ui .archive-menu header{border-bottom:1px solid #713259;padding-bottom:7px;flex-wrap:wrap;gap:8px}
+#mobile-ui .archive-menu h1{font:clamp(11px,1.8vw,18px)/1.6 'Press Start 2P',monospace;color:#ff64ac}
+#mobile-ui .archive-menu h2{color:#f2c6e2;font-size:17px;line-height:1.4}
+#mobile-ui .archive-menu h3{color:#80ede9;font-size:13px}
+#mobile-ui .archive-menu button{border-radius:2px;border:1px solid #963866;background:#32132d;min-height:44px;color:#e7d6ea;box-shadow:inset 0 1px #ffffff0b}
+#mobile-ui .archive-menu button:focus-visible,#mobile-ui .archive-menu button:hover{outline:2px solid #80ede9;outline-offset:-2px;background:#55203f}
+#mobile-ui .archive-menu button:disabled{color:#bca4bc;background:#201727;border-color:#524052}
+#mobile-ui .archive-menu article,#mobile-ui .archive-menu .note-section,#mobile-ui .archive-menu .mobile-settings{background:linear-gradient(130deg,#25132de8,#140d20);border:1px solid #713259;border-left:3px solid #bd3a7b;border-radius:2px;padding:13px;gap:8px}
+#mobile-ui .archive-menu .scroll{padding:2px 3px 12px;min-height:0;overscroll-behavior:contain}
+#mobile-ui .archive-menu nav{gap:7px;flex-wrap:wrap;flex-shrink:0}
+#mobile-ui .archive-menu p{font:14px/1.5 monospace;color:#dccbe3;margin:5px 0}
+#mobile-ui .archive-menu small{font:12px/1.5 monospace;color:#a8dcd9}
+#mobile-ui .archive-menu .archive-meter{height:8px;background:#38233e;border:1px solid #814264;overflow:hidden;margin:6px 0;flex-shrink:0}
+#mobile-ui .archive-meter span{display:block;height:100%;background:linear-gradient(90deg,#c52674,#ff71af)}
+#mobile-ui .archive-menu .archive-pages{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #713259;padding-top:6px}
+#mobile-ui .archive-menu .upgrade-hero{display:grid;grid-template-columns:100px 1fr;column-gap:14px;padding:12px;border:1px solid #713259;background:#25122c;min-height:150px}
+#mobile-ui .upgrade-hero-photo{width:100%;height:160px;grid-row:1/5;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .archive-menu .upgrade-icon{width:54px;height:45px}
+#mobile-ui .archive-menu .upgrade-module{display:flex;flex-direction:column;min-width:0}
+#mobile-ui .archive-menu .upgrade-module button{margin-top:auto}
+#mobile-ui .archive-menu .achievement-row{display:flex;align-items:center;gap:14px}
+#mobile-ui .archive-menu .achievement-row img{width:62px;height:62px;object-fit:contain;image-rendering:pixelated;flex-shrink:0}
+#mobile-ui .archive-menu .achievement-row.pending{opacity:1;border-left-color:#7e597c}
+#mobile-ui .archive-menu .achievement-row.pending img{filter:saturate(.45)}
+#mobile-ui .archive-menu [data-rarity=legendary]{border-left-color:#ffce47}
+#mobile-ui .archive-menu [data-rarity=epic]{border-left-color:#d05bff}
+#mobile-ui .archive-menu .note-section{margin:10px 0}
+#mobile-ui .archive-menu .note-section li{line-height:1.65;margin:9px 0;color:#e0cfe7;font-size:14px}
+#mobile-ui .archive-menu input[type=range]{accent-color:#ed438f}
+@media(max-height:390px){#mobile-ui .archive-menu{padding-top:8px;padding-bottom:8px;gap:6px}#mobile-ui .archive-menu header button,#mobile-ui .archive-pages button{font-size:12px;padding:6px 10px}#mobile-ui .archive-menu nav button{font-size:12px}#mobile-ui .archive-menu .achievement-row img{width:54px;height:54px}}
+
+#mobile-ui .dailychallenges-archive .scroll{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-content:start}
+#mobile-ui .dailychallenges-archive .scroll>p,#mobile-ui .dailychallenges-archive .scroll>small{grid-column:1/-1}
+#mobile-ui .dailychallenges-archive [data-daily-clock]{color:#86eeeb;font-size:20px;letter-spacing:2px;padding:12px;border:1px solid #713259;background:#25122c}
+#mobile-ui .archive-menu .daily-contract{display:flex;flex-direction:column;min-width:0}
+#mobile-ui .archive-menu .contract-icon{width:72px;height:72px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .daily-contract button{margin-top:auto}
+@media(max-width:680px){#mobile-ui .dailychallenges-archive .scroll{grid-template-columns:1fr}#mobile-ui .archive-menu .daily-contract{display:grid;grid-template-columns:70px 1fr}#mobile-ui .daily-contract .contract-icon{grid-column:1;grid-row:2/5}#mobile-ui .daily-contract h2,#mobile-ui .daily-contract p,#mobile-ui .daily-contract small{grid-column:2}#mobile-ui .daily-contract .archive-meter,#mobile-ui .daily-contract button{grid-column:1/-1}}
+#mobile-ui .archive-menu{background:radial-gradient(ellipse at 4% 4%,#51153688,transparent 65%),linear-gradient(120deg,#10091c,#080610)}
+#mobile-ui .upgrades-archive .scroll{display:grid;grid-template-columns:minmax(140px,30%) minmax(0,1fr);align-items:start;gap:12px}
+#mobile-ui .upgrades-archive .upgrade-hero{grid-column:1;grid-row:1/4;display:flex;flex-direction:column;padding:10px;gap:5px}
+#mobile-ui .upgrades-archive .upgrade-hero-photo{height:190px;width:100%}
+#mobile-ui .upgrades-archive .list-grid{grid-column:2;grid-row:1/4;grid-template-columns:1fr;gap:10px}
+#mobile-ui .upgrades-archive .scroll>button{grid-column:1/-1;grid-row:4}
+#mobile-ui .upgrades-archive .upgrade-hero h2{font:13px/1.6 'Press Start 2P',monospace}
+@media(min-width:900px){#mobile-ui .upgrades-archive .list-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Restricted operations center: presentation scoped to its two local views. */
+#mobile-ui .restricted-archive .developer-module{padding:13px;border:1px solid #713259;border-top:2px solid #c84289;background:linear-gradient(130deg,#26142f,#130d20);min-width:0}
+#mobile-ui .restricted-archive .developer-auth-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:12px;margin-top:12px}
+#mobile-ui .restricted-archive .developer-module h2{font:12px/1.7 'Press Start 2P',monospace;color:#ff77b7;margin:4px 0 12px}
+#mobile-ui .restricted-auth [data-action=password]{box-sizing:border-box;width:100%;min-width:0;min-height:48px;font-size:22px;letter-spacing:3px;border:1px solid #ad427c;background:#100919;color:#f3dcec;margin:8px 0 14px;padding:8px}
+#mobile-ui .restricted-archive .developer-keypad{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px}
+#mobile-ui .restricted-archive .developer-keypad button{min-width:0;min-height:44px;padding:4px;font-size:18px;text-align:center}
+#mobile-ui .restricted-archive .developer-module>nav{margin:9px 0}
+#mobile-ui .restricted-archive .developer-error{min-height:20px;color:#ff85a9}
+#mobile-ui .restricted-archive .developer-panel-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px}
+#mobile-ui .restricted-archive .developer-notice{border-left:3px solid #e8bf82;padding:8px 12px;color:#e8c79b}
+#mobile-ui .restricted-archive .developer-characters nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#mobile-ui .restricted-archive .developer-character{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px;min-width:0}
+#mobile-ui .restricted-archive .developer-character img{width:72px;max-width:100%;height:72px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .restricted-archive .developer-character strong{font-size:14px}
+#mobile-ui .restricted-archive .developer-character small{font-size:10px}
+#mobile-ui .restricted-archive .developer-character.selected{border:2px solid #80ede9;background:#31243e}
+#mobile-ui .restricted-archive .developer-resources{display:flex;flex-direction:column;gap:12px}
+#mobile-ui .restricted-archive .developer-resources>strong{font:24px/1.5 monospace;color:#ffe297;overflow-wrap:anywhere}
+#mobile-ui .restricted-archive .developer-round-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+#mobile-ui .restricted-archive .developer-round-grid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:90px;min-width:0;padding:8px;font-size:13px}
+#mobile-ui .restricted-archive .developer-round-grid img{width:54px;height:54px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .restricted-archive .boss-round{border-color:#d24995}
+#mobile-ui .restricted-archive .developer-modifiers{display:flex;flex-direction:column;gap:9px}
+#mobile-ui .restricted-archive .developer-modifiers button{font-size:13px;line-height:1.5;padding:9px;text-align:left}
+@media(max-width:900px){#mobile-ui .restricted-archive .developer-auth-layout{grid-template-columns:1fr}#mobile-ui .restricted-archive .developer-panel-layout{grid-template-columns:1fr}#mobile-ui .restricted-archive .developer-round-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:550px){#mobile-ui .restricted-archive .developer-round-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#mobile-ui .restricted-archive .developer-keypad{gap:3px}}
+
+/* Gameplay HUD uses official cached portraits and weapon art. */
+#mobile-ui .mobile-hud{padding:5px 7px;background:#120a1ee8;border:1px solid #883568;border-radius:2px;max-width:min(570px,calc(100% - 118px));gap:4px 8px}
+#mobile-ui .mobile-hud .vitals{padding:0;min-width:0}
+#mobile-ui .mobile-hud .vitals>img{border:1px solid #c34283;object-fit:contain;background:#24132c}
+#mobile-ui .mobile-hud .meter{border-radius:1px;height:7px;background:#322237}
+#mobile-ui .mobile-hud .meter i{background:repeating-linear-gradient(90deg,#ff438f 0 16px,#b9246a 16px 18px);transition:width .15s linear}
+#mobile-ui .mobile-hud .meter.armor i{background:repeating-linear-gradient(90deg,#41d1ff 0 16px,#23708c 16px 18px)}
+#mobile-ui .mobile-hud .weapons{display:grid;grid-template-columns:1fr 1fr;gap:4px;max-width:none}
+#mobile-ui .hud-gun-slot{padding:3px 5px;border:1px solid #57405e;background:#1b1026;min-width:0;display:grid;grid-template-columns:40px 1fr;gap:2px;align-items:center}
+#mobile-ui .hud-gun-slot.active{border-color:#f2d279;box-shadow:inset 0 0 4px #b47a4033}
+#mobile-ui .hud-gun-slot>small{grid-column:1/-1;font-size:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:100%}
+#mobile-ui .hud-gun-slot img{width:38px;height:20px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .hud-gun-slot strong{font-size:10px;overflow-wrap:anywhere}
+#mobile-ui .hud-item-counts{grid-column:1/-1;font-size:9px;color:#ffe69c}
+#mobile-ui .hud-ultimate{position:relative;height:14px;margin:4px 0 1px;border:1px solid #856b8e;background:#281d36;isolation:isolate}
+#mobile-ui .hud-ultimate>i{display:block;height:100%;background:repeating-linear-gradient(90deg,#42cfff 0 15px,#7c63c5 15px 17px);max-width:100%}
+#mobile-ui .hud-ultimate>span{position:absolute;inset:1px 2px;font:8px/10px monospace;color:#fff;white-space:nowrap;text-shadow:1px 1px #14081e}
+#mobile-ui .hud-ultimate[data-character=cervela]{border-color:#ae8667;background:linear-gradient(90deg,#ad682e 0 18%,#594550 18%)}
+#mobile-ui .hud-ultimate[data-character=cervela]>i{background:linear-gradient(90deg,#af6c32 0 18%,#e6d6c0 18%,#fff0d6 94%,#ff723d 96%);border-right:4px solid #ff7540}
+#mobile-ui .hud-ultimate[data-character=jordan]{margin-left:16px;border-color:#b39a54}
+#mobile-ui .hud-ultimate[data-character=jordan]>i{background:repeating-linear-gradient(90deg,#f9d461 0 15px,#9b6e30 15px 17px)}
+#mobile-ui .hud-ultimate[data-character=jordan]:before{content:'◷';position:absolute;left:-19px;top:-3px;font-size:18px;color:#ffda72;transform:rotate(var(--clock-angle))}
+#mobile-ui .hud-ultimate.ready{box-shadow:0 0 5px #c592cd}
+#mobile-ui .hud-ultimate.active{border-color:#fff4ce}
+#mobile-ui .next-round-prompt{position:absolute;left:50%;bottom:calc(171px + var(--safe-b));transform:translateX(-50%);z-index:2;background:#21102bf0;border:1px solid #80ede9;border-radius:2px;color:#a5ffef;font-size:12px;pointer-events:auto;min-height:44px;padding:8px 12px;white-space:nowrap}
+#mobile-ui .gameplay-pause{background:linear-gradient(110deg,#150a21f5,#080610f5);border-top:2px solid #e9448f}
+#mobile-ui .gameplay-pause h1{font-family:'Press Start 2P',monospace;font-size:18px}
+#mobile-ui .gameplay-pause .pause-summary{min-height:145px;background:#23122b;border:1px solid #7f355f;padding:12px;display:grid;grid-template-columns:100px 1fr;column-gap:14px}
+#mobile-ui .pause-summary img{grid-row:1/6;width:100%;height:150px;object-fit:contain;image-rendering:pixelated}
+#mobile-ui .pause-summary p{font-size:13px;line-height:1.5}
+#mobile-ui .gameplay-pause button{border-radius:2px;border-color:#9c3c76}
+#mobile-ui.hud-reduced-motion .mobile-hud *{transition:none!important;animation:none!important}
+@media(max-width:690px){#mobile-ui .mobile-hud{font-size:10px;grid-template-columns:minmax(135px,1fr) minmax(125px,1fr)}#mobile-ui .hud-gun-slot{grid-template-columns:1fr}#mobile-ui .hud-gun-slot img{display:none}#mobile-ui .hud-gun-slot>small{font-size:8px}}
+
+#mobile-ui .mobile-hud .vitals strong{font-size:11px;line-height:1.15}
+#mobile-ui .mobile-hud .bars{gap:2px}
+#mobile-ui .mobile-hud .bars small{font-size:9px;line-height:1.1}
+#mobile-ui .mobile-hud .meter{height:6px}
+#mobile-ui .mobile-hud .hud-ultimate{height:12px;margin-top:2px}
+#mobile-ui .mobile-hud .chaos-hud span{font-size:9px}
+#mobile-ui .mobile-hud .chaos-hud img{width:18px;height:18px}
+@media(max-width:690px){#mobile-ui .hud-gun-slot{grid-template-columns:26px 1fr}#mobile-ui .hud-gun-slot img{display:block;width:24px;height:14px}#mobile-ui .hud-gun-slot strong{font-size:9px}}
+
+#mobile-ui .hud-currency-gain{position:absolute;top:100%;right:0;color:#ffe27a;background:#190d22e8;padding:3px 7px;font-size:11px;pointer-events:none}
+#mobile-ui .hud-ultimate.active[data-character=nicolas]>i{background:repeating-linear-gradient(90deg,#b578ff 0 15px,#69469a 15px 17px)}
+
+/* Combat renewal: background opacity only; icons, text and selection stay opaque. */
+#mobile-ui .hud-gun-slot{background:rgba(27,16,38,.78)}
+#mobile-ui .hud-item-counts{background:rgba(23,13,35,.78)}
+#mobile-ui .chaos-hud span{background:rgba(23,13,35,.78)}
+#mobile-ui .mobile-hud .boss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;max-width:520px}
+#mobile-ui .mobile-hud .boss[hidden],#mobile-ui .boss-health-row[hidden]{display:none}
+#mobile-ui .boss-health-row{padding:3px 6px;background:rgba(16,9,27,.8);border:1px solid #a74778;min-width:0}
+#mobile-ui .boss-health-row strong{font:9px monospace;color:#ffe1ef;display:block;overflow-wrap:anywhere}
+#mobile-ui .boss-health-track{position:relative;height:6px;margin-top:3px;background:#392137;border:1px solid #ab4878;overflow:hidden}
+#mobile-ui .boss-health-track i{position:absolute;left:0;top:0;height:100%}
+#mobile-ui .boss-health-fill{background:repeating-linear-gradient(90deg,transparent 0 20px,#160b2066 20px 21px),#ff398f}
+#mobile-ui .boss-health-tail{background:#ffb78899}
+#mobile-ui .boss-health-row.hit .boss-health-fill{background-color:#ffc0dc}
+#mobile-ui .combat-dialogue{background:linear-gradient(100deg,#080511e8,#190d24eb);border:1px solid #a53b73;box-shadow:inset 0 2px #ff398f,inset 0 -1px #713259}
+#mobile-ui .combat-dialogue h1{font-family:'Press Start 2P',monospace;color:#ff64ac;font-size:18px;line-height:1.5}
+#mobile-ui .combat-dialogue>.scroll{display:grid;grid-template-columns:minmax(100px,24%) 1fr;align-items:center;gap:12px 20px}
+#mobile-ui .combat-dialogue>.scroll>img{grid-row:1/3;max-height:calc(var(--mobile-height,100vh) - 105px);width:100%;object-fit:contain;border:1px solid #713259;background:#241128b3}
+#mobile-ui .combat-dialogue>.scroll>p{font:17px/1.55 monospace;white-space:pre-line;color:#fff0fa;margin:0}
+#mobile-ui .combat-dialogue button[data-action=continue]{border-color:#a53b73;color:#80ede9}
+
+/* Leave the weapon/consumable region without a second opaque backing layer. */
+#mobile-ui .mobile-hud{background:transparent}
+#mobile-ui .mobile-hud .vitals{background:rgba(18,10,30,.91)}
+#mobile-ui .mobile-hud .objective{background:rgba(18,10,30,.78)}
+
+/* 2.2.0: retain the layout; lower backing opacity in the open city. */
+#mobile-ui.traditional-hud .mobile-hud .vitals{background:rgba(18,10,30,.76)}
+#mobile-ui.traditional-hud .hud-gun-slot,#mobile-ui.traditional-hud .hud-item-counts,#mobile-ui.traditional-hud .chaos-hud span{background:rgba(23,13,35,.66)}

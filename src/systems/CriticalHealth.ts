@@ -1,3 +1,4 @@
+import {menuMotion} from '../ui/MenuSkin';
 import type {Game} from '../scenes/Game';
 import Phaser from 'phaser';
 import {AudioSystem} from './AudioSystem';
@@ -6,6 +7,7 @@ import {maxHealth} from './HealthCapacity';
 import {CRITICAL_DIALOGUE_COOLDOWN,CRITICAL_DIALOGUE_DURATION} from '../config/instinct';
 export const WOUNDED_LINES=['Necesito curarme...','Estoy en la mierda...','Con un cigarrito estoy impecable...'];
 export class CriticalHealth {
+ setHudOpacity(value:number){this.hudPortrait.setAlpha(value)}
  setMobile(value:boolean){this.hudPortrait.setVisible(!value&&!this.scene.ended&&!this.scene.coop)}
  readonly alert=new CriticalAlert();private intensity=0;private lastUpdate=0;private nextDialogue=0;private dialogueUntil=0;
  private warning:Phaser.GameObjects.Text;private border:Phaser.GameObjects.Graphics;private dialogue:Phaser.GameObjects.Container;private hudPortrait:Phaser.GameObjects.Image;
@@ -20,7 +22,7 @@ export class CriticalHealth {
   this.dialogue=scene.add.container(880,535,[bg,portrait,line]).setScrollFactor(0).setDepth(94).setVisible(false);
  }
  get portraitKey(){return this.hudPortrait.texture.key}
- update(health:number,now:number,dead:boolean){const s=this.scene,c=s.character;if(s.coop){this.warning.setVisible(false);this.border.setVisible(false);this.dialogue.setVisible(false);this.hudPortrait.setVisible(false).setTexture(health>0&&health<=maxHealth(s.run)*.25?c.woundedPortraits[0]:c.portrait);return}const blocked=dead||s.ended||s.paused||s.levelUp?.active||s.roulette?.active||s.bossDialogue?.active,{active:critical,beat}=this.alert.update(health,maxHealth(s.run),now,blocked);if(blocked){this.suspend();return}const dt=Math.min(50,Math.max(0,now-this.lastUpdate));this.lastUpdate=now;this.intensity=Phaser.Math.Clamp(this.intensity+(critical?dt/220:-dt/320),0,1);const pulse=.75+.25*(.5+.5*Math.sin(now/190));this.warning.setVisible(this.intensity>0).setAlpha(this.intensity*pulse);this.border.setVisible(this.intensity>0).setAlpha(this.intensity*pulse);
+ update(health:number,now:number,dead:boolean){const s=this.scene,c=s.character;if(s.coop){this.warning.setVisible(false);this.border.setVisible(false);this.dialogue.setVisible(false);this.hudPortrait.setVisible(false).setTexture(health>0&&health<=maxHealth(s.run)*.25?c.woundedPortraits[0]:c.portrait);return}const blocked=dead||s.ended||s.paused||s.levelUp?.active||s.roulette?.active||s.bossDialogue?.active,{active:critical,beat}=this.alert.update(health,maxHealth(s.run),now,blocked);if(blocked){this.suspend();return}const dt=Math.min(50,Math.max(0,now-this.lastUpdate));this.lastUpdate=now;this.intensity=Phaser.Math.Clamp(this.intensity+(critical?dt/220:-dt/320),0,1);const pulse=menuMotion()?.75+.25*(.5+.5*Math.sin(now/190)):1;this.warning.setVisible(this.intensity>0).setAlpha(this.intensity*pulse);this.border.setVisible(this.intensity>0).setAlpha(this.intensity*pulse);
   if(critical&&now>=this.nextDialogue){this.nextDialogue=now+CRITICAL_DIALOGUE_COOLDOWN;this.dialogueUntil=now+CRITICAL_DIALOGUE_DURATION;const index=Phaser.Math.Between(0,c.lowHealthLines.length-1),key=c.woundedPortraits[index%c.woundedPortraits.length],portrait=this.dialogue.list[1] as Phaser.GameObjects.Image;portrait.setTexture(key).setScale(Math.min(104/portrait.width,104/portrait.height));(this.dialogue.list[2] as Phaser.GameObjects.Text).setText(c.lowHealthLines[index]);this.hudPortrait.setTexture(key);}
   if(!critical){this.dialogueUntil=0;this.hudPortrait.setTexture(c.portrait)}this.hudPortrait.setVisible(!dead&&!s.registry.get('mobileUI')).setScale(Math.min(74/this.hudPortrait.width,74/this.hudPortrait.height));
   const mobile=!!s.registry.get('mobileUI');let clearCorner=false;if(critical&&now<this.dialogueUntil){const cam=this.scene.cameras.main,objects=[this.scene.player,...this.scene.foes.map(e=>e.sprite),...this.scene.shots.map(p=>p.sprite)];for(const [x,y] of (mobile?[[880,230],[20,230]]:[[880,440],[20,230],[880,230]])){if(!objects.some(o=>o.active&&o.x-cam.scrollX>x-25&&o.x-cam.scrollX<x+405&&o.y-cam.scrollY>y-35&&o.y-cam.scrollY<y+145)){this.dialogue.setPosition(x,y);clearCorner=true;break}}}

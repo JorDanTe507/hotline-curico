@@ -49,6 +49,7 @@ export class MapVisuals {
    this.visuals=s.children.list.filter(o=>!previous.has(o));
    return;
   }
+  if(!s.worldModel.legacyApartment){this.visuals=s.children.list.filter(o=>!previous.has(o));return}
   const trim=s.add.graphics().setDepth(3.1);
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
    const room=Math.min(2,Math.floor(y/9))*4+Math.min(3,Math.floor(x/10));
