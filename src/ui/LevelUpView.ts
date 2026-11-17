@@ -1,3 +1,4 @@
+import {EvolutionView} from '../roguelite/EvolutionView';
 import {achievements} from '../systems/Achievements';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
@@ -10,14 +11,17 @@ export function upgradeFrame(scene:Phaser.Scene,x:number,y:number,w:number,h:num
  return scene.add.rectangle(x,y,w,h,0x17152a,.98).setStrokeStyle(2,color);
 }
 export class LevelUpView {
+ evolved?:EvolutionView;
  active=false;options:Upgrade[]=[];generation=0;rerolls=0;maxRerolls=1;private panel?:Phaser.GameObjects.Container;private locked=false;
  private keys:Phaser.Input.Keyboard.Key[];
- constructor(private s:Game){this.keys=[Phaser.Input.Keyboard.KeyCodes.ONE,Phaser.Input.Keyboard.KeyCodes.TWO,Phaser.Input.Keyboard.KeyCodes.THREE].map(k=>s.input.keyboard!.addKey(k));}
+ constructor(private s:Game){s.events.once('shutdown',()=>this.evolved?.destroy());this.keys=[Phaser.Input.Keyboard.KeyCodes.ONE,Phaser.Input.Keyboard.KeyCodes.TWO,Phaser.Input.Keyboard.KeyCodes.THREE].map(k=>s.input.keyboard!.addKey(k));}
  private context():UpgradeContext{const s=this.s;return {abilityModule:s.character.ability.module,run:s.run,guns:s.guns,addAmmo:(g,n)=>s.ultimate.addAmmo(g,n),spawnSupply:kind=>{const p=s.lootPoint(s.player.x+35,s.player.y+25);s.addDrop(p.x,p.y,kind,0)}}}
  openIfNeeded(){const s=this.s;if(s.coop?.incapacitated(s.playerId)||this.active||s.ended||s.paused||s.roulette.active||s.bossDialogue.active||!s.run.pendingLevels)return false;
   s.presentation.complete();s.critical.suspend();s.combatHud.update();this.active=true;this.locked=false;this.rerolls=this.maxRerolls=s.run.stats.rerolls??1;s.stopMinigun();s.physics.world.pause();s.time.paused=true;s.tweens.pauseAll();s.player.anims.pause();for(const e of s.foes)e.sprite.anims.pause();this.render();return true;
  }
- private render(options?:Upgrade[]){const s=this.s;this.panel?.destroy(true);this.generation++;this.options=options??s.progression.options(this.context());const generation=this.generation,padOnly=!!s.coop&&s.playerId===2;
+ private render(options?:Upgrade[]){this.evolved?.destroy();this.evolved=undefined;const s=this.s;this.panel?.destroy(true);this.generation++;this.options=options??s.progression.options(this.context());const generation=this.generation,padOnly=!!s.coop&&s.playerId===2;
+  if(s.run.roguelite){this.evolved=new EvolutionView(s,this.options,this.context(),this.rerolls,i=>this.choose(i,generation),()=>this.reroll());return}
+
   const parts:Phaser.GameObjects.GameObject[]=[s.add.rectangle(640,360,1280,720,0x080711,.45)];
   const text=(x:number,y:number,value:string,size:number,color='#f5edf8')=>s.add.text(x,y,value,{fontFamily:'monospace',fontSize:size,color,stroke:'#090712',strokeThickness:2}).setOrigin(.5);
   parts.push(text(640,111,s.coop?`J${s.playerId} · ${s.character.name} · SUBISTE DE NIVEL`:'¡SUBISTE DE NIVEL!',s.coop?27:40,'#ff4eaa'),text(640,162,`NIVEL ${s.run.level} · ${s.run.pendingLevels} ELECCIÓN${s.run.pendingLevels===1?'':'ES'} PENDIENTE${s.run.pendingLevels===1?'':'S'}`,17,'#81eaf0'));
@@ -34,14 +38,16 @@ export class LevelUpView {
   this.panel=s.add.container(0,0,parts).setScrollFactor(0).setDepth(170);for(const key of this.keys)Phaser.Input.Keyboard.JustDown(key);
  }
  reroll(){if(!this.active||this.locked||this.rerolls<=0)return false;const old=this.options.map(u=>u.id),pool=this.s.progression.options(this.context(),Math.random,old);if(pool.every(u=>old.includes(u.id)))return false;this.rerolls--;achievements().event({type:'reroll',character:this.s.character.id});this.render(pool);return true}
+ focus(index:number){this.evolved?.focus(index)}
+ navigate(next:boolean,prev:boolean,confirm:boolean){if(!this.evolved)return;const count=this.options.length+(this.rerolls?1:0);if(next||prev)this.evolved.focus((this.evolved.selected+(next?1:count-1))%count);if(confirm){if(this.evolved.selected===this.options.length)this.reroll();else this.choose(this.evolved.selected)}}
  update(){if(!this.active||this.s.coop&&this.s.playerId===2)return;for(let i=0;i<3;i++)if(Phaser.Input.Keyboard.JustDown(this.keys[i])){this.choose(i,this.generation);break}}
- choose(index:number,generation=this.generation){if(!this.active||this.s.paused||this.s.ended||this.locked||generation!==this.generation||!this.options[index])return false;this.locked=true;const s=this.s,oldDuration=s.run.stats.ultimateDuration;
+ choose(index:number,generation=this.generation){if(!this.active||this.s.paused||this.s.ended||this.locked||generation!==this.generation||!this.options[index])return false;this.locked=true;const s=this.s,oldDuration=s.ultimate.duration;
   if(!s.progression.apply(this.options[index].id,this.options,this.context())){this.locked=false;return false}
-  s.dash.setCooldown(s.ultimate.active(s.clock)?s.ultimate.temporaryDashCooldown??dashCooldown(s.run.stats):dashCooldown(s.run.stats),s.clock,true);s.ultimate.extend(s.run.stats.ultimateDuration-oldDuration,s.clock);s.ultimate.charge=Math.min(s.ultimate.charge,s.ultimate.requiredHits);s.combatHud.update();AudioSystem.play(s,'reward');
-  s.blockPointerUntilRelease=true;
+  s.dash.setCooldown(s.ultimate.active(s.clock)?s.ultimate.temporaryDashCooldown??dashCooldown(s.run.stats):dashCooldown(s.run.stats),s.clock,true);s.ultimate.extend(s.ultimate.duration-oldDuration,s.clock);s.ultimate.charge=Math.min(s.ultimate.charge,s.ultimate.requiredHits);s.combatHud.update();AudioSystem.play(s,'reward');
+  this.evolved?.celebrate(!this.options[index].repeatable&&this.options[index].currentLevel(this.context())===this.options[index].maxLevel);s.blockPointerUntilRelease=true;
   if(s.run.pendingLevels){this.rerolls=this.maxRerolls=s.run.stats.rerolls??1;this.render();this.locked=false}else this.close();return true;
  }
- close(resume=true){const s=this.s;this.active=false;this.locked=true;this.options=[];this.generation++;this.panel?.destroy(true);this.panel=undefined;for(const key of this.keys){Phaser.Input.Keyboard.JustDown(key)}
+ close(resume=true){this.evolved?.destroy();this.evolved=undefined;const s=this.s;this.active=false;this.locked=true;this.options=[];this.generation++;this.panel?.destroy(true);this.panel=undefined;for(const key of this.keys){Phaser.Input.Keyboard.JustDown(key)}
   if(resume&&!s.ended&&!s.paused&&!s.roulette.active&&!s.bossDialogue.active){s.time.paused=false;s.tweens.resumeAll();s.physics.world.resume();s.player.anims.resume();for(const e of s.foes)e.sprite.anims.resume()}
  }
 }

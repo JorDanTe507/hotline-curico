@@ -1,10 +1,11 @@
+import {value,tryhardBonus,tryhardLimit,ROGUE_RULES as R} from '../roguelite/rules';
 import {Ultimate} from './Ultimate';
 import type {Gun} from '../weapons/arsenal';
 import {maxHealth,setHealthMultiplier} from './HealthCapacity';
 /** A single activation budget: 8s + at most eight 750ms kill extensions. */
 export class Tryhard extends Ultimate {
  private startedAt=0;
- override get duration(){return Math.min(14000,this.currentRun?.().stats.tryhardDuration??8000)}
+ override get duration(){return Math.min(this.currentRun?tryhardLimit(this.currentRun()):14000,(this.currentRun?.().stats.tryhardDuration??8000)+(this.currentRun?tryhardBonus(this.currentRun()):0))}
  override get healRate(){return 0}
  override get infiniteAmmo(){return false}
  override get dualFire(){return false}
@@ -14,11 +15,11 @@ export class Tryhard extends Ultimate {
  override get movementMultiplier(){return this.currentRun?.().stats.tryhardSpeed??1.25}
  override get temporaryDashCooldown(){return Math.max(400,425*(1-(this.currentRun?.().stats.permanentDash??0)))}
  protected override get maximumHealth(){return this.currentRun?maxHealth(this.currentRun()):super.maximumHealth}
- override activate(now:number,guns:Gun[]=[]){if(!super.activate(now,guns))return false;this.startedAt=now;if(this.currentRun)setHealthMultiplier(this.currentRun(),(this.currentRun().stats.tryhardMultiplier??5)+2);return true}
- override tick(now:number,health:number,guns:Gun[]=[]){const run=this.currentRun?.();if(!run)return super.tick(now,health,guns);const finishes=this.until>0&&now>=this.until&&health>0;run.health=health;run.health=super.tick(now,health,guns);if(!this.active(now)){setHealthMultiplier(run,1);if(finishes&&run.health>0)run.health=maxHealth(run)}return run.health}
+ override activate(now:number,guns:Gun[]=[]){if(!super.activate(now,guns))return false;this.startedAt=now;if(this.currentRun)setHealthMultiplier(this.currentRun(),(this.currentRun().stats.tryhardMultiplier??5)+2+value(this.currentRun(),'nicolas-titan',R.titan));return true}
+ override tick(now:number,health:number,guns:Gun[]=[]){const run=this.currentRun?.();if(!run)return super.tick(now,health,guns);const finishes=this.until>0&&now>=this.until&&health>0;run.health=health;if(this.active(now)){const multiplier=(run.stats.tryhardMultiplier??5)+2+value(run,'nicolas-titan',R.titan);if(run.healthMultiplier!==multiplier)setHealthMultiplier(run,multiplier)}run.health=super.tick(now,run.health,guns);if(!this.active(now)){setHealthMultiplier(run,1);if(finishes&&run.health>0)run.health=maxHealth(run)}return run.health}
  override stop(){super.stop();if(this.currentRun)setHealthMultiplier(this.currentRun(),1)}
  override trackGun(_gun:Gun,_now:number){}
- override extend(ms:number,now:number){if(ms<=0||!this.active(now))return;this.until=Math.min(this.startedAt+14000,this.until+ms);this.activeDuration=this.until-this.startedAt}
+ override extend(ms:number,now:number){if(ms<=0||!this.active(now))return;this.until=Math.min(this.startedAt+(this.currentRun?tryhardLimit(this.currentRun()):14000),this.until+ms);this.activeDuration=this.until-this.startedAt}
  override eliminated(now:number){this.extend(750,now)}
  override double(_guns:{id:number}[],_now:number){return false}
 }

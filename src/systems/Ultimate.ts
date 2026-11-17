@@ -1,3 +1,4 @@
+import {value,ROGUE_RULES as R} from '../roguelite/rules';
 import {baseStats,type PlayerStats} from '../config/progression';
 import {ULTIMATE_HITS,ULTIMATE_DURATION,ULTIMATE_HEAL_PER_SECOND} from '../config/instinct';
 import {singleTank,normalizeAmmo,addGunAmmo,type Gun} from '../weapons/arsenal';
@@ -9,7 +10,7 @@ export class Ultimate {
  constructor(private stats:()=>PlayerStats=baseStats,protected currentRun?:()=>Run){}
  protected get maximumHealth(){return this.stats().maxHealth}
  get requiredHits(){return Math.max(20,this.stats().ultimateHits)}
- get duration(){return this.stats().ultimateDuration}
+ get duration(){return this.stats().ultimateDuration+(this.currentRun?value(this.currentRun(),'cervela-duration',R.caladaDuration):0)}
  get healRate(){return this.stats().ultimateHeal*.6}
  get infiniteAmmo(){return true}
  get dualFire(){return true}

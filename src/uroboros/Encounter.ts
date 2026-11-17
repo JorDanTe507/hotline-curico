@@ -1,3 +1,4 @@
+import {directedImpact} from './ThrowImpact';
 import Phaser from 'phaser';
 import type {Game, Foe} from '../scenes/Game';
 import {gun, type Gun} from '../weapons/arsenal';
@@ -18,7 +19,7 @@ type Point = {x:number; y:number};
 type Stage = 1 | 2;
 type Mode = 'intro' | 'pursue' | 'windup' | 'dash' | 'grab' | 'evade' | 'recover' | 'transform' | 'won';
 interface ActorKit {guns:Gun[]; active:number; medkits:number; adrenaline:number; armor:number; charge:number; counts:number[]; selected:number}
-interface Infection {level:number; elapsed:number; cures:number; protectedUntil:number; throwUntil:number; vx:number; vy:number; noticeUntil:number}
+interface Infection {level:number; elapsed:number; cures:number; protectedUntil:number; throwUntil:number; vx:number; vy:number; noticeUntil:number;impactApplied:boolean}
 interface AttackPlan {kind:Attack; target:Point; angle:number}
 interface Bolt {sprite:Phaser.GameObjects.Image; vx:number; vy:number; remaining:number}
 
@@ -144,7 +145,7 @@ export class UroborosEncounter {
   state(id:number) {
     let state=this.infections.get(id);
     if (!state) {
-      state={level:0,elapsed:0,cures:0,protectedUntil:0,throwUntil:0,vx:0,vy:0,noticeUntil:0};
+      state={level:0,elapsed:0,cures:0,protectedUntil:0,throwUntil:0,vx:0,vy:0,noticeUntil:0,impactApplied:true};
       this.infections.set(id,state);
     }
     return state;
@@ -267,9 +268,17 @@ export class UroborosEncounter {
   locked(a:Game) {
     if(this.grabbed===a) { a.player.setVelocity(0);return true; }
     const state=this.state(a.playerId);
-    if(this.s.clock>=state.throwUntil)return false;
+    if(this.s.clock>=state.throwUntil){state.vx=state.vy=0;return false;}
     a.player.setVelocity(state.vx,state.vy);
     return true;
+  }
+
+  staticImpact(a:Game,obstacle:unknown){
+    const state=this.state(a.playerId),body=(obstacle as Phaser.GameObjects.GameObject&{body?:Phaser.Physics.Arcade.StaticBody})?.body;
+    if(this.stopped||state.impactApplied||this.s.clock>=state.throwUntil||!body||body.physicsType!==Phaser.Physics.Arcade.STATIC_BODY||!body.enable||body.checkCollision.none)return false;
+    if(!directedImpact(a.player.body!.center,{x:state.vx,y:state.vy},body))return false;
+    state.impactApplied=true;state.throwUntil=0;state.vx=state.vy=0;a.player.setVelocity(0);a.damage(C.throwImpactDamage*(this.s.rush?.tuning(WESKER).damage??this.traditionalScale('damage')),true,false);
+    if(!this.s.ended)this.effect('impact',a.player,60,220);return true;
   }
 
   private updateInfection(elapsed:number) {
@@ -301,7 +310,7 @@ export class UroborosEncounter {
 
   private warning() {
     const p=this.plan!;
-    if(p.kind==='charge')return;
+    if(p.kind==='charge'){const e=this.foe.sprite,end=this.clip(e,p.angle,C.attacks.charge.radius);this.graphics.lineStyle(2,0xff77b3,.8).lineBetween(e.x,e.y,end.x,end.y).strokeCircle(end.x,end.y,20);return;}
     const a=C.attacks[p.kind], e=this.foe.sprite;
     this.graphics.lineStyle(3,0xff3d79,.95).fillStyle(0xf83288,.16);
     if(p.kind==='projectile') {
@@ -373,9 +382,7 @@ export class UroborosEncounter {
     state.protectedUntil=this.s.clock+C.grabProtection;
     this.hurt(a,C.attacks.charge.damage,true);
     if(a.run.health<=0)return;
-    const end=this.clip(a.player,angle,C.throwSpeed*C.throwMs/1000);
-    const distance=Math.hypot(end.x-a.player.x,end.y-a.player.y);
-    state.throwUntil=this.s.clock+distance/C.throwSpeed*1000;
+    state.impactApplied=false;state.throwUntil=this.s.clock+C.throwMs;
     state.vx=Math.cos(angle)*C.throwSpeed;
     state.vy=Math.sin(angle)*C.throwSpeed;
   }
@@ -410,7 +417,7 @@ export class UroborosEncounter {
         ? ['charge','sweep','projectile','ground','strike','tentacles','burst']
         : ['charge','strike'];
       const available=pool.filter(kind=>{
-        const reach=kind==='charge'?290:kind==='tentacles'?245:kind==='projectile'?530:C.attacks[kind].radius-10;
+        const reach=kind==='charge'?C.attacks.charge.radius-20:kind==='tentacles'?245:kind==='projectile'?530:C.attacks[kind].radius-10;
         return d<=reach;
       });
       if(available.length){
@@ -538,7 +545,7 @@ export class UroborosEncounter {
       image.destroy();
     }
     this.effects=[];
-    for(const state of this.infections.values())state.throwUntil=0;
+    for(const state of this.infections.values()){state.throwUntil=0;state.impactApplied=true;state.vx=state.vy=0;}
     this.grabbed=undefined;
   }
 

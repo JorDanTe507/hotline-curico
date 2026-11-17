@@ -1,0 +1,40 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {newRun} from '../src/systems/run';import {UPGRADES,type UpgradeContext} from '../src/systems/UpgradeCatalog';import {Progression} from '../src/systems/Progression';
+import {NEW_TRADITIONAL_UPGRADES,evolve,evolutionPreview} from '../src/roguelite/catalog';import {passiveRate,piercingDamage,traditionalXP,ROGUE_RULES} from '../src/roguelite/rules';
+import {Ultimate} from '../src/systems/Ultimate';import {Tryhard} from '../src/systems/Tryhard';import {Judgment} from '../src/v20/Judgment';import {maxHealth} from '../src/systems/HealthCapacity';import {Rogue19} from '../src/v19/Rogue19';
+import {magazineCapacity} from '../src/systems/PlayerModifiers';
+import {DamageBudget} from '../src/chaos/DamageBudget';
+const catalog=[...UPGRADES.map(evolve),...NEW_TRADITIONAL_UPGRADES];
+function setup(abilityModule='calada'){const run=newRun();run.roguelite=true;const context:UpgradeContext={run,abilityModule,guns:[],addAmmo:()=>{},spawnSupply:()=>{}};return {run,context,p:new Progression(run)}}
+function grant(v:ReturnType<typeof setup>,id:string,times=1){const u=catalog.find(u=>u.id===id)!;for(let i=0;i<times;i++){v.run.pendingLevels++;assert(v.p.apply(id,[u],v.context))}return u}
+test('perks evolve once per pending choice, capped, single-purchase preserved, no duplicate offers or hidden magnet',()=>{
+ const v=setup();const heart=grant(v,'heart',5);assert.equal(v.run.stats.maxHealth,200);assert.equal(passiveRate(v.run),.2);v.run.pendingLevels=1;assert(!v.p.apply('heart',[heart],v.context));grant(v,'secondChance');v.run.pendingLevels=1;assert(!v.p.apply('secondChance',[catalog.find(u=>u.id==='secondChance')!],v.context));
+ for(let i=0;i<300;i++){const options=v.p.options(v.context);assert.equal(options.length,3);assert.equal(new Set(options.map(u=>u.id)).size,3);assert(options.every(u=>!['heart','secondChance','magnet'].includes(u.id)))}
+});
+test('general/exclusive pools are isolated between actors and legacy Rush has no new cards',()=>{
+ for(const [module,other]of [['calada','nicolas'],['tryhard','jordan'],['judgment','cervela']]){const v=setup(module);for(let i=0;i<200;i++)assert(v.p.options(v.context).every(u=>!u.characters||!u.characters.includes(other)||u.characters.length===3))}
+ const a=setup(),b=setup('tryhard');grant(a,'cellular',4);assert.equal(passiveRate(a.run),2);assert.equal(passiveRate(b.run),0);assert.equal(b.run.stats.maxHealth,100);
+ const old=newRun(),p=new Progression(old),c={...a.context,run:old};for(let i=0;i<100;i++)assert(p.options(c).every(u=>UPGRADES.some(o=>o.id===u.id)));assert.equal(passiveRate(old),0);assert.equal(p.required(30),Math.round(100*1.18**29));
+});
+test('armor is deterministic in both orders, old maximum retained and conventional reload keeps minigun tank',()=>{
+ const a=setup(),b=setup();grant(a,'armor',4);grant(a,'v19-fortress');grant(b,'v19-fortress');grant(b,'armor',4);assert.equal(a.run.stats.maxArmor,225);assert.equal(a.run.stats.maxArmor,b.run.stats.maxArmor);
+ grant(a,'tacticalReload',4);assert(Math.abs(a.run.stats.reloadReduction!-.25)<1e-10);grant(a,'magazine',4);assert.equal(magazineCapacity(7,a.run.stats),1000);assert.equal(magazineCapacity(6,a.run.stats),1);
+});
+test('piercing targets real shield tier only, no proc/secondary duplication',()=>{const v=setup();grant(v,'piercing',3);assert.equal(piercingDamage(v.run,{tier:3,boss:-1},100,true),130);assert.equal(piercingDamage(v.run,{tier:9,boss:-1},100,true),100);assert.equal(piercingDamage(v.run,{tier:3,boss:1},100,true),100);assert.equal(piercingDamage(v.run,{tier:3,boss:-1},100,false),100)});
+test('Cervela combines original and permanent regeneration, bounded duration and active kill buff',()=>{
+ const v=setup();v.run.stats.ultimateHeal=25;grant(v,'regen',4);assert.equal(new Ultimate(()=>v.run.stats,()=>v.run).healRate,30);grant(v,'cervela-duration',3);const u=new Ultimate(()=>v.run.stats,()=>v.run);assert.equal(u.duration,18000);
+});
+test('Tryhard reaches 1000 base HP, preserves fraction, reconciles evolution once and restores normal life',()=>{
+ const v=setup('tryhard');v.run.health=40;grant(v,'nicolas-titan',4);const u=new Tryhard(()=>v.run.stats,()=>v.run);u.charge=40;u.activate(0);assert.equal(maxHealth(v.run),1000);assert.equal(v.run.health,400);u.tick(1000,400);assert.equal(maxHealth(v.run),1000);grant(v,'nicolas-duration',3);u.extend(6000,1000);assert.equal(u.until,14000);for(let i=0;i<50;i++)u.eliminated(2000);assert.equal(u.until,20000);u.tick(20000,v.run.health);assert.equal(maxHealth(v.run),100);assert.equal(v.run.health,100);
+ const legacy=newRun(),old=new Tryhard(()=>legacy.stats,()=>legacy);old.charge=40;old.activate(0);assert.equal(maxHealth(legacy),700);for(let i=0;i<50;i++)old.eliminated(1);assert.equal(old.until,14000);
+});
+test('Jordan uses 20 actual actions, heals only confirmed executions once, and keeps Rush ten-action behavior',()=>{
+ const v=setup('judgment');grant(v,'jordan-actions',4);grant(v,'jordan-breath',2);grant(v,'jordan-borrowed',3);const u=new Judgment(()=>v.run.stats,()=>v.run);u.charge=40;u.activate(0);v.run.health=1;const targets=Array.from({length:20},()=>({hp:1}));for(const [i,e]of targets.entries())assert(u.execute(e,false,10+i));assert.equal(v.run.health,1);assert.equal(u.maxActions,20);assert(!u.execute({},false,100));u.finish(100);for(const e of targets){e.hp=0;u.confirmExecution(e)};assert.equal(v.run.health,100);assert(!u.confirmExecution(targets[0]));const legacy=new Judgment();assert.equal(legacy.maxActions,10);assert.equal(legacy.durationLimit,16000);
+});
+test('passive and dash defenses obey timers, cap healing, do not double count a dead foe',()=>{
+ const v=setup();grant(v,'cellular',4);grant(v,'ghost-step',3);grant(v,'v19-killing-machine',4);const s:any={run:v.run,clock:0,character:{id:'cervela'},ultimate:{active:()=>false},chaos:{isBurning:()=>false},dash:{readyAt:0}};const r=new Rogue19(s);v.run.health=99;r.passive(1000);assert.equal(v.run.health,100);v.run.health=0;r.passive(1000);assert.equal(v.run.health,0);v.run.health=100;r.dashed();assert.equal(r.incoming(),1);s.clock=180;assert.equal(r.incoming(),.8);s.clock=2181;assert.equal(r.incoming(),1);const foe:any={};r.killed(foe);r.killed(foe);assert.equal(r.damage(),1.02);
+});
+test('live preview does not mutate run, selected level exactly matches runtime tables',()=>{const v=setup();const original=JSON.stringify(v.run),u=catalog.find(u=>u.id==='regen')!;const preview=evolutionPreview(u,v.context);assert.equal(JSON.stringify(v.run),original);assert(preview.next.includes('15'));assert.equal(ROGUE_RULES.cellular[4],2);assert(traditionalXP(35)<Math.round(100*1.18**34));assert.equal(traditionalXP(10),Math.round(100*1.18**9))});
+test('expanded selection respects category weights while giving each offered ID one slot',()=>{const v=setup(),counts:Record<string,number>={common:0,uncommon:0,rare:0,epic:0,legendary:0};let seed=309;const rng=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/2**32);for(let i=0;i<20000;i++)counts[v.p.options(v.context,rng)[0].rarity]++;for(const [rarity,weight]of Object.entries({common:60,uncommon:22,rare:13,epic:4.5,legendary:.5}))assert(Math.abs(counts[rarity]/200-weight)<1,rarity)});
+test('fragmentation multiplier remains inside original shared cast budgets; other throwables unchanged',()=>{const normal={},boss={},root=new DamageBudget();assert.equal(root.claim(normal,100*ROGUE_RULES.explosive[3]),120);assert.equal(root.claim(normal,20),0);assert.equal(root.claim(boss,100*ROGUE_RULES.explosive[3]*.65,true),65);assert.equal(root.claim(boss,20,true),0);const noPerk=newRun();assert.equal(passiveRate(noPerk),0);assert.equal(ROGUE_RULES.explosive[0],1)});
+test('twenty-action healing rejects unconfirmed/live targets and canceled time fields',()=>{const v=setup('judgment');grant(v,'jordan-actions',4);const u=new Judgment(()=>v.run.stats,()=>v.run);u.charge=40;u.activate(0);v.run.health=1;const target={hp:20};assert(u.execute(target,false,10));assert(!u.confirmExecution(target));u.stop();target.hp=0;assert(!u.confirmExecution(target));assert.equal(v.run.health,1)});

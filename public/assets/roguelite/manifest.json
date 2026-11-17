@@ -1,0 +1,47 @@
+{
+  "method": "Built-in image_gen alpha sprite-atlas recreation, then deterministic grid slicing. No portraits generated or consumed.",
+  "references": [
+    {
+      "file": "Nuevas perks generales de Curicó.png",
+      "sha256": "71955876b999c3b2767cf1fc667cff093a06e9c5e08df79d31fcd0defaa7ae04"
+    },
+    {
+      "file": "Nuevas perks exclusivas de Hotline Curicó.png",
+      "sha256": "cb5187617cbb37a9e1477b7a6a6b31b6e6be7cb8310556bffa84a508d9b3b59c"
+    },
+    {
+      "file": "Hoja de interfaz roguelite neón retro.png",
+      "sha256": "3c041bb5d352db7c1171f82364819cb22241b6871033c33e0c0c7389329042a5"
+    },
+    {
+      "file": "¡Subida de nivel_ Elige una mejora!.png",
+      "sha256": "3302bc0018d841585f78dbbd3e1b35e1bef17abaf4dc5aa4a39b8ad435336f61"
+    }
+  ],
+  "sprites": [
+    "cellular",
+    "piercing",
+    "fury",
+    "ghost",
+    "reload",
+    "survival",
+    "magnet",
+    "breath",
+    "explosive",
+    "lungs",
+    "smoke",
+    "smoker",
+    "titan",
+    "party",
+    "wall",
+    "sentence",
+    "time",
+    "verdict",
+    "frame-common",
+    "frame-uncommon",
+    "frame-rare",
+    "frame-epic",
+    "frame-legendary",
+    "spark"
+  ]
+}

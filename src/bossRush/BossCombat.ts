@@ -1,3 +1,6 @@
+import {CombatMedic} from './CombatMedic';
+import {chooseRefuge,pathDistance} from './TacticalRules';
+import {PLAYER_SPEED} from '../config/player';
 import {DemolisherGuard} from './DemolisherGuard';
 import Phaser from 'phaser';
 import type {Game,Foe} from '../scenes/Game';
@@ -9,17 +12,17 @@ interface Mind {
   meleeAt:number; meleeUntil:number; meleeTarget?:CombatPoint;
   action?:'radio'|'bombardment'|'slam'|'machete'|'suppression';
   until:number; next:number; specialUsed:boolean; calls:number; radioAt:number;
-  medicUsed:boolean; angle:number; updated:number; slamAt:number; macheteAt:number;
-  wave:number; safe?:CombatPoint; pose?:Phaser.GameObjects.Image; machetes?:number; warning?:number; phase2?:boolean;
+  angle:number; updated:number; slamAt:number; macheteAt:number;
+  wave:number; safe?:CombatPoint;safeRadius?:number;safeHistory?:number[]; pose?:Phaser.GameObjects.Image; machetes?:number; warning?:number; phase2?:boolean;
 }
 interface Impact extends CombatPoint {owner:Foe;at:number;marker:Phaser.GameObjects.Graphics;image:Phaser.GameObjects.Image}
-interface Medic {leader:Foe;until:number;remaining:number}
+
 
 /** Combat additions belong to the current Rush session, never to Wesker or city rounds. */
 export class BossCombat {
   readonly guards:DemolisherGuard;
   private minds=new Map<Foe,Mind>();
-  private medics=new Map<Foe,Medic>();
+  readonly medics:CombatMedic;
   private impacts:Impact[]=[];
   private graphics:Phaser.GameObjects.Graphics;
   private blind:Phaser.GameObjects.Rectangle;
@@ -32,7 +35,7 @@ export class BossCombat {
   private stopped=false;
 
   constructor(private s:Game) {
-    this.guards=new DemolisherGuard(s);
+    this.guards=new DemolisherGuard(s);this.medics=new CombatMedic(s);
     this.graphics=s.add.graphics().setDepth(28);
     this.blind=s.add.rectangle(640,360,1280,720,0xfff4da,0).setScrollFactor(0).setDepth(45);
     s.events.on('postupdate',this.visibility,this);
@@ -46,7 +49,7 @@ export class BossCombat {
     let m=this.minds.get(e);
     if(!m){
       m={meleeAt:0,meleeUntil:0,until:0,next:0,specialUsed:false,calls:0,radioAt:0,
-        medicUsed:false,angle:0,updated:this.s.clock,slamAt:2500,macheteAt:3500,wave:0};
+        angle:0,updated:this.s.clock,slamAt:2500,macheteAt:3500,wave:0};
       this.minds.set(e,m);
     }
     return m;
@@ -73,7 +76,7 @@ export class BossCombat {
 
   freezeEnemy(e:Foe,delta:number) {
     this.guards.freeze(e,delta);
-    const medic=this.medics.get(e);if(medic)medic.until+=delta;
+    this.medics.freeze(e,delta);
     const m=this.minds.get(e);
     if(!m)return;
     for(const key of ['meleeAt','meleeUntil','until','next','radioAt','slamAt','macheteAt'] as const)if(m[key])m[key]+=delta;
@@ -84,10 +87,10 @@ export class BossCombat {
   update() {
     const s=this.s;
     if(this.stopped)return;
-    this.graphics.clear();
+    this.graphics.clear();this.medics.begin();
     this.blind.setFillStyle(0xfff4da,s.clock<this.blindUntil?.85:0);
     if(!s.rush?.combat||this.stopped)return;
-    for(const m of this.minds.values())if(m.action==='bombardment'&&m.safe)this.graphics.lineStyle(1,0x81eee0,.7).strokeCircle(m.safe.x,m.safe.y,C.bombardment.safeRadius);
+    for(const m of this.minds.values())if(m.action==='bombardment'&&m.safe)this.graphics.lineStyle(1,0x81eee0,.7).strokeCircle(m.safe.x,m.safe.y,m.safeRadius??C.bombardment.safeRadius);
     for(const impact of [...this.impacts]){
       if(impact.owner.hp<=0||!impact.owner.sprite.active){this.cancelImpact(impact);continue}
       if(s.temporal.active)continue;
@@ -169,9 +172,9 @@ export class BossCombat {
       return true;
     }
     if(e.boss===1&&e.hp<=e.max*C.radio.threshold&&m.calls<C.radio.calls&&s.clock>=m.radioAt&&
-       s.foes.filter(f=>f.rushSupport===e).length<C.radio.maxAlive&&!this.busy(e)){
+       s.foes.filter(f=>f.rushSupport===e).length===0&&!this.busy(e)){
       m.radioAt=s.clock+6000;
-      this.startCall(e,m,()=>{m.calls++;m.radioAt=s.clock+C.radio.cooldown;this.reinforce(e,m);m.action=undefined;s.newBosses.interrupt(e,s.clock+1200)},C.radio.damageInterrupt);
+      this.startCall(e,m,()=>{if(this.reinforce(e,m))m.calls++;m.radioAt=s.clock+C.radio.cooldown;m.action=undefined;s.newBosses.interrupt(e,s.clock+1200)},C.radio.damageInterrupt);
       return true;
     }
     if(this.close(e))return true;
@@ -200,27 +203,13 @@ export class BossCombat {
   }
 
   private reinforce(e:Foe,m:Mind) {
-    const s=this.s,limit=s.rush!.encounter.length===2?C.radio.doubleCount:C.radio.count;
-    const available=Math.min(limit,C.radio.maxAlive-s.foes.filter(f=>f.rushSupport===e).length);
-    const points=s.radio.reinforcementPoints(available);
-    const medic=!m.medicUsed&&Math.random()<C.radio.medicChance;
-    for(const [i,p] of points.entries()){
-      const f=s.spawn(medic&&i===0?14:i%2?2:1,-1,[p.x,p.y]);
-      f.rushSupport=e;f.awake=true;
-      if(f.tier===14){m.medicUsed=true;this.medics.set(f,{leader:e,until:s.clock+C.medic.duration,remaining:C.medic.budget})}
-    }
+    const s=this.s;if(m.calls>=C.radio.calls||s.foes.some(f=>f.rushSupport===e))return false;
+    const count=Math.min(C.radio.maxAlive,s.rush!.encounter.length===2?C.radio.doubleCount:C.radio.count),points=s.radio.reinforcementPoints(16).filter(p=>s.navigation.canReach(p,e.sprite.body!.center)).slice(0,count);
+    if(points.length<count)return false;
+    for(const [i,p]of points.entries()){const f=s.spawn([1,2,1,14][i],-1,[p.x,p.y]);f.rushSupport=e;f.awake=true;if(f.tier===14)this.medics.add(f,e)}
+    return true;
   }
-
-  medicHealing(e:Foe) {
-    const state=this.medics.get(e);
-    if(!state||this.s.clock>=state.until||state.leader.hp<=0||state.remaining<=0)return;
-    const target=state.leader;
-    const amount=Math.min(15,state.remaining,target.max-target.hp);
-    if(amount<=0||Math.hypot(e.sprite.x-target.sprite.x,e.sprite.y-target.sprite.y)>=350||
-      !this.s.lineClear(e.sprite.x,e.sprite.y,target.sprite.x,target.sprite.y))return;
-    state.remaining-=amount;
-    return {target,amount};
-  }
+  medicHealing(e:Foe){return this.medics.healing(e)}
 
   startSuppression(e:Foe) {
     const s=this.s,m=this.state(e);
@@ -254,24 +243,27 @@ export class BossCombat {
     if(s.clock<m.next)return true;
     if(m.wave>=c.waves){m.action=undefined;s.newBosses.interrupt(e,s.clock+1800);return true}
     const points:CombatPoint[]=[];for(let y=1;y<s.rush!.map.height-1;y++)for(let x=1;x<s.rush!.map.width-1;x++)if(s.walkablePoint(x*48+24,y*48+24))points.push({x:x*48+24,y:y*48+24});
-    const safePoints=points.filter(p=>{
-      if(Math.hypot(p.x-s.player.x,p.y-s.player.y)>100||!s.walkablePoint(p.x,p.y,1)||s.chaos.fires.some(f=>Math.hypot(f.x-p.x,f.y-p.y)<(f.radius??90)+c.safeRadius))return false;
-      const path=s.navigation.routes.route(s.player.body!.center,p);
-      return path.length>0&&(path.length-1)*48<=96;
+    const actors=s.coop?.livingActors()??[s],radius=c.safeRadius+Math.max(0,actors.length-1)*20;
+    const fireFree=(p:CombatPoint)=>!s.chaos.fires.some(f=>Math.hypot(f.x-p.x,f.y-p.y)<(f.radius??90)+radius);
+    const safePoints=points.filter(p=>s.walkablePoint(p.x,p.y,1)&&fireFree(p)&&!s.foes.some(f=>f!==e&&f.boss>=0&&Math.hypot(f.sprite.x-p.x,f.sprite.y-p.y)<165));
+    const chosen=chooseRefuge(safePoints,s.rush!.map.width*48,s.rush!.map.height*48,m.safeHistory??[],p=>{
+      let longest=0;
+      for(const actor of actors){const from=actor.player.body!.center,path=s.navigation.routes.route(from,p);if(!path.length||!path.every(fireFree))return;
+        const speed=PLAYER_SPEED*actor.run.stats.speed*Math.min(1,actor.perks.speed(s.clock)*actor.rogue.movement());longest=Math.max(longest,pathDistance(path,from,p)/Math.max(50,speed)*1000);
+      }return longest;
     });
-    m.safe=safePoints[Math.floor(Math.random()*safePoints.length)];
-    if(!m.safe&&s.walkablePoint(s.player.x,s.player.y)&&!s.chaos.fires.some(f=>Math.hypot(f.x-s.player.x,f.y-s.player.y)<(f.radius??90)+c.safeRadius))m.safe={x:s.player.x,y:s.player.y};
-    if(!m.safe){m.next=s.clock+200;return true}
-    const targets=bombardmentTargets(points,m.safe,m.wave);
+    if(!chosen){m.next=s.clock+200;return true}
+    m.safe=chosen.point;m.safeRadius=radius;m.safeHistory=[...m.safeHistory??[],chosen.region].slice(-2);
+    const targets=bombardmentTargets(points,m.safe,m.wave,Math.random,radius),warning=chosen.warning;
     if(!targets.length){m.next=s.clock+500;return true}
     for(const [i,point] of targets.entries()){
       const marker=s.add.graphics().setDepth(27);
       marker.lineStyle(3,0xffb453,.95).strokeCircle(point.x,point.y,c.radius)
         .lineBetween(point.x-12,point.y,point.x+12,point.y).lineBetween(point.x,point.y-12,point.x,point.y+12);
       const image=s.add.image(point.x,point.y-180,'rush-attack-polish','frag-flight-0').setDisplaySize(24,24).setDepth(29);
-      this.impacts.push({...point,owner:e,at:s.clock+c.warning+i*c.stagger,marker,image});
+      this.impacts.push({...point,owner:e,at:s.clock+warning+i*c.stagger,marker,image});
     }
-    m.wave++;m.next=s.clock+c.warning+(targets.length-1)*c.stagger+c.interval;
+    m.wave++;m.next=s.clock+warning+(targets.length-1)*c.stagger+c.interval;
     e.label.setText('BOMBARDEO · OLEADA '+m.wave+'/'+c.waves);
     return true;
   }
@@ -317,16 +309,16 @@ export class BossCombat {
     const s=this.s;
     if(s.clock<this.blindAt||Math.hypot(s.player.x-x,s.player.y-y)>200||!s.lineClear(x,y,s.player.x,s.player.y))return;
     if(s.dash.active(s.clock))return;
-    this.blindUntil=s.clock+C.sniper.blindMs;this.blindAt=this.blindUntil+C.sniper.blindImmunity;
+    for(const e of s.foes)if(e.boss===3)s.newBosses.tactics.force(e);this.blindUntil=s.clock+C.sniper.blindMs;this.blindAt=this.blindUntil+C.sniper.blindImmunity;
   }
 
   remove(e:Foe) {
     this.guards.remove(e);
-    const m=this.minds.get(e);m?.pose?.destroy();this.s.radio.cancelBossCall(e);this.minds.delete(e);this.medics.delete(e);
+    const m=this.minds.get(e);m?.pose?.destroy();this.s.radio.cancelBossCall(e);this.minds.delete(e);this.medics.remove(e);
     for(const impact of [...this.impacts])if(impact.owner===e)this.cancelImpact(impact);
     for(const support of [...this.s.foes])if(support.rushSupport===e){
       this.s.radio.retire(support);this.s.survival.died(support,false);support.collider?.destroy();
-      support.sprite.destroy();support.label.destroy();this.medics.delete(support);
+      support.sprite.destroy();support.label.destroy();this.medics.remove(support);
       this.s.foes=this.s.foes.filter(f=>f!==support);
     }
     if(e.boss===3)this.s.rush?.power?.update(false);
@@ -340,6 +332,6 @@ export class BossCombat {
     for(const e of [...this.minds.keys()])this.remove(e);
     for(const impact of [...this.impacts])this.cancelImpact(impact);
     this.blindUntil=this.stunUntil=this.knockUntil=0;
-    this.blind.destroy();this.graphics.destroy();
+    this.blind.destroy();this.graphics.destroy();this.medics.stop();
   }
 }
