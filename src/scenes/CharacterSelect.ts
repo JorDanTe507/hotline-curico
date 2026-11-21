@@ -7,8 +7,8 @@ import type {RushStart} from '../bossRush/state';
 type SelectionRush={kind:'campaign'}|{kind:'practice';boss:number;weapon:number};
 interface Slot {panel:Phaser.GameObjects.Rectangle;label:Phaser.GameObjects.Text;thumb?:Phaser.GameObjects.Image;lock?:Phaser.GameObjects.Graphics}
 export class CharacterSelect extends Phaser.Scene {
- coop=false;private fromModes=false;private fromTraditional=false;private rush?:SelectionRush;
- init(data:{coop?:boolean;rush?:SelectionRush;fromModes?:boolean;fromTraditional?:boolean}={}){this.fromTraditional=data.fromTraditional===true;this.fromModes=data.fromModes===true;this.rush=data.rush;this.coop=!this.rush&&data.coop===true&&!this.registry.get('mobileUI')}
+ continuous=false;coop=false;private fromModes=false;private fromTraditional=false;private rush?:SelectionRush;
+ init(data:{continuous?:boolean;coop?:boolean;rush?:SelectionRush;fromModes?:boolean;fromTraditional?:boolean}={}){this.continuous=data.continuous===true;this.fromTraditional=data.fromTraditional===true;this.fromModes=data.fromModes===true;this.rush=data.rush;this.coop=!this.rush&&data.coop===true&&!this.registry.get('mobileUI')}
  cards:Slot[]=[];focused:number|undefined;confirming=false;visit=new SelectionVisit();
  private hero!:Phaser.GameObjects.Image;private badge!:Phaser.GameObjects.Text;private silhouette!:Phaser.GameObjects.Graphics;
  private nameLabel!:Phaser.GameObjects.Text;private description!:Phaser.GameObjects.Text;private abilityLabel!:Phaser.GameObjects.Text;
@@ -88,7 +88,7 @@ export class CharacterSelect extends Phaser.Scene {
   if(this.confirming||index<0||index>=SELECTION_SLOTS)return;
   if(!CHARACTERS[index]){this.focus(index);this.warning.setText('EXPEDIENTE CLASIFICADO · NO DISPONIBLE');this.cameras.main.shake(90,.002);return}
   this.focus(index);this.confirming=true;const c=CHARACTERS[index];AudioSystem.play(this,'reward',.5);this.cameras.main.flash(100,255,48,142,false);this.confirm.setText('CONFIRMADO');
-  this.time.delayedCall(380,()=>{if(this.rush){const rush:RushStart={...this.rush,character:c.id};this.scene.start('Game',{characterId:c.id,coop:false,rush});return}MusicManager.get(this.game).newSession();this.scene.start(this.coop?'CoopLobby':'Intro',{characterId:c.id,fromTraditional:this.fromTraditional})});
+  this.time.delayedCall(380,()=>{if(this.rush){const rush:RushStart={...this.rush,character:c.id};this.scene.start('Game',{characterId:c.id,coop:false,rush});return}MusicManager.get(this.game).newSession();if(this.continuous){this.scene.start('Game',{continuous:true,characterId:c.id});return}this.scene.start(this.coop?'CoopLobby':'Intro',{characterId:c.id,fromTraditional:this.fromTraditional})});
  }
  back(){if(!this.confirming)this.scene.start(this.rush?'BossRush':this.fromTraditional?'TraditionalModes':this.fromModes?'GameModes':'Menu',this.rush?.kind==='practice'?{practice:true,focusBoss:this.rush.boss,terminalReady:true}:{})}
 }

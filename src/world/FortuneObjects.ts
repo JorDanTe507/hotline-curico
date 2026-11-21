@@ -1,3 +1,4 @@
+import {MAGNET} from '../economy/CoinLedger';
 import {CHAOS} from '../chaos/config';
 import Phaser from 'phaser';
 import type {Game} from '../scenes/Game';
@@ -33,10 +34,10 @@ export class FortuneObjects {
  }
  private hide(id:string){const view=this.views.get(id);if(!view)return;const {item,image}=view;if(item.kind==='safe'&&!item.opened)item.progress=0;view.price?.destroy();if(this.pending?.id===id)this.cancelConfirmation();if(item.kind==='crate'){this.s.worldModel.setDynamicSolid(Math.floor(item.x/48),Math.floor(item.y/48),false);if(image.body)this.s.physics.world.remove(image.body);if(this.s.walls.children)this.s.walls.remove(image,true,true);else image.destroy()}else image.destroy();this.views.delete(id)}
  occupied(x:number,y:number,radius=70){return [...this.views.values()].some(v=>Math.hypot(v.item.x-x,v.item.y-y)<radius)}
- unload(chunk:string){for(const [id,v] of this.views)if(v.item.chunk===chunk)this.hide(id)}
+ unload(chunk:string){for(const [id,v] of this.views)if(v.item.chunk===chunk)this.hide(id);if(this.s.continuous)this.ledger.unloadGenerated(chunk)}
  atObstacle(object:unknown){const id=(object as Phaser.GameObjects.GameObject)?.getData?.('fortune') as string|undefined;return id?this.views.get(id)?.item:undefined}
  atPoint(x:number,y:number){return [...this.views.values()].find(v=>v.item.kind==='crate'&&!v.item.opened&&Math.floor(v.item.x/48)===Math.floor(x/48)&&Math.floor(v.item.y/48)===Math.floor(y/48))?.item}
- damage(item:FortuneObject,amount:number,_credit?:ShotCredit){if(!this.ledger.damage(item,amount)){const view=this.views.get(item.id);if(view&&!item.uroboros&&item.hp<FORTUNE.crateHP)view.image.setTexture('fortune-crate-hurt');return false}
+ damage(item:FortuneObject,amount:number,_credit?:ShotCredit,random=Math.random){if(!this.ledger.damage(item,amount)){const view=this.views.get(item.id);if(view&&!item.uroboros&&item.hp<FORTUNE.crateHP)view.image.setTexture('fortune-crate-hurt');return false}
   const s=this.s;this.hide(item.id);
   if(item.uroboros){
    s.add.image(item.x,item.y,'uroboros','crate-open').setDisplaySize(46,44).setDepth(2);
@@ -44,7 +45,7 @@ export class FortuneObjects {
    return true;
   }
   const debris=s.add.image(item.x,item.y,'fortune-crate-dead').setDepth(2);s.tweens.add({targets:debris,alpha:0,duration:550,onComplete:()=>debris.destroy()});
-  if(this.ledger.claim(item)){const owner=s.coop?.actor(_credit?.playerId??1)??s,kind=crateReward(Math.random,owner.rogue?.has('scrapper'));if(kind==='hc')s.economy.supply(FORTUNE.crateHC);else if(kind!=='none')s.addDrop(item.x,item.y,kind,0);if(Math.random()<CHAOS.crateChance)s.addDrop(item.x+25,item.y,'throwable',Math.floor(Math.random()*5))}return true;
+  if(this.ledger.claim(item)){const owner=s.coop?.actor(_credit?.playerId??1)??s,kind=crateReward(random,owner.rogue?.has('scrapper'));if(kind==='hc'){if(s.coins)s.coins.deposit(FORTUNE.crateHC,item.x,item.y);else s.economy.supply(FORTUNE.crateHC);}else if(kind!=='none')s.addDrop(item.x,item.y,kind,0);if(s.coins&&random()<MAGNET.pocketChance)s.coins.pocket(item.x+20,item.y);if(random()<CHAOS.crateChance)s.addDrop(item.x+25,item.y,'throwable',Math.floor(random()*5))}return true;
  }
  melee(x:number,y:number,angle:number,range:number,damage:number){const view=[...this.views.values()].filter(v=>v.item.kind==='crate'&&!v.item.opened&&Math.hypot(v.item.x-x,v.item.y-y)<=range&&Math.cos(Math.atan2(v.item.y-y,v.item.x-x)-angle)>.35&&this.s.lineClear(x,y,v.item.x+(x-v.item.x)*.6,v.item.y+(y-v.item.y)*.6)).sort((a,b)=>Math.hypot(a.item.x-x,a.item.y-y)-Math.hypot(b.item.x-x,b.item.y-y))[0];if(!view)return false;this.s.mapVisuals.impactAt(view.item.x,view.item.y);return this.damage(view.item,damage*CRATE_MELEE_DAMAGE_MULTIPLIER)}
  blast(x:number,y:number,radius:number,damage:number,credit?:ShotCredit){for(const {item} of [...this.views.values()])if(item.kind==='crate'&&!item.opened&&Math.hypot(item.x-x,item.y-y)<radius)this.damage(item,damage,credit)}
@@ -58,15 +59,15 @@ export class FortuneObjects {
   if(this.pending.actor.playerId!==owner.playerId)return true;
   if(s.clock>this.pending.until||!this.near(item,owner)){this.cancelConfirmation();return true}
   this.cancelConfirmation();
-  const wallet=permanentProgress();if(!wallet.spend(FORTUNE.mysteryCost,owner.character.id)){this.message=`CAJA MISTERIOSA · NECESITAS ${FORTUNE.mysteryCost} HC`;this.until=s.clock+1800;return true}
+  const wallet=s.economy;if(!wallet.spend(FORTUNE.mysteryCost)){this.message=`CAJA MISTERIOSA · NECESITAS ${FORTUNE.mysteryCost} HC`;this.until=s.clock+1800;return true}
   this.busy=true;item.opened=true;view.image.setTexture('fortune-mystery-open');
-  if(!s.roulette.start(()=>{this.busy=false;if(this.ledger.claim(item))owner.awardWeapon(s.roulette.winner);s.rounds.state.restUntil=Math.max(s.rounds.state.restUntil,s.clock+5000)},mysteryWeights())){wallet.award(FORTUNE.mysteryCost,owner.character.id);this.busy=false;item.opened=false;view.image.setTexture('fortune-mystery')}
+  if(!s.roulette.start(()=>{this.busy=false;if(this.ledger.claim(item))owner.awardWeapon(s.roulette.winner);s.rounds.state.restUntil=Math.max(s.rounds.state.restUntil,s.clock+5000)},mysteryWeights())){wallet.refund(FORTUNE.mysteryCost);this.busy=false;item.opened=false;view.image.setTexture('fortune-mystery')}
   return true;
  }
  update(delta:number){const s=this.s;if(this.stopped||s.paused||s.ended||s.roulette.active||s.levelUp.active||s.coop?.actor(2).levelUp.active||s.presentation.active||s.bossDialogue.active)return;this.graphics.clear();const view=this.nearest();
   const actors=s.coop?.livingActors()??[s];if(this.pending){const pending=this.views.get(this.pending.id);if(!pending||pending.item.opened||!this.near(pending.item,this.pending.actor)||s.clock>this.pending.until||s.rounds.state.phase!=='rest')this.cancelConfirmation()}
   for(const row of this.views.values()){
-   const eligible=actors.filter(a=>this.near(row.item,a)).sort((a,b)=>Math.hypot(row.item.x-a.player.x,row.item.y-a.player.y)-Math.hypot(row.item.x-b.player.x,row.item.y-b.player.y));
+   const eligible=actors.filter(a=>!s.coop?.controlBlocked(a.playerId)&&this.near(row.item,a)).sort((a,b)=>Math.hypot(row.item.x-a.player.x,row.item.y-a.player.y)-Math.hypot(row.item.x-b.player.x,row.item.y-b.player.y));
    row.price?.setVisible(!row.item.opened&&eligible.length>0).setText(this.pending?.id===row.item.id?`CONFIRMAR ${FORTUNE.mysteryCost} HC\n[E / ×] · ALEJARSE CANCELA`:`${FORTUNE.mysteryCost} HC${hudPreferences.helpers?' · [E / ×] COMPRAR':''}`);
    if(row.item.kind!=='safe'||row.item.opened)continue;
    if(this.ledger.advance(row.item,delta,eligible.length>0)&&this.ledger.claim(row.item)){row.image.setTexture('fortune-safe-open');eligible[0].awardWeapon(safeWeapon());if(Math.random()<CHAOS.safeChance)s.addDrop(row.item.x+40,row.item.y,'throwable',Math.floor(Math.random()*5))}

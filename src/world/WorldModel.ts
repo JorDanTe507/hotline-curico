@@ -1,3 +1,4 @@
+import {preservesLocalPassage} from './PropPlacement';
 import {zoneChoice,type UrbanZone} from './UrbanZones';
 import {templateFor,type BuildingType} from './BuildingTemplates';
 import {createMap,COLS,ROWS} from '../maps/apartments';
@@ -11,14 +12,16 @@ export class WorldModel {
  readonly dynamicSolids=new Set<string>();collisionRevision=0;
  setDynamicSolid(x:number,y:number,solid:boolean){const key=`${x},${y}`,before=this.dynamicSolids.has(key);if(solid)this.dynamicSolids.add(key);else this.dynamicSolids.delete(key);if(before!==solid)this.collisionRevision++}
  readonly grid:number[][];readonly apartment=createMap();readonly cache=new Map<string,Chunk>();generated=0;
- constructor(readonly seed:number, readonly fixedGrid?:number[][], readonly legacyApartment=false){
+ constructor(readonly seed:number, readonly fixedGrid?:number[][], readonly legacyApartment=false,readonly continuous=false){
   for(const x of [14,15,16,17]){this.apartment[0][x]=0;this.apartment[27][x]=0}for(const y of [13,14,15,16,17]){this.apartment[y][0]=0;this.apartment[y][39]=0}
   const rows=new Map<number,number[]>();const row=(y:number)=>{let r=rows.get(y);if(!r){r=new Proxy(Array(COLS).fill(0),{get:(a,k)=>typeof k==='string'&&/^-?\d+$/.test(k)?this.cell(Number(k),y):Reflect.get(a,k)});if(rows.size>128)rows.delete(rows.keys().next().value!);rows.set(y,r)}return r};
   this.grid=new Proxy(Array.from({length:ROWS},(_,y)=>row(y)),{get:(a,k)=>typeof k==='string'&&/^-?\d+$/.test(k)?row(Number(k)):Reflect.get(a,k)});
  }
  inApartment(x:number,y:number){return this.legacyApartment&&!this.fixedGrid&&x>=0&&y>=0&&x<COLS&&y<ROWS}
  startPoint(){return {x:16*WORLD_TILE+24,y:16*WORLD_TILE+24}}
- biome(cx:number,cy:number):Biome{const distance=Math.max(Math.abs(cx),Math.abs(cy));if(distance<=1)return 'residential';if(cx>=4&&Math.abs(cy)<=2)return 'industrial';if(distance>=4&&hash(this.seed,Math.floor(cx/3),Math.floor(cy/3))%3!==0)return 'industrial';return (['commercial','plaza','residential'] as Biome[])[hash(this.seed,Math.floor(cx/3),Math.floor(cy/3))%3]}
+ biome(cx:number,cy:number):Biome{
+  if(this.continuous)return (['residential','commercial','industrial'] as const)[hash(this.seed+3100,Math.floor(cx/3),Math.floor(cy/3))%3];
+  const distance=Math.max(Math.abs(cx),Math.abs(cy));if(distance<=1)return 'residential';if(cx>=4&&Math.abs(cy)<=2)return 'industrial';if(distance>=4&&hash(this.seed,Math.floor(cx/3),Math.floor(cy/3))%3!==0)return 'industrial';return (['commercial','plaza','residential'] as Biome[])[hash(this.seed,Math.floor(cx/3),Math.floor(cy/3))%3]}
  cell(x:number,y:number){if(this.dynamicSolids.has(`${x},${y}`))return 1;if(this.fixedGrid)return this.fixedGrid[y]?.[x]??1;if(this.inApartment(x,y))return this.apartment[y][x];const cx=Math.floor(x/32),cy=Math.floor(y/32);return this.chunk(cx,cy).cells[y-cy*32][x-cx*32]}
  chunk(cx:number,cy:number){const key=`${cx},${cy}`,cached=this.cache.get(key);if(cached){this.cache.delete(key);this.cache.set(key,cached);return cached}const chunk=this.generate(cx,cy);this.generated++;if(this.cache.size>=64)this.cache.delete(this.cache.keys().next().value!);this.cache.set(key,chunk);return chunk}
  private generate(cx:number,cy:number):Chunk{
@@ -26,9 +29,29 @@ export class WorldModel {
   const touchesApartment=(x:number,y:number,w:number,h:number)=>this.legacyApartment&&baseX+x<COLS+1&&baseX+x+w>-1&&baseY+y<ROWS+1&&baseY+y+h>-1;
   const reserved:{x:number;y:number;w:number;h:number}[]=[];
   const overlap=(a:{x:number;y:number;w:number;h:number},b:{x:number;y:number;w:number;h:number})=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
-  const connected=()=>{const seen=new Set<number>(),queue=[0];seen.add(0);for(let k=0;k<queue.length;k++){const n=queue[k],x=n%32,y=Math.floor(n/32);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,key=ny*32+nx;if(nx>=0&&ny>=0&&nx<32&&ny<32&&!cells[ny][nx]&&!seen.has(key)){seen.add(key);queue.push(key)}}}return seen.size===cells.flat().filter(c=>c===0).length};
+  // Reuse the flood-fill workspace across all candidate obstacles in this sector.
+  const queue=new Uint16Array(1024),seen=new Uint16Array(1024);
+  let visit=0,tail=0;
+  const enqueue=(index:number)=>{
+   if(seen[index]===visit||cells[index>>>5][index&31]!==0)return;
+   seen[index]=visit;
+   queue[tail++]=index;
+  };
+  const connected=()=>{
+   visit++;tail=0;enqueue(0);
+   for(let head=0;head<tail;head++){
+    const index=queue[head],x=index&31;
+    if(x>0)enqueue(index-1);
+    if(x<31)enqueue(index+1);
+    if(index>=32)enqueue(index-32);
+    if(index<992)enqueue(index+32);
+   }
+   let open=0;
+   for(const row of cells)for(const value of row)if(value===0)open++;
+   return tail===open;
+  };
   const free=(r:{x:number;y:number;w:number;h:number})=>r.x>=1&&r.y>=1&&r.x+r.w<=31&&r.y+r.h<=31&&!touchesApartment(r.x,r.y,r.w,r.h)&&!props.some(p=>(p.solid!==false||p.atlas!=='urban17')&&overlap(p,r))&&!reserved.some(p=>overlap(p,r))&&Array.from({length:r.h},(_,j)=>Array.from({length:r.w},(_,i)=>cells[r.y+j][r.x+i]===0)).flat().every(Boolean);
-  const prop=(frame:string,x:number,y:number,w=1,h=1,atlas:WorldProp['atlas']='environment',solid=true)=>{const r={x,y,w,h};if(!free(r))return false;if(solid){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)cells[j][i]=2;if(!connected()){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)cells[j][i]=0;return false}}if(frame==='car'){frame='car-'+['aveo','spark','lanos'][hash(this.seed,baseX+x,baseY+y)%3];atlas='expansion'}props.push({...r,frame,atlas,solid});return true};
+  const prop=(frame:string,x:number,y:number,w=1,h=1,atlas:WorldProp['atlas']='environment',solid=true)=>{const r={x,y,w,h};if(!free(r))return false;if(solid){if(!preservesLocalPassage(cells,r))return false;for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)cells[j][i]=2;if(!connected()){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)cells[j][i]=0;return false}}if(frame==='car'){frame='car-'+['aveo','spark','lanos'][hash(this.seed,baseX+x,baseY+y)%3];atlas='expansion'}props.push({...r,frame,atlas,solid});return true};
   for(const [q,[x,y]] of [[3,3],[20,3],[3,20],[20,20]].entries()){
    const n=hash(this.seed+q,cx,cy),t=templateFor(this.seed,cx,cy,q,biome);
    const zone=zoneChoice(hash(this.seed+1707+q,cx,cy));
@@ -39,7 +62,7 @@ export class WorldModel {
      for(const [i,car] of ['spark','lanos','aveo','cerato'].entries()){item('parking-mark',1+i*2,2,2,3,false);item('parking-'+car,1+i*2,2,1,2);item('parking-stop',1+i*2,1,1,1)}item('parking-sign',0,7,1,2);item('parking-booth',7,8,3,2);
     }else if(zone==='alley'){
      for(const dx of [0,3,7,10])for(let dy=0;dy<10;dy++)cells[y+dy][x+dx]=1;
-     item('alley-bin',4,2,1,2);item('alley-bags',6,6);item('alley-trash',1,4);item('alley-pallet',8,7,2,1);item('alley-drain',5,4,1,1,false);item('alley-lamp',3,3,1,2,false);item('alley-lamp',7,7,1,2,false);item('alley-door',3,6,1,2,false);
+     item('alley-bin',4,2,1,2);item('alley-bags',6,6);item('alley-trash',1,4);item('alley-pallet',4,4,2,1);item('alley-drain',5,4,1,1,false);item('alley-lamp',3,3,1,2,false);item('alley-lamp',7,7,1,2,false);item('alley-door',3,6,1,2,false);
     }else{
      const bw=zone==='copec'?9:11,bh=zone==='copec'?5:10,bx=x,by=y;
      const doors=[{x:bx+4,y:by},{x:bx+4,y:by+bh-1}];
@@ -59,15 +82,16 @@ export class WorldModel {
     if(n%2){prop('car',x+1,y+1,1,2);prop('car',x+5,y+1,1,2);prop('bin-yellow',x+7,y+6,1,1,'urban')}else{prop('tree',x,y,2,2,'city');prop('tree',x+6,y+6,2,2,'city');prop('bench-urban',x+4,y,2,1,'urban');prop('fountain',x+2,y+3,2,2,'city')}continue;
    }
    const w=t.id==='convenience'?7:9+n%2,h=9+Math.floor(n/2)%2;if(touchesApartment(x,y,w,h))continue;
-   const doors=[{x:x+Math.floor(w/2),y:y+h-1},{x:x+Math.floor(w/2),y}],b:Building={x,y,w,h,type:t.id,name:t.name,facade:t.facade,variant:n%4,material:t.material,wall:t.wall,doors,rooms:[]};buildings.push(b);
+   const residence=this.continuous&&biome==='residential'&&q%2===0;
+   const doors=[{x:x+Math.floor(w/2),y:y+h-1},{x:x+Math.floor(w/2),y}],b:Building={x,y,w,h,type:residence?undefined:t.id,name:residence?(n%2?'DEPARTAMENTOS':'CASA'):t.name,facade:residence?0:t.facade,variant:n%4,material:residence?'wood':t.material,wall:t.wall,doors,rooms:[]};buildings.push(b);
    for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)if(i===x||j===y||i===x+w-1||j===y+h-1)cells[j][i]=1;
    for(const d of doors){cells[d.y][d.x]=0;cells[d.y][d.x-1]=0;reserved.push({x:d.x-1,y:d.y===y?y-1:d.y,w:2,h:2})}
    const mid=x+Math.floor(w/2),cuts=[y+3,y+6],bands=[{y:y+1,h:2},{y:y+4,h:2},{y:y+7,h:h-8}];
    for(const [row,split] of cuts.entries()){const gap=mid+(n%3-1)*(row?-1:1);for(let i=x+1;i<x+w-1;i++)if(i<gap-1||i>gap)cells[split][i]=1}
    const modules=bands.flatMap(band=>[{x:x+1,y:band.y,w:mid-x-2,h:band.h},{x:mid+1,y:band.y,w:x+w-mid-2,h:band.h}]);
    const hotelRooms=['Recepción','Individual','Doble','Baño','Estar',['Servicio','Deteriorada','Cerrada'][n%3]];
-   const roomOrder=t.id==='hotel'?hotelRooms.map((_,i)=>i<4?hotelRooms[(i+n%4)%4]:hotelRooms[n%2?(i===4?5:4):i]):t.rooms.map((_,i)=>t.rooms[(i+n%6)%6]);
-   const furniture:Record<string,string>={'Recepción':'desk','Vestíbulo':'desk','Cajas':'counter','Oficinas':'desk','Espera':'sofa','Bóveda':'vault-urban','Ventas':'shelves','Mostrador':'counter','Medicamentos':'shelves','Bodega':'crate','Consultorio':'bed','Baño':'washer','Interrogatorio':'table','Celdas':'fence-urban','Productos':'shelves','Cámara fría':'machine','Oficina':'desk','Reparación':'car','Herramientas':'shelves','Elevadores':'machine','Almacén':'crate','Salón':'table','Mesas':'table','Cocina':'machine','Caja':'counter','Refrigeradores':'machine','Individual':'bed','Doble':'bed-blue','Estar':'sofa','Servicio':'washer','Deteriorada':'bed-blue'};
+   const roomOrder=residence?['Estar','Dormitorio','Cocina','Baño','Comedor','Dormitorio']:t.id==='hotel'?hotelRooms.map((_,i)=>i<4?hotelRooms[(i+n%4)%4]:hotelRooms[n%2?(i===4?5:4):i]):t.rooms.map((_,i)=>t.rooms[(i+n%6)%6]);
+   const furniture:Record<string,string>={'Dormitorio':'bed','Comedor':'table','Recepción':'desk','Vestíbulo':'desk','Cajas':'counter','Oficinas':'desk','Espera':'sofa','Bóveda':'vault-urban','Ventas':'shelves','Mostrador':'counter','Medicamentos':'shelves','Bodega':'crate','Consultorio':'bed','Baño':'washer','Interrogatorio':'table','Celdas':'fence-urban','Productos':'shelves','Cámara fría':'machine','Oficina':'desk','Reparación':'car','Herramientas':'shelves','Elevadores':'machine','Almacén':'crate','Salón':'table','Mesas':'table','Cocina':'machine','Caja':'counter','Refrigeradores':'machine','Individual':'bed','Doble':'bed-blue','Estar':'sofa','Servicio':'washer','Deteriorada':'bed-blue'};
    modules.forEach((r,i)=>{const roomName=roomOrder[i],frame=furniture[roomName]??'nightstand';b.rooms!.push({...r,name:roomName});if(roomName==='Cerrada'){for(let j=r.y;j<r.y+r.h;j++)for(let k=r.x;k<r.x+r.w;k++)cells[j][k]=1;return}const px=n%2&&r.w>1?r.x+r.w-1:r.x,hp=roomName!=='Doble'&&(frame==='bed'||frame==='bed-blue'||frame==='car')&&r.h>1?2:1;prop(frame,px,r.y,1,hp,['fence-urban','vault-urban'].includes(frame)?'urban':'environment');if(roomName==='Doble'&&r.w>1)prop('bed',r.x===px?r.x+r.w-1:r.x,r.y,1,hp);if((roomName==='Mesas'||roomName==='Salón')&&r.w>1)prop('chair-urban',r.x===px?r.x+r.w-1:r.x,r.y,1,1,'urban')});
    b.rooms!.push({x:mid-1,y:y+1,w:2,h:h-2,name:'Pasillo'});
    if(t.id==='supermarket'){if(n%2)for(let j=y+2;j<y+h-2;j+=2)prop('shelves',x+w-2,j);else for(let i=x+1;i<x+w-1;i+=2)prop('shelves',i,y+h-2)}
@@ -80,4 +104,3 @@ export class WorldModel {
  }
 }
 export function collisionRects(cells:number[][]){const result:{x:number;y:number;w:number;h:number}[]=[];let previous=new Map<string,number>();for(let y=0;y<cells.length;y++){const next=new Map<string,number>();for(let x=0;x<cells[y].length;){if(!cells[y][x]){x++;continue}const start=x;while(x<cells[y].length&&cells[y][x])x++;const w=x-start,k=`${start}:${w}`,index=previous.get(k);if(index!==undefined){result[index].h++;next.set(k,index)}else{next.set(k,result.length);result.push({x:start,y,w,h:1})}}previous=next}return result}
-

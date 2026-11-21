@@ -1,3 +1,4 @@
+import {SessionWallet} from '../economy/SessionWallet';
 import {achievements} from './Achievements';
 import {developerSession} from './DeveloperSession';
 import {ECONOMY,PERMANENT,upgradeCost,type PermanentCharacter} from '../config/permanent';
@@ -24,7 +25,8 @@ export class PermanentProgress {
  purchase(id:PermanentCharacter,key:string){const definition=PERMANENT[id].find(d=>d[0]===key);if(!definition)return false;const level=this.level(id,key),cost=upgradeCost(level);if(level>=definition[3]||this.balance(id)<cost)return false;this.data.balances![id]-=cost;this.data.characters[id][key]=level+1;this.save();if(!this.testing)achievements().event({type:'purchase',character:id,maxed:PERMANENT[id].every(d=>this.level(id,d[0])>=d[3])});return true}
  spend(amount:number,id:PermanentCharacter=this.data.activeCharacter??'cervela'){if(!Number.isSafeInteger(amount)||amount<=0||this.balance(id)<amount)return false;this.data.balances![id]-=amount;this.save();return true}
  award(amount:number,id:PermanentCharacter=this.data.activeCharacter??'cervela'){const valid=integer(amount,Number.MAX_SAFE_INTEGER-this.balance(id));this.data.balances![id]+=valid;this.save();return valid}
- apply(id:PermanentCharacter,stats:PlayerStats){const l=this.data.characters[id];stats.rerolls=1+(l.rerolls??0);stats.permanentHealth=10*l.vitality;stats.maxHealth+=stats.permanentHealth;stats.permanentFireDamage=(id==='nicolas'?.04:.03)*l.damage;stats.permanentDash=.03*l.dash;stats.dashReduction+=stats.permanentDash;
+ transact(entries:{id:PermanentCharacter;amount:number}[]){const deltas=new Map<PermanentCharacter,number>();for(const e of entries){if(!(e.id in this.data.characters)||!Number.isSafeInteger(e.amount))return false;deltas.set(e.id,(deltas.get(e.id)??0)+e.amount)}for(const [id,n] of deltas){const next=this.balance(id)+n;if(!Number.isSafeInteger(next)||next<0)return false}for(const [id,n] of deltas)this.data.balances![id]+=n;this.save();return true}
+ apply(id:PermanentCharacter,stats:PlayerStats){const l=this.data.characters[id];stats.magnetLevel=l.magnet??0;stats.rerolls=1+(l.rerolls??0);stats.permanentHealth=10*l.vitality;stats.maxHealth+=stats.permanentHealth;stats.permanentFireDamage=(id==='nicolas'?.04:.03)*l.damage;stats.permanentDash=.03*l.dash;stats.dashReduction+=stats.permanentDash;
  if(id==='cervela'){stats.ultimateHeal+=l.regeneration;stats.ultimateDuration+=500*l.ultimateDuration;stats.caladaReduction=.4+.02*l.damageReduction}
  else if(id==='jordan'){stats.judgmentHeal=.005*l.executionHeal;stats.judgmentChain=100*l.chainTime;stats.judgmentDuration=500*l.ultimateDuration}
  else{stats.tryhardMultiplier=5+.25*l.overload;stats.tryhardSpeed=1.25+.03*l.adrenaline;stats.tryhardDuration=8000+500*l.ultimateDuration}
@@ -34,11 +36,16 @@ let shared:PermanentProgress|undefined,trial:PermanentProgress|undefined;
 export function permanentProgress(){if(!shared){let storage:StorageLike|undefined;try{storage=globalThis.localStorage}catch{}shared=new PermanentProgress(storage,false,!developerSession.active)}if(developerSession.active){if(!trial){trial=new PermanentProgress(undefined,true);trial.data=migratePermanent(shared.data);trial.data.balances={cervela:1_000_000,nicolas:1_000_000,jordan:1_000_000}}return trial}return shared}
 export class RunEconomy {
  earned=0;completedRounds=0;private enemies=new WeakSet<object>();private completed=new Set<number>();private milestones=new Set<number>();
- constructor(private progress:PermanentProgress,private character:PermanentCharacter='cervela'){}
- private grant(amount:number){this.earned+=this.progress.award(amount,this.character)}
- defeated(enemy:{hp:number;boss:number}){if(enemy.hp>0||this.enemies.has(enemy))return false;this.enemies.add(enemy);this.grant(enemy.boss>=0?ECONOMY.bossKill:ECONOMY.normalKill);return true}
+ wallet:SessionWallet;defer?:(amount:number,x:number,y:number)=>void;
+ constructor(private progress:PermanentProgress,private character:PermanentCharacter='cervela'){this.wallet=new SessionWallet(progress,[character])}
+ get balance(){return this.wallet.balance}
+ spend(amount:number){return this.wallet.spend(amount)}
+ refund(amount:number){return this.wallet.refund(amount)}
+ collect(amount:number){return this.grant(amount)}
+ private grant(amount:number){const n=this.wallet.credit(amount);this.earned+=n;return n}
+ defeated(enemy:{hp:number;boss:number},x=0,y=0){if(enemy.hp>0||this.enemies.has(enemy))return false;this.enemies.add(enemy);const amount=enemy.boss>=0?ECONOMY.bossKill:ECONOMY.normalKill;if(this.defer)this.defer(amount,x,y);else this.grant(amount);return true}
  supply(amount:number){this.grant(amount)}
- special(){this.grant(50)}
+ special(x=0,y=0){if(this.defer)this.defer(50,x,y);else this.grant(50)}
  reached(round:number){if(round>0&&round%5===0&&!this.milestones.has(round)){this.milestones.add(round);this.grant(ECONOMY.milestone)}}
  complete(round:number,type:string){if(this.completed.has(round))return false;this.completed.add(round);this.completedRounds++;this.grant(type==='EXTERMINIO'?ECONOMY.extermination:type==='SUPERVIVENCIA'?ECONOMY.survival:0);return true}
 }

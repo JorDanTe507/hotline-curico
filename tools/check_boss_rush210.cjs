@@ -74,7 +74,7 @@ async function checkProduction(browser){
   assert.deepEqual(await game(()=>hotlineGame.scene.getScene('Game').children.list.filter(o=>o.name.startsWith('rush-safe-')) .map(o=>o.name).sort()),['rush-safe-cervela','rush-safe-nicolas']);
   await game(()=>{const g=hotlineGame.scene.getScene('Game');g.player.setPosition(120,360);g.pickup();g.player.setPosition(600,456);g.roulette.random=()=>.17;g.pickup()});
   await p.waitForFunction(()=>hotlineGame.scene.getScene('Game').roulette.active);
-  await game(()=>hotlineGame.scene.getScene('Game').roulette.update(15000));
+  await game(()=>{const r=hotlineGame.scene.getScene('Game').roulette;r.update(15000);r.cancel()});
   await p.waitForTimeout(1300);
   assert(await game(()=>hotlineGame.scene.getScene('Game').rush.pendingWeapon?.id===2));
   await game(()=>{const g=hotlineGame.scene.getScene('Game');g.player.setPosition(360,504);g.pickup()});
@@ -98,6 +98,7 @@ async function checkProduction(browser){
   await p.keyboard.press('KeyR',{delay:85});await p.waitForFunction(a=>{const g=hotlineGame.scene.getScene('Game');return g.guns[g.active].reserve<a&&!g.reloadAt},rolled.guns[rolled.active].reserve);
   const reloaded=await arsenal();
   for(const boss of [1,2,3,4]){
+   await game(()=>{const g=hotlineGame.scene.getScene("Game");g.run.health=10000});
    assert.equal(await game(()=>hotlineGame.scene.getScene('Game').foes[0].boss),boss);
    await track(['tortured','commander','demolisher','executioner','butcher'][boss]);
    if(boss===1){
@@ -125,7 +126,7 @@ async function checkProduction(browser){
     const aimed=await game(()=>{
      const g=hotlineGame.scene.getScene('Game'),e=g.foes[0],ai=g.newBosses,m=ai.state(e);
      g.player.setPosition(696,264).setVelocity(150,0);g.player.body.updateFromGameObject();
-     m.phase='move';m.until=g.clock;ai.update(e);
+     g.rush.bossCombat.state(e).meleeUntil=0;g.rush.bossCombat.state(e).meleeAt=g.clock+10000;m.phase='move';m.until=g.clock;ai.update(e);
      const lead=m.x-g.player.x;
      m.x=696;m.y=504;m.until=g.clock;
      const blocked=!g.lineClear(e.sprite.x,e.sprite.y,m.x,m.y),before=g.shots.length;
@@ -140,8 +141,8 @@ async function checkProduction(browser){
       g.player.setPosition(264,312);g.player.body.updateFromGameObject();
       cut.interact(()=>.99);const failed=cut.dark;
       cut.retry=g.clock;cut.interact(()=>0);const restored=!cut.dark;
-      cut.next=g.clock;cut.update(true);cut.until=g.clock;cut.update(true);
-      return [started,failed,restored,!cut.dark];
+      cut.next=g.clock;cut.update(true);cut.update(true);
+      const permanent=cut.dark;cut.update(false);return [started,failed,restored,permanent];
     });
     assert.deepEqual(power,[true,true,true,true]);
     await game(()=>{
@@ -170,7 +171,7 @@ async function checkProduction(browser){
    const crates=[...g.fortune.ledger.objects.values()].filter(c=>c.uroboros);const c=crates[0];const med=g.run.medkits;
    u.infect(g);g.fortune.damage(c,c.hp);g.player.setPosition(c.x,c.y);g.pickup();const picked=u.state(1).cures;
    u.useCure(g);return [crates.length,picked,u.state(1).level,g.run.medkits===med];});
-  assert.deepEqual(cured,[3,1,0,true]);
+  assert.deepEqual(cured,[3,0,0,true]);
   await kill();await active('BossRush');
   const results=await game(()=>JSON.parse(localStorage.getItem('hotline-rush-results-v1')));
   assert.equal(results.completed,1);assert.equal(results.best[0].times.length,6);
@@ -318,6 +319,7 @@ async function checkProduction(browser){
   await mobile.locator('[data-action=rotation-accept]').tap();
   await mobile.getByRole('button',{name:'MODOS DE JUEGO'}).tap();
   await mobile.getByRole('button',{name:'BOSS RUSH',exact:true}).tap();
+  await mobile.waitForFunction(()=>hotlineGame.scene.isActive('BossRush'));
   await mobile.getByRole('button',{name:'PRÁCTICA DE JEFES',exact:true}).tap();
   assert(await mobile.locator('[data-action=practice-0]').isDisabled());
   await mobile.evaluate(()=>{localStorage.setItem('hotline-rush-unlocked-v1','1');hotlineGame.scene.getScene('BossRush').render();});

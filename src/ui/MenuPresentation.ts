@@ -3,6 +3,7 @@ export const MODE_CARDS=[
  {id:'traditional',title:'MODO TRADICIONAL',description:'Sobrevive a las oleadas en las calles de Curicó. Consigue dinero, mejoras y llega lo más lejos posible.',tags:'SUPERVIVENCIA · PROGRESIÓN · RECOMPENSAS'},
  {id:'boss-rush',title:'BOSS RUSH',description:'Enfréntate a los jefes del juego en combates consecutivos. Campaña, práctica y continuación de tus rachas.',tags:'JEFES · RÉCORDS · RECOMPENSAS'},
  {id:'story',title:'HISTORIA',description:'La historia de Cervela, Nicolás y Jordan en una futura campaña narrativa ambientada en Curicó.',tags:'PRÓXIMAMENTE'},
+ {id:'continuous',title:'SUPERVIVENCIA CONTINUA',description:'Resiste en las calles mientras aumenta la amenaza. Cada segundo cuenta.',tags:'INDIVIDUAL · SIN RONDAS'},
 ] as const;
 export const MENU_ITEMS=[
  {id:'modes',label:'MODOS DE JUEGO'}, {id:'upgrades',label:'MEJORAS'}, {id:'achievements',label:'LOGROS'},

@@ -29,7 +29,7 @@ export class NewBosses {
   if(tuning&&e.boss===4){const second=!!s.rush?.bossCombat?.phaseTwo(e);if(second&&!m.phase2&&m.phase==='charge')this.interrupt(e,s.clock+900);m.phase2=second}
   if(!s.tweens.isTweening(e.sprite))e.sprite.setAlpha(1);e.sprite.setVelocity(0).setFlipX(p.x<e.sprite.x);e.label.setPosition(e.sprite.x,e.sprite.y-72).setText(c.name+(m.phase==='recover'?' · ENFRIANDO':''));
   m.image.setVisible(m.phase==='move'||m.phase==='recover');m.image.setPosition(e.sprite.x+Math.cos(a)*8*BOSS_VISUAL_SCALE/BOSS_OLD_SCALE,e.sprite.y+bossAttachmentY(e.boss,10)).setDisplaySize((e.boss===4?56:64)*BOSS_VISUAL_SCALE/BOSS_OLD_SCALE,24*BOSS_VISUAL_SCALE/BOSS_OLD_SCALE).setRotation(a).setFlipY(Math.cos(a)<0);
-  if(c.mag>0&&!g.ammo&&!g.reserve){s.navigation.move(e,p.x,p.y,speed);if(!tuning&&dist<65&&los&&s.clock>=m.next){s.damage(T.contactDamage);m.next=s.clock+T.contactCooldown}return}
+  if(c.mag>0&&!g.ammo&&!g.reserve){s.navigation.move(e,p.x,p.y,speed);if(!tuning&&dist<65&&los&&s.clock>=m.next){s.damage(T.contactDamage,false,true,false,s.continuous?e.boss:undefined);m.next=s.clock+T.contactCooldown}return}
   if(m.phase==='recover'){e.sprite.play(bossAnimation(e.boss,e.boss===1?'idle':'reload'),true);if(s.clock<m.until){if(tuning&&e.boss!==4)this.reposition(e,m,a,speed*(e.boss===1&&g.ammo?1.24:.75));return}if(g.ammo===0&&c.mag>0){const n=Math.min(c.mag,g.reserve);g.ammo=n;g.reserve-=n}m.phase='move';m.until=s.clock+400}
   if(m.phase==='move'){
    e.sprite.play(bossAnimation(e.boss,'walk'),true);if(tuning&&e.boss===3){if(!this.tactics.move(e,speed))s.navigation.move(e,p.x,p.y,speed)}else if(!los||dist>(e.boss===4?120:380))s.navigation.move(e,p.x,p.y,speed);
@@ -146,7 +146,7 @@ export class NewBosses {
   }
   const target=m.position??s.player;s.navigation.move(e,target.x,target.y,speed);
  }
- private slam(e:Foe,damage:number,radius:number){const s=this.s;if(Math.hypot(s.player.x-e.sprite.x,s.player.y-e.sprite.y)<radius&&s.lineClear(e.sprite.x,e.sprite.y,s.player.x,s.player.y))s.damage(damage);s.coop?.damageOthers(s.coop.targetId||s.playerId,e.sprite.x,e.sprite.y,radius,damage);s.rush?.friendlyArea(e.boss,e.sprite,radius,damage);const pulse=s.add.circle(e.sprite.x,e.sprite.y,radius,0xff3665,.18).setStrokeStyle(2,0xff7598).setDepth(4);s.tweens.add({targets:pulse,alpha:0,duration:300,onComplete:()=>pulse.destroy()});s.cameras.main.shake(100,.003)}
+ private slam(e:Foe,damage:number,radius:number){const s=this.s;if(Math.hypot(s.player.x-e.sprite.x,s.player.y-e.sprite.y)<radius&&s.lineClear(e.sprite.x,e.sprite.y,s.player.x,s.player.y))s.damage(damage,false,true,false,s.continuous?e.boss:undefined);s.coop?.damageOthers(s.coop.targetId||s.playerId,e.sprite.x,e.sprite.y,radius,damage);s.rush?.friendlyArea(e.boss,e.sprite,radius,damage);const pulse=s.add.circle(e.sprite.x,e.sprite.y,radius,0xff3665,.18).setStrokeStyle(2,0xff7598).setDepth(4);s.tweens.add({targets:pulse,alpha:0,duration:300,onComplete:()=>pulse.destroy()});s.cameras.main.shake(100,.003)}
  remove(e:Foe){this.tactics.remove(e);e.sprite.setVelocity(0);const m=this.states.get(e);if(m){this.images.delete(m.image);m.image.destroy();m.pose?.destroy();this.states.delete(e)}}
  stop(){for(const image of this.images)image.destroy();this.images.clear();this.graphics.destroy()}
 }

@@ -19,20 +19,20 @@ export class GameModes extends Phaser.Scene {
  create(){
   this.modeNotice='';this.focused=-1;this.cards=[];MusicManager.get(this.game).menu();this.cameras.main.setBackgroundColor('#100918');
   this.add.text(56,48,this.mobileTitle,{fontFamily:'"Press Start 2P",monospace',fontSize:27,color:'#ff428e'});
-  MODE_CARDS.forEach((mode,i)=>{const x=244+i*396,box=this.add.rectangle(x,360,368,490,0x1b1024).setStrokeStyle(1,0x69304f);const left=x-166;
-   if(i===1)bossPortraits.forEach(([key,frame],j)=>{const image=this.add.image(left+54+(j%3)*111,180+Math.floor(j/3)*100,key,frame);image.setScale(Math.min(104/image.width,94/image.height))});
-   else{const image=this.add.image(x,225,'mode-city-art');image.setScale(Math.min(330/image.width,200/image.height));if(i===2)image.setTint(0x4b3b52).setAlpha(.45)}
-   const title=this.add.text(left,348,mode.title,{fontFamily:'"Press Start 2P",monospace',fontSize:i===0?15:19,color:i===2?'#9c8199':'#fff0fa'});
-   text(this,left,400,mode.description,21,i===2?'#9b8297':'#dec9da').setWordWrapWidth(330);
-   text(this,left,555,mode.tags,13,i===2?'#c3a2b9':'#81e4e7').setWordWrapWidth(330);
-   const target=this.add.text(left,118,'',{fixedWidth:332,fixedHeight:476}).setInteractive({useHandCursor:true});
+  MODE_CARDS.forEach((mode,i)=>{const x=164+i*318,box=this.add.rectangle(x,360,300,490,0x1b1024).setStrokeStyle(1,0x69304f);const left=x-136;
+   if(i===1)bossPortraits.forEach(([key,frame],j)=>{const image=this.add.image(left+46+(j%3)*90,180+Math.floor(j/3)*100,key,frame);image.setScale(Math.min(84/image.width,94/image.height))});
+   else{const image=this.add.image(x,225,'mode-city-art');image.setScale(Math.min(268/image.width,200/image.height));if(i===2)image.setTint(0x4b3b52).setAlpha(.45)}
+   const title=this.add.text(left,348,mode.title,{fontFamily:'"Press Start 2P",monospace',wordWrap:{width:270},fontSize:i===0||i===3?15:19,color:i===2?'#9c8199':'#fff0fa'});
+   text(this,left,400,mode.description,21,i===2?'#9b8297':'#dec9da').setWordWrapWidth(270);
+   text(this,left,555,mode.tags,13,i===2?'#c3a2b9':'#81e4e7').setWordWrapWidth(270);
+   const target=this.add.text(left,118,'',{fixedWidth:272,fixedHeight:476}).setInteractive({useHandCursor:true});
    target.on('pointerover',()=>this.focusMode(i)).on('menu-focus',()=>this.focusMode(i)).on('pointerdown',()=>this.chooseMode(mode.id));
    this.cards.push({box,title});if(i===2)text(this,x,260,'🔒',38,'#9b7c94').setOrigin(.5);
   });
   button(this,655,'← VOLVER',()=>this.scene.start('Menu')).setX(60).setFontSize(20);text(this,490,666,'FLECHAS / CRUCETA · ENTER / × · ESC / ○',16,'#bca0b4');this.focusMode(0);
  }
  focusMode(index:number){if(this.focused===index)return;this.focused=index;this.cards.forEach((c,i)=>{c.box.setStrokeStyle(i===index?3:1,i===index?0xff419c:0x69304f).setFillStyle(i===index?0x31142c:0x1b1024);c.title.setColor(i===2?'#a98ba4':i===index?'#ff80bb':'#fff0fa')});AudioSystem.play(this,'pickup',.3)}
- chooseMode(id:string){if(id==='story'){this.modeNotice='HISTORIA · PRÓXIMAMENTE';this.focusMode(2);return}AudioSystem.play(this,'reward',.4);if(id==='traditional')this.scene.start('TraditionalModes');else if(id==='boss-rush')this.scene.start('BossRush',{})}
+ chooseMode(id:string){if(id==='story'){this.modeNotice='HISTORIA · PRÓXIMAMENTE';this.focusMode(2);return}AudioSystem.play(this,'reward',.4);if(id==='continuous')this.scene.start('CharacterSelect',{continuous:true,fromModes:true});else if(id==='traditional')this.scene.start('TraditionalModes');else if(id==='boss-rush')this.scene.start('BossRush',{})}
 }
 
 export class BossRushMenu extends Phaser.Scene {

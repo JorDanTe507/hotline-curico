@@ -7,9 +7,9 @@ import {DamageBudget} from '../src/chaos/DamageBudget';
 const catalog=[...UPGRADES.map(evolve),...NEW_TRADITIONAL_UPGRADES];
 function setup(abilityModule='calada'){const run=newRun();run.roguelite=true;const context:UpgradeContext={run,abilityModule,guns:[],addAmmo:()=>{},spawnSupply:()=>{}};return {run,context,p:new Progression(run)}}
 function grant(v:ReturnType<typeof setup>,id:string,times=1){const u=catalog.find(u=>u.id===id)!;for(let i=0;i<times;i++){v.run.pendingLevels++;assert(v.p.apply(id,[u],v.context))}return u}
-test('perks evolve once per pending choice, capped, single-purchase preserved, no duplicate offers or hidden magnet',()=>{
+test('perks evolve once per pending choice, capped, single-purchase preserved, no duplicate offers; magnet now available',()=>{
  const v=setup();const heart=grant(v,'heart',5);assert.equal(v.run.stats.maxHealth,200);assert.equal(passiveRate(v.run),.2);v.run.pendingLevels=1;assert(!v.p.apply('heart',[heart],v.context));grant(v,'secondChance');v.run.pendingLevels=1;assert(!v.p.apply('secondChance',[catalog.find(u=>u.id==='secondChance')!],v.context));
- for(let i=0;i<300;i++){const options=v.p.options(v.context);assert.equal(options.length,3);assert.equal(new Set(options.map(u=>u.id)).size,3);assert(options.every(u=>!['heart','secondChance','magnet'].includes(u.id)))}
+ for(let i=0;i<300;i++){const options=v.p.options(v.context);assert.equal(options.length,3);assert.equal(new Set(options.map(u=>u.id)).size,3);assert(options.every(u=>!['heart','secondChance'].includes(u.id)))}
 });
 test('general/exclusive pools are isolated between actors and legacy Rush has no new cards',()=>{
  for(const [module,other]of [['calada','nicolas'],['tryhard','jordan'],['judgment','cervela']]){const v=setup(module);for(let i=0;i<200;i++)assert(v.p.options(v.context).every(u=>!u.characters||!u.characters.includes(other)||u.characters.length===3))}

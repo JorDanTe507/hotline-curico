@@ -4,6 +4,7 @@ import {DETECTION_RADII,BOSS_DETECTION_RADIUS,PERCEPTION_INTERVAL,LAST_SEEN_MEMO
 interface Sighting {x:number;y:number;visible:boolean;seenAt:number;next:number;known:boolean}
 export class Perception {
  private states=new WeakMap<Foe,Sighting>();
+ forget(e:Foe){this.states.delete(e)}
  freezeEnemy(e:Foe,dt:number){const m=this.states.get(e);if(m){m.next+=dt;m.seenAt+=dt}}
 
  constructor(private scene:Game){}

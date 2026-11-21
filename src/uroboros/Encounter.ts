@@ -60,7 +60,7 @@ export class UroborosEncounter {
   private icon: Phaser.GameObjects.Image;
   private meter: Phaser.GameObjects.Graphics;
 
-  constructor(private s: Game, kit: UroborosKit,readonly traditional=false) {
+  constructor(private s: Game, kit: UroborosKit,readonly traditional=false,spawnPoint?:[number,number]) {
     this.initial=kit;
     this.graphics=s.add.graphics().setDepth(17);
     this.infectionAura=s.add.graphics().setDepth(17);
@@ -68,7 +68,7 @@ export class UroborosEncounter {
       .setOrigin(.5).setScrollFactor(0).setDepth(96);
     this.icon=s.add.image(640,199,ATLAS,'infection').setDisplaySize(24,24).setScrollFactor(0).setDepth(96);
     this.meter=s.add.graphics().setScrollFactor(0).setDepth(96);
-    for (const [i,a] of this.actors().entries()) {
+    for (const [i,a] of (s.continuous?[]:this.actors()).entries()) {
       const saved=kit[i];
       a.guns=saved?saved.guns.map(g=>({...g})):[gun(0)];
       if (!saved) continue;
@@ -80,7 +80,7 @@ export class UroborosEncounter {
       a.chaos.inventory.counts.splice(0,saved.counts.length,...saved.counts);
       a.chaos.inventory.selected=saved.selected;
     }
-    const [x,y]=traditional?s.validPoint(550,true):[DIRECTOR_START.x,DIRECTOR_START.y];
+    const [x,y]=spawnPoint??(traditional?s.validPoint(550,true):[DIRECTOR_START.x,DIRECTOR_START.y]);
     const sprite=s.physics.add.sprite(x,y,ATLAS,'human-idle-down-0').setDepth(10);
     this.applyScale(sprite);
     const hp=Math.round(C.health*(s.coop?C.coopHealth:1)*(s.rush?.tuning(WESKER).hp??(traditional?1+Math.max(0,Math.floor(s.run.round/30)-1)*.25:1)));
@@ -91,13 +91,14 @@ export class UroborosEncounter {
     });
     s.foes.push(this.foe);
     if(!traditional){CRATES.forEach((p,i)=>s.fortune.placeUroborosCrate('uroboros-'+i,p.x,p.y,C.crateHP));s.rounds.state.stop();}
-    else for(let i=0;i<3;i++){const p=s.lootPoint(s.player.x+(i-1)*90,s.player.y+90);s.addDrop(p.x,p.y,'med',0)}
+    else if(!s.continuous)for(let i=0;i<3;i++){const p=s.lootPoint(s.player.x+(i-1)*90,s.player.y+90);s.addDrop(p.x,p.y,'med',0)}
     this.animate('idle',0,1);
   }
 
   start(done?:()=>void) {
     const enter=()=>{this.recover(900);done?.();};
-    if(this.s.rush?.endless)this.s.time.delayedCall(850,enter);
+    if(this.s.continuous)enter();
+    else if(this.s.rush?.endless)this.s.time.delayedCall(850,enter);
     else this.dialogue(false,enter);
   }
   evadeBullet(origin?: Point) {
@@ -152,6 +153,7 @@ export class UroborosEncounter {
   }
 
   private dialogue(transform:boolean, done:()=>void) {
+    if(this.s.continuous){done();return}
     if(transform&&this.s.rush?.endless){this.s.physics.world.resume();done();return;}
     const actors=this.actors();
     const lines=transform
@@ -195,7 +197,7 @@ export class UroborosEncounter {
       this.state(actor.playerId).throwUntil=0;
       actor.player.setVelocity(0);
     }
-    this.s.physics.world.pause();
+    if(!this.s.continuous)this.s.physics.world.pause();
     this.animate('transform');
     const e=this.foe;
     this.effect('purge',e.sprite,120,620);
@@ -227,7 +229,7 @@ export class UroborosEncounter {
   private hurt(a:Game,damage:number,infects:boolean) {
     if (a.dash.active(this.s.clock))return;
     const hp=a.run.health, armor=a.run.armor+(a.run.temporaryArmor??0);
-    a.damage(damage*(this.s.rush?.tuning(WESKER).damage??this.traditionalScale('damage')),true);
+    a.damage(damage*(this.s.rush?.tuning(WESKER).damage??this.traditionalScale('damage')),true,true,false,this.s.continuous?WESKER:undefined);
     if(infects&&a.run.health>0&&(a.run.health<hp||a.run.armor+(a.run.temporaryArmor??0)<armor))this.infect(a);
   }
 
@@ -277,7 +279,7 @@ export class UroborosEncounter {
     const state=this.state(a.playerId),body=(obstacle as Phaser.GameObjects.GameObject&{body?:Phaser.Physics.Arcade.StaticBody})?.body;
     if(this.stopped||state.impactApplied||this.s.clock>=state.throwUntil||!body||body.physicsType!==Phaser.Physics.Arcade.STATIC_BODY||!body.enable||body.checkCollision.none)return false;
     if(!directedImpact(a.player.body!.center,{x:state.vx,y:state.vy},body))return false;
-    state.impactApplied=true;state.throwUntil=0;state.vx=state.vy=0;a.player.setVelocity(0);a.damage(C.throwImpactDamage*(this.s.rush?.tuning(WESKER).damage??this.traditionalScale('damage')),true,false);
+    state.impactApplied=true;state.throwUntil=0;state.vx=state.vy=0;a.player.setVelocity(0);a.damage(C.throwImpactDamage*(this.s.rush?.tuning(WESKER).damage??this.traditionalScale('damage')),true,false,false,this.s.continuous?WESKER:undefined);
     if(!this.s.ended)this.effect('impact',a.player,60,220);return true;
   }
 
@@ -408,7 +410,7 @@ export class UroborosEncounter {
 
   private pursue() {
     const e=this.foe, s=this.s;
-    const target=this.living().sort((a,b)=>
+    const target=s.coop?.pressure?s.coop.pressure.target(e):this.living().sort((a,b)=>
       Math.hypot(a.player.x-e.sprite.x,a.player.y-e.sprite.y)-Math.hypot(b.player.x-e.sprite.x,b.player.y-e.sprite.y))[0];
     if(!target)return;
     const dx=target.player.x-e.sprite.x,dy=target.player.y-e.sprite.y,d=Math.hypot(dx,dy);
@@ -583,11 +585,15 @@ export class UroborosEncounter {
     const feetY=e.sprite.y+(BOSS_SHAPES[WESKER].feet-e.sprite.displayOriginY)*e.sprite.scaleY;
     const fallen=s.add.sprite(e.sprite.x,feetY,ATLAS,'defeat-0').setOrigin(.5,1).setScale(.82*C.visualScale[1]).setDepth(11);
     fallen.play('uro-defeat');
+    if(s.continuous)s.time.delayedCall(3500,()=>fallen.destroy());
     e.sprite.destroy();
     e.label.destroy();
     s.temporal.end(false);
     if(s.rush){s.rush.defeated();return;}
-    if(this.traditional){const actor=s.coop?.actor(this.lastCredit?.playerId??1)??s;actor.run.kills++;actor.run.bosses++;actor.progression.defeated(e);actor.economy.defeated(e);actor.goals.killed(e,this.lastCredit);s.rounds.killed(e);achievements().event({type:'kill',boss:true,bossIndex:5,character:actor.character.id,weapon:this.lastCredit?.weaponId,method:this.lastCredit?.method});s.uroboros=undefined;return;}
+    if(this.traditional){const actor=s.coop?.actor(this.lastCredit?.playerId??1)??s;actor.run.bosses++;if(!this.lastCredit?.environment){actor.run.kills++;actor.progression.defeated(e);actor.goals.killed(e,this.lastCredit)}actor.economy.defeated(e,fallen.x,fallen.y);if(s.encounters)s.encounters.defeated(e,!!this.lastCredit?.environment);else s.rounds.killed(e);if(!this.lastCredit?.environment)achievements().event({type:'kill',boss:true,bossIndex:5,character:actor.character.id,weapon:this.lastCredit?.weaponId,method:this.lastCredit?.method});if(s.continuous){
+      for(const visual of [this.status,this.icon,this.meter,this.graphics,this.infectionAura,...this.markers.values()])visual.destroy();
+    }
+    s.uroboros=undefined;return;}
     for(const shot of s.shots) {
       if(shot.collider?.active)shot.collider.destroy();
       if(shot.sprite.active)shot.sprite.destroy();

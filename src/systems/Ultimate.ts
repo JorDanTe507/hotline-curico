@@ -3,7 +3,7 @@ import {baseStats,type PlayerStats} from '../config/progression';
 import {ULTIMATE_HITS,ULTIMATE_DURATION,ULTIMATE_HEAL_PER_SECOND} from '../config/instinct';
 import {singleTank,normalizeAmmo,addGunAmmo,type Gun} from '../weapons/arsenal';
 import type {Run} from './run';
-export interface ShotCredit {playerId?:number;throwableId?:number;hell?:boolean;castToken?:object;method?:string;achievementToken?:object;achievementHit?:boolean;achievementPending?:number;origin?:{x:number;y:number};damageMultiplier?:number;closeBonus?:number;critical?:boolean;fromPlayer?:boolean;procTargets?:WeakSet<object>;secondary?:boolean;weaponId?:number;eligible:boolean;targets:WeakSet<object>}
+export interface ShotCredit {environment?:boolean;playerId?:number;throwableId?:number;hell?:boolean;castToken?:object;method?:string;achievementToken?:object;achievementHit?:boolean;achievementPending?:number;origin?:{x:number;y:number};damageMultiplier?:number;closeBonus?:number;critical?:boolean;fromPlayer?:boolean;procTargets?:WeakSet<object>;secondary?:boolean;weaponId?:number;eligible:boolean;targets:WeakSet<object>}
 interface SavedAmmo {ammo:number;reserve:number;gained:number}
 export class Ultimate {
  playerId=1;activeDuration=ULTIMATE_DURATION;

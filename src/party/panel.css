@@ -1,0 +1,6 @@
+.hc-online-entry,.hc-party{position:fixed;z-index:400;right:max(12px,env(safe-area-inset-right));font:600 15px/1.4 monospace;color:#fff1fa;background:#211124;border:1px solid #e561af;border-radius:4px}
+.hc-online-entry{bottom:max(12px,env(safe-area-inset-bottom));cursor:pointer;padding:8px 14px}
+.hc-party{bottom:58px;padding:16px;width:min(340px,85vw);max-height:70vh;overflow:auto;box-shadow:0 5px 22px #120713}
+.hc-party button,.hc-party input{box-sizing:border-box;font:inherit;border:1px solid #8d548a;border-radius:3px;color:inherit;background:#311b35;padding:6px 9px;margin:3px}
+.hc-party button{cursor:pointer}.hc-party button:disabled{opacity:.55}.hc-party input{width:98%}.hc-party h2{font-size:20px;margin:0 0 10px}.hc-party p:empty{display:none}
+.hc-member{display:flex;align-items:center;gap:8px;margin:6px 0}.hc-member img{width:28px;height:28px;border-radius:50%}

@@ -5,7 +5,7 @@ import {selectionDossier} from '../src/characters/SelectionDossier';
 import {MENU_ITEMS,MODE_CARDS,TRADITIONAL_CHOICES} from '../src/ui/MenuPresentation';
 test('menus preserve ancillary functions, expose traditional and keep story as preview',()=>{
  assert(!MENU_ITEMS.some(x=>x.label==='JUGAR' as string));for(const id of ['modes','upgrades','achievements','options','daily','notes','restricted'])assert(MENU_ITEMS.some(x=>x.id===id));
- assert(!MENU_ITEMS.some(x=>x.id==='coop' as string));assert.deepEqual(TRADITIONAL_CHOICES.map(x=>[x.id,x.coop]),[['solo',false],['coop',true]]);assert.deepEqual(MODE_CARDS.map(x=>x.id),['traditional','boss-rush','story']);
+ assert(!MENU_ITEMS.some(x=>x.id==='coop' as string));assert.deepEqual(TRADITIONAL_CHOICES.map(x=>[x.id,x.coop]),[['solo',false],['coop',true]]);assert.deepEqual(MODE_CARDS.map(x=>x.id),['traditional','boss-rush','story','continuous']);
 });
 test('preview reuses permanent apply on fresh stats, without double bonuses or saved mutations',()=>{
  const p=new PermanentProgress(undefined,false,false);

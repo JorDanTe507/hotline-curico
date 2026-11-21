@@ -3,6 +3,7 @@ from PIL import Image
 from collections import deque
 import json,shutil
 from jordan_alpha import clean_exterior_matte
+from prepare_jordan_selection import selection_cutout
 out=Path('public/assets/v20');im=Image.open('D:/Descargas/Hoja de sprites pixel art de Jordan.png').convert('RGBA')
 def flood(a,white=True):
  a=a.copy();w,h=a.size;p=a.load();q=deque([(x,0) for x in range(w)]+[(x,h-1) for x in range(w)]+[(0,y) for y in range(h)]+[(w-1,y) for y in range(h)]);seen=set()
@@ -43,7 +44,7 @@ for i,a in enumerate(frames):atlas.alpha_composite(a,(i%16*96,i//16*112))
 atlas.save(out/'jordan-atlas.png');(out/'jordan-frames.json').write_text(json.dumps({'poses':poses},indent=2))
 for name,box in [('portrait',(20,315,102,403)),('wounded',(20,426,103,512)),('critical',(20,535,102,623)),('special',(1000,901,1067,978))]:
  a=im.crop(box);a.save(out/(name+'.png'))
-selection=flood(Image.open('D:/Descargas/Jordan ensangrentado bajo luces neón.png').convert('RGBA'),False);selection.save(out/'selection.png')
+selection=selection_cutout(Image.open('D:/Descargas/Jordan ensangrentado bajo luces neón.png'));selection.save(out/'selection.png')
 for source,target in [('Jordan y el tiempo detenido.png','ultimate.png'),('Pantalla de derrota en neón.png','death.png'),('Caídos bajo las luces de Curicó.png','death-cervela-jordan.png'),('Han Caído_ Nicolás y Jordan.png','death-nicolas-jordan.png')]:shutil.copyfile('D:/Descargas/'+source,out/target)
 icons=Image.open('D:/Descargas/Logros y mejoras de Jordan.png').convert('RGBA')
 for group,rects in [('achievement',[(42,179,226,350),(249,180,438,350),(460,180,648,350),(665,179,853,350),(43,500,227,665),(248,500,438,665),(460,500,648,665),(670,500,857,665)]),('perk',[(940,179,1131,334),(1148,179,1338,334),(1356,179,1545,334),(1552,179,1742,334),(953,499,1145,655),(1230,499,1417,655),(1450,499,1641,655)])]:

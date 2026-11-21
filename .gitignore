@@ -29,3 +29,10 @@ Thumbs.db
 # Local Python preparation caches.
 __pycache__/
 *.py[cod]
+
+# Local Firebase development configuration and emulator artifacts
+.env.local
+.env.*.local
+.firebase/
+firestore-debug.log
+firebase-debug.log

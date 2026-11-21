@@ -60,12 +60,13 @@
     "test:browser:jordan20:production": "node check-jordan20-production.cjs"
   },
   "dependencies": {
+    "firebase": "^13.4.0",
     "phaser": "^3.90.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "vite": "^6.4.1",
+    "@types/node": "^24.0.0",
     "tsx": "^4.20.6",
-    "@types/node": "^24.0.0"
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1"
   }
 }

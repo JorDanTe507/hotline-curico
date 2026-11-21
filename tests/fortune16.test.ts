@@ -50,3 +50,26 @@ test('logro Requiem conserva ID/icono/marco y desbloqueo con título y descripci
  const def=ACHIEVEMENTS.find(a=>a.id==='requiem-round')!;assert.equal(def.name,'Salud para los vivos, Requiem para los muertos');assert.equal(def.description,'Completa una ronda de combate utilizando exclusivamente la Requiem.');assert.equal(def.rarity,'legendary');assert.equal(def.icon,12);
  const saved=JSON.stringify({version:1,unlocked:{'requiem-round':'2026-10-31T12:00:00Z'},progress:{},kills:507,rerolls:{}}),a=new AchievementService({getItem:()=>saved,setItem:()=>assert.fail('no reset')},()=>false);assert.equal(a.data.unlocked[def.id],'2026-10-31T12:00:00Z');assert.equal(a.data.kills,507);assert.equal(ACHIEVEMENTS.length,81);
 });
+test('revisiting an evicted sector preserves the same crate, damage and single reward',()=>{
+ const world=new WorldModel(507,undefined,false,true),ledger=new FortuneLedger();
+ for(let cx=0;cx<100;cx++){
+  const chunk=world.chunk(cx,0),items=ledger.load(world,chunk),crate=items.find(i=>i.kind==='crate');
+  if(!crate){ledger.unloadGenerated(chunk.key);continue}
+  const original={...crate};
+  const revisit=()=>{
+   ledger.unloadGenerated(chunk.key);
+   for(let i=1;i<=65;i++)world.chunk(cx+i,1);
+   const candidates=ledger.load(world,world.chunk(cx,0));
+   assert.equal(candidates.filter(i=>i.id===original.id).length,1);
+   return candidates.find(i=>i.id===original.id)!;
+  };
+  const fresh=revisit();assert.deepEqual(fresh,original);
+  assert.equal(ledger.damage(fresh,1),false);
+  const wounded=revisit();assert.equal(wounded.hp,original.hp-1);
+  assert.equal(ledger.damage(wounded,wounded.hp),true);
+  assert.equal(ledger.claim(wounded),true);
+  const spent=revisit();assert.equal(spent.opened,true);
+  assert.equal(ledger.claim(spent),false);return;
+ }
+ assert.fail('Expected a generated crate');
+});

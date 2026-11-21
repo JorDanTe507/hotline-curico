@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function google() {
+   return request.auth != null && request.auth.token.firebase.sign_in_provider == 'google.com';
+  }
+  function uid(){return request.auth.uid;}
+  function changed(fields){return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);}
+  function lease(t){return t is timestamp && t > request.time && t < request.time + duration.value(4,'m');}
+  function profile(p){return p is map && p.keys().hasOnly(['name','avatar']) && p.name is string && p.name.size() <= 128 && p.avatar is string && p.avatar.size() <= 2048;}
+  match /partyCodes/{code} {
+   allow create: if google() && code.matches('[A-F0-9]{24}') && request.resource.data.keys().hasOnly(['reserved']) &&
+    request.resource.data.reserved == true && getAfter(/databases/$(database)/documents/parties/$(code)).data.host == uid();
+  }
+  match /parties/{code} {
+   function member(){return uid()==resource.data.host || uid()==resource.data.guest;}
+   function live(){return resource.data.expiresAt > request.time && !resource.data.closed;}
+   function d(){return request.resource.data;}
+   allow get: if google() && member();
+   allow create: if google() && code.matches('[A-F0-9]{24}') && !exists(/databases/$(database)/documents/partyCodes/$(code)) &&
+    getAfter(/databases/$(database)/documents/partyCodes/$(code)).data.reserved == true &&
+    d().keys().hasOnly(['host','guest','hostProfile','hostSeen','expiresAt','closed','round']) &&
+    d().host==uid() && d().guest==null && d().closed==false && d().round==0 &&
+    profile(d().hostProfile) && d().hostSeen==request.time && lease(d().expiresAt);
+   allow update: if google() && live() && (
+    (resource.data.guest==null && uid()!=resource.data.host && d().guest==uid() &&
+     changed(['guest','guestProfile','guestSeen']) && profile(d().guestProfile) && d().guestSeen==request.time) ||
+    (member() && changed(['closed','closedBy','offer','answer','joinKey']) && d().closed==true && d().closedBy==uid() &&
+     !('offer' in d()) && !('answer' in d()) && !('joinKey' in d())) ||
+    (uid()==resource.data.host && changed(['hostSeen','expiresAt']) && lease(d().expiresAt) && d().hostSeen==request.time) ||
+    (uid()==resource.data.guest && changed(['guestSeen']) && d().guestSeen==request.time) ||
+    (uid()==resource.data.host && resource.data.guest!=null && changed(['round','offer','joinKey','answer']) &&
+     d().round==resource.data.round+1 && d().offer is string && d().offer.size()<65536 &&
+     d().joinKey is string && d().joinKey.size()<256 && !('answer' in d())) ||
+    (uid()==resource.data.guest && 'offer' in resource.data && !('answer' in resource.data) &&
+     changed(['answer']) && d().answer is string && d().answer.size()<65536)
+   );
+  }
+ }
+}
