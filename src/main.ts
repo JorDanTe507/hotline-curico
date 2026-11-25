@@ -55,6 +55,7 @@ onlineEntry.className='hc-online-entry';onlineEntry.textContent='Cooperativo onl
 document.body.append(onlineEntry);
 function showOnlineEntry(){onlineEntry.hidden=!game.scene.isActive('Menu')}
 game.events.on('poststep',showOnlineEntry);
+for(const event of ['pointerdown','pointerup','mousedown','mouseup','touchstart','touchend'])onlineEntry.addEventListener(event,e=>e.stopPropagation());
 onlineEntry.onclick=async()=>{
  onlineEntry.disabled=true;
  try{

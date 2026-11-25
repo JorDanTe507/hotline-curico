@@ -8,14 +8,13 @@ type Welcome={v:1;type:'welcome';session:string;slot:2;host:string;participant:s
 type State={v:1;type:'state';session:string;frame:number;ack:number;world:Snapshot};
 type HostMessage=Welcome|State;
 type Invitation={session:string;key:string};
-const stun=import.meta.env.VITE_WEBRTC_STUN_URL;
-const peer=()=>new RTCPeerConnection({iceServers:stun&&/^stuns?:/.test(stun)?[{urls:stun}]:[]});
+import {createPeer} from './ice';
 
 // Manual signalling transfers a complete SDP, including local ICE candidates.
-async function description(pc:RTCPeerConnection,local:RTCSessionDescriptionInit){
+export async function description(pc:RTCPeerConnection,local:RTCSessionDescriptionInit){
  await pc.setLocalDescription(local);
  if(pc.iceGatheringState!=='complete')await new Promise<void>((resolve,reject)=>{
-  const timer=setTimeout(()=>done(new Error('ICE incompleto')),10000);
+  const timer=setTimeout(()=>done(pc.localDescription?.sdp.includes('a=candidate:')?undefined:new Error('Tiempo de espera ICE: ningún candidato disponible')),8000);
   function done(error?:Error){clearTimeout(timer);pc.removeEventListener('icegatheringstatechange',changed);error?reject(error):resolve()}
   function changed(){if(pc.iceGatheringState==='complete')done()}
   pc.addEventListener('icegatheringstatechange',changed);changed();
@@ -23,7 +22,7 @@ async function description(pc:RTCPeerConnection,local:RTCSessionDescriptionInit)
  return pc.localDescription!.toJSON();
 }
 
-export function createHost(game:Game){
+export function createHost(game:Game, partyPeer?:()=>RTCPeerConnection|undefined){
  const coop=game.coop;
  if(!game.continuous||!coop||game.ended)throw Error('Se requiere Continua cooperativa activa');
  const intent=new MovementIntent(),snapshot=snapshotReader(game);
@@ -35,15 +34,15 @@ export function createHost(game:Game){
  let authenticated=false,lastPacket=0;
  function release(){
   const pc=current;
-  current=undefined;channel=undefined;intent.clear();
+  current=undefined;if(partyPeer)channel?.close();channel=undefined;intent.clear();
   if(authenticated)coop!.observeControl('remote-client',false,performance.now());
-  authenticated=false;pc?.close();
+  authenticated=false;if(!partyPeer)pc?.close();
  }
  function send(message:HostMessage){channel!.send(JSON.stringify(message))}
  const timer=setInterval(()=>{
   if(game.ended){stop();return}
   if(!current)return;
-  if(performance.now()-lastPacket>(authenticated?5000:15000)){release();return}
+  if(performance.now()-lastPacket>(authenticated?5000:35000)){release();return}
   if(authenticated&&channel?.readyState==='open'&&channel.bufferedAmount<65536){
    try{send({v:VERSION,type:'state',session,frame:++frame,ack:intent.seq,world:snapshot()})}catch{release()}
   }
@@ -57,13 +56,16 @@ export function createHost(game:Game){
   get memberCredentials(){return {session,key:claimed?resume:key,rejoining:claimed}},
   async offer(){
    if(stopped||game.ended||current||coop.partnerControl?.status!=='grace')throw Error('Plaza no disponible');
-   const pc=current=peer();lastPacket=performance.now();
+   const pc=current=partyPeer?partyPeer():await createPeer();
+   if(!pc)throw Error("Sala desconectada");lastPacket=performance.now();
    const ch=channel=pc.createDataChannel('continua-v1',{ordered:true});
-   const lost=()=>{if(current===pc)release()};
-   pc.onconnectionstatechange=()=>{if(['failed','disconnected','closed'].includes(pc.connectionState))lost()};
+   const lost=()=>{if(current===pc&&channel===ch)release()};
+   if(!partyPeer)pc.onconnectionstatechange=()=>{if(['failed','disconnected','closed'].includes(pc.connectionState))lost()};
    ch.onclose=ch.onerror=lost;
    ch.onmessage=event=>{
-    if(current!==pc)return;
+    if(current!==pc||channel!==ch)return;
+    if(ch.readyState==='connecting'){ch.addEventListener('open',()=>ch.onmessage?.(event),{once:true});return}
+    if(ch.readyState!=='open')return;
     const m=decodeClient(event.data);
     if(!m){lost();return}
     const now=performance.now();
@@ -79,6 +81,7 @@ export function createHost(game:Game){
     else lost();
    };
    try{
+    if(partyPeer)return {offer:{type:"offer"} as RTCSessionDescriptionInit,answer:async(_value:RTCSessionDescriptionInit)=>{}};
     const offer=await description(pc,await pc.createOffer());
     return {offer,answer:async(value:RTCSessionDescriptionInit)=>{
      if(current!==pc)throw Error('Oferta caducada');
@@ -90,8 +93,8 @@ export function createHost(game:Game){
 }
 
 export async function connectGuest(offer:RTCSessionDescriptionInit,credentials:Invitation,rejoining=false,
- game:Phaser.Game|undefined=(window as Window & {hotlineGame?:Phaser.Game}).hotlineGame){
- const pc=peer();
+ game:Phaser.Game|undefined=(window as Window & {hotlineGame?:Phaser.Game}).hotlineGame, partyChannel?:{pc:RTCPeerConnection;ch:RTCDataChannel}){
+ const pc=partyChannel?.pc??await createPeer();
  let channel:RTCDataChannel|undefined,welcome:Welcome|undefined,state:State|undefined,seq=0;
  let move={x:0,y:0,angle:0,buttons:0};
  function sendInput(){
@@ -99,14 +102,16 @@ export async function connectGuest(offer:RTCSessionDescriptionInit,credentials:I
    channel.send(JSON.stringify({v:VERSION,type:'input',seq:++seq,...move}));
  }
  const timer=setInterval(sendInput,100);
- function close(){clearInterval(timer);pc.close()}
- const feed={close,get closed(){return pc.signalingState==='closed'},move:(x:number,y:number)=>{move={...move,x,y};sendInput()},controls:(value:typeof move)=>{move=value;sendInput()},get welcome(){return welcome},get state(){return state}};
+ let closed=false;function close(){closed=true;clearInterval(timer);if(partyChannel)channel?.close();else pc.close()}
+ const feed={close,get closed(){return closed||pc.signalingState==='closed'},move:(x:number,y:number)=>{move={...move,x,y};sendInput()},controls:(value:typeof move)=>{move=value;sendInput()},get welcome(){return welcome},get state(){return state}};
 
- pc.onconnectionstatechange=()=>{if(['failed','disconnected','closed'].includes(pc.connectionState))close()};
- pc.ondatachannel=event=>{
-  const ch=channel=event.channel;
+ if(!partyChannel)pc.onconnectionstatechange=()=>{if(['failed','disconnected','closed'].includes(pc.connectionState))close()};
+ const attach=(ch:RTCDataChannel)=>{
+  channel=ch;
   ch.onclose=ch.onerror=close;
-  ch.onopen=()=>ch.send(JSON.stringify({v:VERSION,type:rejoining?'resume':'join',...credentials}));
+  const greet=()=>{ch.onopen=null;ch.send(JSON.stringify({v:VERSION,type:rejoining?'resume':'join',...credentials}))};
+  ch.onopen=greet;
+  if(ch.readyState==="open")greet();
   ch.onmessage=event=>{
    let m:HostMessage;
    try{m=JSON.parse(event.data)}catch{close();return}
@@ -123,6 +128,8 @@ export async function connectGuest(offer:RTCSessionDescriptionInit,credentials:I
   };
  };
  try{
+  if(partyChannel){attach(partyChannel.ch);return Object.assign(feed,{answer:{type:"answer"} as RTCSessionDescriptionInit})}
+  pc.ondatachannel=e=>attach(e.channel);
   await pc.setRemoteDescription(offer);
   const answer=await description(pc,await pc.createAnswer());
   return Object.assign(feed,{answer});

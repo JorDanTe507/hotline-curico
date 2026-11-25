@@ -3,6 +3,8 @@ import {GoogleAuthProvider,onAuthStateChanged,signInWithPopup,signOut,type User}
 import {onSnapshot} from 'firebase/firestore';
 import {firebaseServices} from './firebase';
 import {closeParty,createParty,heartbeat,joinParty,roomRef,type Profile,type Room} from './store';
+import {CHARACTERS} from '../characters/catalog';
+import {canStart} from './lobby';
 import {PartyLink} from './link';
 
 export function openParties(game:Phaser.Game,trigger:HTMLButtonElement){
@@ -15,17 +17,17 @@ export function openParties(game:Phaser.Game,trigger:HTMLButtonElement){
  const codeBox=document.createElement('input');codeBox.readOnly=true;codeBox.setAttribute('aria-label','Código de esta sala');codeBox.onclick=()=>codeBox.select();
  const hide=document.createElement('button');hide.textContent='Ocultar';hide.onclick=()=>{panel.hidden=true};
  panel.append(heading,account,codeBox,roster,input,actions,status,hide);document.body.append(panel);
- for(const event of ['keydown','keyup'])panel.addEventListener(event,e=>e.stopPropagation());
+ for(const event of ['keydown','keyup','pointerdown','pointerup','mousedown','mouseup','touchstart','touchend'])panel.addEventListener(event,e=>e.stopPropagation());
  trigger.onclick=()=>{panel.hidden=!panel.hidden};
  codeBox.hidden=input.hidden=true;
  let services:ReturnType<typeof firebaseServices>;
  try{services=firebaseServices()}catch(e){status.textContent=(e as Error).message;game.events.on('poststep',()=>{trigger.hidden=!game.scene.isActive('Menu');if(trigger.hidden)panel.hidden=true});return}
  const {auth,db}=services;
  let user:User|null=null,code='',room:Room|undefined,link:PartyLink|undefined,unsub=()=>{},busy=false;
- let lastBeat=0,wasConnected=false,online=true;
+ let lastBeat=0,wasPlaying=false,online=true;
  const cache=(u:User)=>'hc-party:'+u.uid;
  function clear(voluntary=false){
-  unsub();unsub=()=>{};link?.stop(voluntary);link=undefined;code='';room=undefined;wasConnected=false;
+  unsub();unsub=()=>{};link?.stop(voluntary);link=undefined;code='';room=undefined;wasPlaying=false;
   if(user)sessionStorage.removeItem(cache(user));
  }
  function explain(e:unknown){
@@ -38,7 +40,7 @@ export function openParties(game:Phaser.Game,trigger:HTMLButtonElement){
   b.onclick=async()=>{if(busy)return;busy=true;status.textContent='Procesando…';render();
    try{await fn();if(status.textContent==='Procesando…')status.textContent=''}catch(e){explain(e)}
    finally{busy=false;render()}
-  };actions.append(b);
+  };actions.append(b);return b;
  }
  function person(container:HTMLElement,p:Profile,label=''){
   const row=document.createElement('div');row.className='hc-member';
@@ -56,10 +58,30 @@ export function openParties(game:Phaser.Game,trigger:HTMLButtonElement){
   }else{
    if(room){
     const presence=(seen?:{toMillis():number})=>seen&&Date.now()-seen.toMillis()<65000?'presente':'sin señal reciente';
-    person(roster,room.hostProfile,'J1 · '+presence(room.hostSeen)+' · ');
+    person(roster,room.hostProfile,'J1 · Anfitrión · '+presence(room.hostSeen)+' · ');
     if(room.guestProfile)person(roster,room.guestProfile,'J2 · '+presence(room.guestSeen)+' · ');
     else roster.append(document.createTextNode('J2 · Esperando invitado'));
-    roster.append(document.createTextNode(!online?'Firestore sin conexión':link?.connected?'WebRTC conectado':room.guest?'Conectando WebRTC…':'Sala abierta'));
+    roster.append(document.createTextNode(!online?'Firestore sin conexión':link?.diagnostic||'Sala abierta'));
+   }
+   action('Copiar código',async()=>{await navigator.clipboard.writeText(codeBox.value);status.textContent='Código copiado.'});
+   if(link){
+    const connection=link,lobby=connection.lobby,slot=connection.owner?0:1;
+    const summary=document.createElement('p');
+    summary.textContent=(lobby.mode==='continuous'?'Supervivencia Continua':'Tradicional · pendiente de sincronización')+' · '+(lobby.playing?'Partida en curso':'Sala de espera');
+    roster.append(summary);
+    for(const [i,id] of lobby.heroes.entries()){
+     const hero=CHARACTERS.find(c=>c.id===id),line=document.createElement('div');line.className='hc-member';
+     if(hero){const img=document.createElement('img');img.src=hero.selectionPortrait.file;img.alt='';line.append(img)}
+     line.append(document.createTextNode('J'+(i+1)+' · '+(hero?.name||'Eligiendo personaje')+' · '+(lobby.ready[i]?'Listo':'Sin confirmar')));roster.append(line);
+    }
+    if(!lobby.playing){
+     if(connection.owner)for(const [id,name] of [['continuous','Supervivencia Continua'],['traditional','Tradicional (en preparación)']]){
+      action(name,async()=>connection.select('mode',id));
+     }
+     for(const hero of CHARACTERS)action('Elegir '+hero.name,async()=>connection.select('hero',hero.id)).disabled=busy||lobby.heroes[1-slot]===hero.id||(!connection.owner&&!connection.connected);
+     action(lobby.ready[slot]?'Cancelar preparación':'Estoy listo',async()=>connection.select('ready',!lobby.ready[slot])).disabled=busy||!connection.connected||!lobby.heroes[slot];
+     if(connection.owner)action('Iniciar partida',async()=>connection.start()).disabled=busy||!canStart(lobby,connection.connected);
+    }
    }
    action(room?.host===user.uid?'Cerrar party':'Abandonar sala',async()=>{await closeParty(db,code,user!.uid);clear();status.textContent='Sala cerrada.'});
   }
@@ -88,8 +110,8 @@ export function openParties(game:Phaser.Game,trigger:HTMLButtonElement){
   if(room.expiresAt.toMillis()<=Date.now()){clear();status.textContent='La sala caducó.';render();return}
   if(Date.now()-lastBeat>25000){lastBeat=Date.now();void heartbeat(db,code,link.owner).catch(explain)}
   if(online)void link.sync(room).catch(explain);
-  const connected=link.connected;if(connected&&!wasConnected){panel.hidden=true;status.textContent=''}
-  wasConnected=connected;if(!panel.hidden)render();
+  const connected=link.lobby.playing;if(connected!==wasPlaying){panel.hidden=connected;status.textContent=''}
+  wasPlaying=connected;if(!panel.hidden)render();
  },1000);
  game.events.on('poststep',()=>{trigger.hidden=!code&&!game.scene.isActive('Menu')});
 }
